@@ -33,141 +33,186 @@ ActiveAdmin.register Event do
   end
 
   show title: myTitle do
-    panel "Add a Player" do
-      # Formulaire de recherche
-      div do
-        form action: admin_tour_event_path(resource.tour, resource), method: :get do
-          div style: "display: flex; gap: 10px; align-items: center;" do
-            label "Find by name or licence number :"
-            input type: :text, name: :player_lastname, value: params[:player_lastname]
-            button "Find", type: :submit
-            button "Clear", type: :button, onclick: "window.location='#{admin_tour_event_path(resource.tour, resource)}'"
+    # Menu Navigation with Buttons
+    div class: "button-group", style: "margin-top: -30px; margin-bottom: -20px;" do
+      a href: "#entries", class: "menu-button menu-event-button", data: { target: "#entries" } do
+        text_node "Entries"
+      end
+      a href: "#rounds", class: "menu-button menu-event-button", data: { target: "#rounds" } do
+        text_node "Rounds"
+      end
+      a href: "#player-categories", class: "menu-button menu-event-button", data: { target: "#player-categories" } do
+        text_node "Player Categories"
+      end
+      a href: "#event-details", class: "menu-button menu-event-button", data: { target: "#event-details" } do
+        text_node "Event Details"
+      end
+    end
+
+    div id: "entries" do
+      panel "Add a Player" do
+        # Formulaire de recherche
+        div do
+          form action: admin_tour_event_path(resource.tour, resource), method: :get do
+            div style: "display: flex; gap: 10px; align-items: center;" do
+              label "Find by name or licence number :"
+              input type: :text, name: :player_lastname, value: params[:player_lastname]
+              button "Find", type: :submit
+              button "Clear", type: :button, onclick: "window.location='#{admin_tour_event_path(resource.tour, resource)}'"
+            end
           end
         end
-      end
 
-      # Si une recherche est effectuée
-      if params[:player_lastname].present?
-        div do
-          # Limiter le nombre de joueurs trouvés à 10
-          #
-          # Exclure les joueurs déjà inscrits à cet événement
-          players = Player
-            .left_joins(:licences) # Associe la table `licences` via une jointure (si la relation existe)
-            .where(
-              "players.lastname ILIKE :query OR licences.num ILIKE :query",
-              query: "%#{params[:player_lastname].strip}%" # Recherche sur lastname ou licence.num
-            )
-            .where.not(id: Entry.where(event_id: resource.id).select(:player_id)) # Exclure les joueurs déjà inscrits
-            .limit(10)
+        # Si une recherche est effectuée
+        if params[:player_lastname].present?
+          div do
+            # Limiter le nombre de joueurs trouvés à 10
+            #
+            # Exclure les joueurs déjà inscrits à cet événement
+            players = Player
+              .left_joins(:licences) # Associe la table `licences` via une jointure (si la relation existe)
+              .where(
+                "players.lastname ILIKE :query OR licences.num ILIKE :query",
+                query: "%#{params[:player_lastname].strip}%" # Recherche sur lastname ou licence.num
+              )
+              .where.not(id: Entry.where(event_id: resource.id).select(:player_id)) # Exclure les joueurs déjà inscrits
+              .limit(10)
 
-          h4 "Max 10 players show", style: "color: darkred;"
+            h4 "Max 10 players show", style: "color: darkred;"
 
-          if players.any?
-            table do
-              thead do
-                tr do
-                  th "Cat"
-                  th "Nom complet"
-                  th "Genre"
-                  th "Licence"
-                  th "Club"
-                  th "Âge"
-                  th "Action"
-                end
-              end
-              tbody do
-                players.each do |player|
+            if players.any?
+              table do
+                thead do
                   tr do
-                    td player.icon_age_category
-                    td player.full_name # Remplacez `full_name` par la méthode appropriée pour afficher le nom complet.
-                    td player.sexe
-                    td player.my_licence # Remplacez `my_licence` par l'attribut ou la méthode correspondant à la licence.
-                    td player.my_club # Remplacez `my_club` par l'attribut ou la méthode correspondant au club.
-                    td player.age # Remplacez `age` par l'attribut ou la méthode calculant l'âge.
+                    th "Cat"
+                    th "Nom complet"
+                    th "Genre"
+                    th "Licence"
+                    th "Club"
+                    th "Âge"
+                    th "Action"
+                  end
+                end
+                tbody do
+                  players.each do |player|
+                    tr do
+                      td player.icon_age_category
+                      td player.full_name # Remplacez `full_name` par la méthode appropriée pour afficher le nom complet.
+                      td player.sexe
+                      td player.my_licence # Remplacez `my_licence` par l'attribut ou la méthode correspondant à la licence.
+                      td player.my_club # Remplacez `my_club` par l'attribut ou la méthode correspondant au club.
+                      td player.age # Remplacez `age` par l'attribut ou la méthode calculant l'âge.
 
-                    # Bouton pour ajouter à la table entries
-                    td do
-                      if player.licences.exists?
-                        link_to "Ajouter", admin_entries_path(entry: { event_id: resource.id, player_id: player.id }), method: :post, class: "button"
-                      else
-                        span "No licence found", style: "color: red;"
+                      # Bouton pour ajouter à la table entries
+                      td do
+                        if player.licences.exists?
+                          link_to "Ajouter", admin_entries_path(entry: { event_id: resource.id, player_id: player.id }), method: :post, class: "button"
+                        else
+                          span "No licence found", style: "color: red;"
+                        end
                       end
                     end
                   end
                 end
               end
+            else
+              div "Aucun joueur trouvé."
             end
-          else
-            div "Aucun joueur trouvé."
+          end
+        end
+      end
+
+      panel "Entries list" do
+        # Grouper les entrées par statut
+        grouped_entries = resource.entries.order(status: :asc, created_at: :desc).group_by(&:status)
+
+        # Parcourir chaque statut et afficher une table pour chaque groupe
+        grouped_entries.each do |status, entries|
+          div(class: "panel-table-subtitre") do
+            "Status :  #{status.presence || 'Undefined'} : #{entries.count}"
+          end
+
+          table_for entries do
+            column "CAT" do |entry|
+              entry.player.icon_age_category
+            end
+            column do |entry|
+              entry.player.full_name
+            end
+            column "Sexe" do |entry|
+              entry.player.sexe
+            end
+            column "Age" do |entry|
+              entry.player.age
+            end
+            column "Licence" do |entry|
+              entry.player.my_licence
+            end
+            column "Hcp" do |entry|
+              entry.hcp
+            end
+            column "Player Cat" do |entry|
+              entry.playercat ? entry.playercat.name : "N/A"
+            end
+            column "Club" do |entry|
+              entry.player.my_club
+            end
+            column :status
+            column :updated_at
+            column "" do |entry|
+              button_to "Edit", edit_admin_entry_path(entry), method: :get, class: "btt btt-edit"
+            end
+            column "" do |entry|
+              button_to "Delete", admin_entry_path(entry), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel"
+            end
           end
         end
       end
     end
 
-    panel "Entries list" do
-      # Grouper les entrées par statut
-      grouped_entries = resource.entries.order(status: :asc, created_at: :desc).group_by(&:status)
+    div id: "rounds", style: "display:none;" do
+      panel "Rounds" do
+        # À définir par après
+        p "Rounds section - à configurer"
+      end
+    end
 
-      # Parcourir chaque statut et afficher une table pour chaque groupe
-      grouped_entries.each do |status, entries|
-        div(class: "panel-table-subtitre") do
-          "Status :  #{status.presence || 'Undefined'} : #{entries.count}"
-        end
-
-        table_for entries do
-          column "CAT" do |entry|
-            entry.player.icon_age_category
-          end
-          column do |entry|
-            entry.player.full_name
-          end
-          column "Sexe" do |entry|
-            entry.player.sexe
-          end
-          column "Age" do |entry|
-            entry.player.age
-          end
-          column "Licence" do |entry|
-            entry.player.my_licence
-          end
-          column "Hcp" do |entry|
-            entry.hcp
-          end
-          column "Player Cat" do |entry|
-            entry.playercat ? entry.playercat.name : "N/A"
-          end
-          column "Club" do |entry|
-            entry.player.my_club
-          end
-          column :status
-          column :updated_at
-          column "" do |entry|
-            button_to "Edit", edit_admin_entry_path(entry), method: :get, class: "btt btt-edit"
-          end
-          column "" do |entry|
-            button_to "Delete", admin_entry_path(entry), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel"
-          end
+    div id: "player-categories", style: "display:none;" do
+      panel "Player Categories" do
+        table_for event.playercats do |playercat|
+            column "name", :name
+            column "format", :format
+            column "sexe", :sexe
+            column "teebox", :teebox
+            column "hcp_min", :hcp_min
+            column "hcp_max", :hcp_max
+            column "version", :version
+            column "Age Cat" do |playercat|
+              playercat.agecats.map(&:name).join(", ")
+            end
         end
       end
     end
 
-    panel "Player Categories" do
-      table_for event.playercats do |playercat|
-          column "name", :name
-          column "format", :format
-          column "sexe", :sexe
-          column "teebox", :teebox
-          column "hcp_min", :hcp_min
-          column "hcp_max", :hcp_max
-          column "version", :version
-          column "Age Cat" do |playercat|
-            playercat.agecats.map(&:name).join(", ")
-          end
+    div id: "event-details", style: "display:none;" do
+      panel "Event Details" do
+        attributes_table do
+          row :name
+          row :status
+          row :format
+          row :date_event
+          row :date_open
+          row :date_close
+          row :actif
+          row :nb_rounds
+          row :tour
+        end
       end
     end
 
-    default_main_content
+    div id: "default-content" do
+      # default_main_content
+    end
   end
 
   form do |f|
