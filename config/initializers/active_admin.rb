@@ -71,8 +71,7 @@ ActiveAdmin.setup do |config|
   #
   # This setting changes the method which Active Admin calls
   # within the application controller.
-  config.authentication_method = :authenticate_user!
-
+  config.authentication_method = false
   # == User Authorization
   #
   # Active Admin will automatically call an authorization
@@ -155,6 +154,7 @@ ActiveAdmin.setup do |config|
   #
   # You can customize the comment menu:
   # config.comments_menu = { parent: 'Admin', priority: 1 }
+  config.comments = false
 
   # == Batch Actions
   #
@@ -261,6 +261,11 @@ ActiveAdmin.setup do |config|
   #       menu.add label: "My Great Website", url: "http://www.mygreatwebsite.com", html_options: { target: "_blank" }
   #     end
   #   end
+  config.namespace :admin do |admin|
+    admin.build_menu :utility_navigation do |menu|
+      menu.add label: "Logout", url: "/home/index"
+    end
+  end
 
   # == Download Links
   #
@@ -349,4 +354,23 @@ ActiveAdmin.setup do |config|
   # You can switch to using Webpacker here.
   #
   # config.use_webpacker = true
+
+  config.use_webpacker = false
+
+  config.batch_actions = true
+
+  # clear any previous assets
+  config.clear_javascripts!
+
+  # We need jQuery and jQuery UI and jQuery-ujs which are dependencies
+  config.register_javascript "https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.js"
+  config.register_javascript "https://cdn.jsdelivr.net/npm/jquery-ujs@1.2.3/src/rails.min.js"
+  config.register_javascript "https://cdn.jsdelivr.net/npm/jquery-ui@1.13.2/dist/jquery-ui.min.js"
+
+  # The actual active admin javascript file
+  config.register_javascript "https://cdn.jsdelivr.net/npm/@activeadmin/activeadmin@2.13.1/app/assets/javascripts/active_admin/base.min.js"
+
+  # My
+  config.register_javascript "test.js"
+  config.register_javascript "cards_edit.js"
 end

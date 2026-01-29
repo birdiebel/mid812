@@ -1,0 +1,102 @@
+<% if mode == 'hole_num' %>
+    <% datas = (1..tee.course.nb_hole).to_a %>
+<% else %>
+    <% datas = tee.str_to_array(zone) %>
+<% end %>
+
+<% if datas.count > 0 %>
+
+    <!-- ROW LABEL -->
+    <td class="scorecard-label <%= tee.teebox.downcase %>"><%= label %></td>
+
+    <% if datas.count == 18 %>
+    
+        <!-- HOLE 1-9 -->
+        <% datas.slice(0,9).each_with_index do |data,index|  %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'>
+            <% if mode == 'hole_num' %>
+                <%= data %>
+            <% else %>
+                <input class="score-input" style="width: 100%" 
+                    id="<%= zone %>[<%= index %>]" 
+                    name="<%= zone %>[<%= index %>]" 
+                    type="text" 
+                    zone="<%= zone %>"
+                    value=<%= data %> 
+                    hole="<%= index+1 %>" 
+                    limit=<%= limit %>
+                />
+            <% end %>    
+            </td>
+        <% end %>
+
+        <!-- TOTAL FRONT -->
+        <% if mode == 'total' %>
+            <td id='<%= zone %>-front' class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% else %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% end %>
+
+        <!-- HOLE 10-18 -->
+        <% datas.slice(9,9).each_with_index do |data,index|  %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'>
+            <% if mode == 'hole_num' %>
+                <%= data %>
+            <% else %>
+                <input class="score-input" style="width: 100%"
+                    id="<%= zone %>[<%= index+9 %>]" 
+                    name="<%= zone %>[<%= index+9 %>]" 
+                    type="text" 
+                    zone="<%= zone %>"
+                    value=<%= data %> 
+                    hole="<%= index+10 %>" 
+                    limit=<%= limit %>
+                />
+            <% end %>    
+            </td>
+        <% end %>
+
+        <!-- TOTAL BACK -->
+        <% if mode == 'total' %>
+            <td id='<%= zone %>-back' class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% else %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% end %>        
+
+        <!-- TOTAL CARD -->
+        <% if mode == 'total' %>
+            <td id='<%= zone %>-total' class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% else %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% end %> 
+
+    <% else %>
+    
+        <% datas.slice(0,datas.count).each_with_index do |data,index|  %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'>
+            <% if mode == 'hole_num' %>
+                <%= data %>
+            <% else %>
+                <input class="score-input" style="width: 100%" 
+                    id="<%= zone %>[<%= index %>]" 
+                    name="<%= zone %>[<%= index %>]" 
+                    type="text" 
+                    zone="<%= zone %>"
+                    value=<%= data %> 
+                    hole="<%= index+1 %>" 
+                    limit=<%= limit %>
+                />
+            <% end %>    
+            </td>
+        <% end %>
+
+        <!-- TOTAL FRONT -->
+        <% if mode == 'total' %>
+            <td id='<%= zone %>-front' class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% else %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <% end %>
+
+    <% end %>
+
+<% end %>    

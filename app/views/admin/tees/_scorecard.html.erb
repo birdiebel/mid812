@@ -1,0 +1,48 @@
+<h3>Scorecard for <%= course.name %> (<%= course.version%>)</h3>
+
+<table>
+
+    <% if !tee.par_str.empty? %>
+        
+        <!-- TITLE -->
+        <tr>
+            <td colspan="99" class="scorecard-title <%= tee.teebox.downcase %>"><%= tee.teebox %> tees</td>
+        </tr>    
+
+        <!-- HOLE NUM -->
+        <tr>
+            <%= render partial: 'row_data', 
+                locals: {tee: tee, zone: "par_str", label: "", mode: "hole_num"} %>
+        </tr>
+
+        <!-- PAR -->
+        <tr>
+            <%= render partial: 'row_data', 
+                locals: {tee: tee, zone: "par_str", label: "Par", mode: "total"} %>
+        </tr>
+
+        <!-- STROKE -->
+        <tr>
+            <%= render partial: 'row_data', 
+                locals: {tee: tee, zone: "stroke_str", label: "Stroke", mode: "info"} %>
+        </tr>
+
+        <!-- DIST -->
+        <tr>
+            <%= render partial: 'row_data', 
+                locals: {tee: tee, zone: "dist_str",  label: tee.teebox, mode: "total"} %>
+        </tr>
+
+        <!-- SLOPE & RATING -->
+        <tr>
+            <td colspan="99" class="scorecard-title <%= tee.teebox.downcase %>">
+                Slope : <%= tee.slope %> | Rating : <%= tee.rating %>
+            </td>
+        </tr>    
+        </tr>
+
+        <tr></tr>
+    <% end %>
+    
+
+</table>

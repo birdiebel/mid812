@@ -467,7 +467,7 @@ DEPENDENCIES
   brakeman
   bundler-audit
   capybara
-  dartsass-rails
+  dartsass-rails (= 0.5.1)
   debug
   devise (~> 4.0)
   faker

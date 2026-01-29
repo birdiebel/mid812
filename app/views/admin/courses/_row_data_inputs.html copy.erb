@@ -1,0 +1,42 @@
+<% if mode == 'hole_num' %>
+    <% datas = (1..tee.nb_hole).to_a %>
+<% else %>
+    <% datas = tee.str_to_array(zone) %>
+<% end %>
+
+<% if datas.count > 0 %>
+
+    <!-- ROW LABEL -->
+    <td class="scorecard-label <%= tee.teebox.downcase %>"><%= label %></td>
+    
+    <!-- HOLE 1-9 -->
+    <% datas.slice(0,9).each do |data|  %>
+        <td class='scorecard-zone <%= tee.teebox.downcase %>'>
+            <input type="text" id="<%= zone %>" hole="x" >
+        </td>
+    <% end %>
+
+    <!-- TOTAL 1-9 -->
+    <% if mode == 'total' %>
+        <td class='scorecard-zone scorecard-label <%= tee.teebox.downcase %>'><%= datas.slice(0,9).sum %></td>
+    <% else %>
+        <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+    <% end %>
+
+    <!-- HOLE 10-18 -->
+    <% if datas.count == 18 %>
+        <% datas.slice(9,9).each do |data|  %>
+            <td class='scorecard-zone <%= tee.teebox.downcase %>'><%= data %></td>
+        <% end %>
+    <% end %>    
+
+    <!-- TOTAL 10-18 AND 1-18 -->
+    <% if mode == 'total' %>
+        <td class='scorecard-zone scorecard-label <%= tee.teebox.downcase %>'><%= datas.slice(9,9).sum %></td>
+        <td class='scorecard-zone scorecard-label <%= tee.teebox.downcase %>'><%= datas.slice(0,18).sum %></td>
+    <% else %>
+        <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+        <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
+    <% end %>
+
+<% end %>

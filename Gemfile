@@ -68,7 +68,7 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "dartsass-rails"
+gem "dartsass-rails", "0.5.1"
 gem "activeadmin"
 gem "devise", "~> 4.0"
 gem "jquery-rails"
