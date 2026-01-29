@@ -184,8 +184,62 @@ def seed_admin_user
     puts "Admin User #{user.email}"
 end
 
+def seed_rigenee
+    # Club
+    club = Club.new
+    club.name = "Golf de Rigenée"
+    club.save
+    puts "Club #{club.name}"
+    # Course
+    course = Course.new
+    course.club = club
+    course.name = "Le Château"
+    course.nb_hole = 18
+    course.version = "2026"
+    course.save
+    puts "Course #{course.name}"
+    # Tees are created by after_create callback
+    # course.create_tees
+    # puts " Tees created"
+    tee = Tee.find_by(course: course, teebox: "White")
+    tee.par_str = "4,4,4,4,3,5,3,5,4,4,5,4,4,3,5,5,4,3"
+    tee.stroke_str = "16,14,2,8,6,10,18,12,4,1,11,5,9,3,17,13,7,15"
+    tee.dist_str = "286,339,404,370,170,483,146,490,353,367,500,323,319,163,467,483,341,139"
+    tee.rating = 72.7
+    tee.slope = 133
+    tee.save
+    puts " TEE #{tee.teebox} for course #{course.name}"
+
+    tee = Tee.find_by(course: course, teebox: "Yellow")
+    tee.par_str = "4,4,4,4,3,5,3,5,4,4,5,4,4,3,5,5,4,3"
+    tee.stroke_str = "16,14,2,8,6,10,18,12,4,1,11,5,9,3,17,13,7,15"
+    tee.dist_str = "270,313,342,310,160,466,145,470,360,349,470,315,309,144,435,456,306,136"
+    tee.rating = 70.6
+    tee.slope = 127
+    tee.save
+    puts " TEE #{tee.teebox} for course #{course.name}"
+
+    tee = Tee.find_by(course: course, teebox: "Blue")
+    tee.par_str = "4,4,4,4,3,5,3,5,4,4,5,4,4,3,5,5,4,3"
+    tee.stroke_str = "16,14,2,8,6,10,18,12,4,1,11,5,9,3,17,13,7,15"
+    tee.dist_str = "253,290,340,292,144,413,119,423,288,310,418,277,266,127,403,406,292,116"
+    tee.rating = 73.1
+    tee.slope = 127
+    tee.save
+    puts " TEE #{tee.teebox} for course #{course.name}"
+
+    tee = Tee.find_by(course: course, teebox: "Red")
+    tee.par_str = "4,4,4,4,3,5,3,5,4,4,5,4,4,3,5,5,4,3"
+    tee.stroke_str = "16,14,2,8,6,10,18,12,4,1,11,5,9,3,17,13,7,15"
+    tee.dist_str = "209,270,290,264,127,377,106,396,295,294,392,259,257,110,367,380,262,107"
+    tee.rating = 70.8
+    tee.slope = 123
+    tee.save
+    puts " TEE #{tee.teebox} for course #{course.name}"
+end
+
 # Seed Admin User
-seed_admin_user
+# seed_admin_user
 
 # # Seed Players
 # seed_players(50, 30)
@@ -198,3 +252,6 @@ seed_admin_user
 
 # Seed Tours and Events
 # seed_tours("Federal Tour")
+#
+# Seed Rigenée Club and Course
+seed_rigenee
