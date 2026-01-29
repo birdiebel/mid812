@@ -254,4 +254,4 @@ end
 # seed_tours("Federal Tour")
 #
 # Seed Rigenée Club and Course
-seed_rigenee
+# seed_rigenee
