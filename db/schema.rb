@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_191656) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_29_193629) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -144,6 +144,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_191656) do
     t.index ["user_id"], name: "index_players_on_user_id"
   end
 
+  create_table "rounds", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "date"
+    t.bigint "event_id", null: false
+    t.integer "num"
+    t.integer "status"
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_rounds_on_event_id"
+  end
+
   create_table "tees", force: :cascade do |t|
     t.bigint "course_id"
     t.datetime "created_at", null: false
@@ -183,4 +193,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_191656) do
   add_foreign_key "entries", "events"
   add_foreign_key "entries", "playercats"
   add_foreign_key "entries", "players"
+  add_foreign_key "rounds", "events"
 end

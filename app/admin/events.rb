@@ -34,7 +34,7 @@ ActiveAdmin.register Event do
 
   show title: myTitle do
     # Menu Navigation with Buttons
-    div class: "button-group", style: "margin-top: -30px; margin-bottom: -20px;" do
+    div name: "event-menu", class: "button-group", style: "margin-top: -30px; margin-bottom: -20px;" do
       a href: "#entries", class: "menu-button menu-event-button", data: { target: "#entries" } do
         text_node "Entries"
       end
@@ -189,8 +189,31 @@ ActiveAdmin.register Event do
 
     div id: "rounds", style: "display:none;" do
       panel "Rounds" do
-        # À définir par après
-        p "Rounds section - à configurer"
+        div style: "margin-bottom: 15px;" do
+          link_to "Add Round", new_admin_round_path(round: { event_id: resource.id }), class: "button"
+        end
+
+        if resource.rounds.any?
+          table_for resource.rounds.order(:num) do
+            column "Num" do |round|
+              button_to round.num, admin_round_path(round), method: :get, class: "btt btt-edit"
+            end
+            column "Date" do |round|
+              round.date
+            end
+            column "Status" do |round|
+              status_tag round.status
+            end
+            column "" do |round|
+              button_to "Edit", edit_admin_round_path(round), method: :get, class: "btt btt-edit"
+            end
+            column "" do |round|
+              button_to "Delete", admin_round_path(round), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel"
+            end
+          end
+        else
+          p "No rounds yet. Click 'Add Round' to create one."
+        end
       end
     end
 

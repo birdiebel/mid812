@@ -3,6 +3,7 @@ class Event < ApplicationRecord
   has_and_belongs_to_many :playercats
   has_and_belongs_to_many :courses
   has_many :entries, dependent: :destroy
+  has_many :rounds, dependent: :destroy
 
   def self.ransackable_associations(auth_object = nil)
     [ "tour" ]

@@ -2,7 +2,14 @@ $(document).ready(function () {
   const $buttons = $(".menu-event-button")
   if ($buttons.length === 0) return
 
-  const sections = ["#entries", "#rounds", "#courses", "#player-categories", "#event-details"]
+  CallMenu = $buttons.parent().attr("name")
+
+  if (CallMenu == "event-menu") {
+    sections = ["#entries", "#rounds", "#courses", "#player-categories", "#event-details"]
+  }
+  if (CallMenu == "round-menu") {
+    sections = ["#start-list", "#scores", "#status", "#round-details"]
+  }
 
   function showSection(target) {
     sections.forEach((selector) => {
