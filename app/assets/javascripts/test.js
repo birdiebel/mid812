@@ -2,7 +2,7 @@ $(document).ready(function () {
   const $buttons = $(".menu-event-button")
   if ($buttons.length === 0) return
 
-  const sections = ["#entries", "#rounds", "#player-categories", "#event-details"]
+  const sections = ["#entries", "#rounds", "#courses", "#player-categories", "#event-details"]
 
   function showSection(target) {
     sections.forEach((selector) => {

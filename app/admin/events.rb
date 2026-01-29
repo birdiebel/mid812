@@ -2,7 +2,7 @@ ActiveAdmin.register Event do
   belongs_to :tour
   includes :tour
 
-  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, playercat_ids: []
+  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, playercat_ids: [], course_ids: []
 
   menu false
   config.batch_actions = false
@@ -44,8 +44,25 @@ ActiveAdmin.register Event do
       a href: "#player-categories", class: "menu-button menu-event-button", data: { target: "#player-categories" } do
         text_node "Player Categories"
       end
+      a href: "#courses", class: "menu-button menu-event-button", data: { target: "#courses" } do
+        text_node "Courses"
+      end
+
       a href: "#event-details", class: "menu-button menu-event-button", data: { target: "#event-details" } do
         text_node "Event Details"
+      end
+    end
+
+    div id: "courses", style: "display:none;" do
+      panel "Courses" do
+        table_for event.courses do |course|
+            column "Club" do |course|
+              course.club.name
+            end
+            column "Course Name", :name
+            column "Number of Holes", :nb_hole
+            column "Version", :version
+        end
       end
     end
 
@@ -228,6 +245,7 @@ ActiveAdmin.register Event do
       f.input :date_close, as: :datepicker, input_html: { value: f.object.date_close&.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
       f.input :nb_rounds, as: :number
       f.input :playercats, as: :check_boxes, collection: Playercat.all.map { |pc| [ pc.name, pc.id ] }
+      f.input :courses, as: :check_boxes, collection: Course.all.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }
     end
     f.actions do
       f.action :submit

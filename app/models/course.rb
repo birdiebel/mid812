@@ -1,6 +1,7 @@
 class Course < ApplicationRecord
   belongs_to :club
   has_many :tees, dependent: :destroy
+  has_and_belongs_to_many :events
 
   def self.ransackable_attributes(auth_object = nil)
     [ "club_id", "created_at", "id", "name", "updated_at", "version", "nb_hole" ]
