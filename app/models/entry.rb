@@ -3,6 +3,7 @@ class Entry < ApplicationRecord
   belongs_to :player
   belongs_to :licence, optional: true
   belongs_to :playercat, optional: true
+  belongs_to :team, optional: true
 
   def self.ransackable_attributes(auth_object = nil)
     [ "created_at", "event_id", "id", "licence_id", "player_id", "status", "updated_at", "playercat_id", "hcp" ]
@@ -14,7 +15,19 @@ class Entry < ApplicationRecord
   enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
   # enum :status, [ :enter, :refused, :canceled, :disqualified, :noshow ]
 
+  after_create :create_single_team
+  after_create :create_single_team
   after_save :add_licence_to_entry
+
+  def create_single_team
+    if event.single?
+      team = event.teams.create!(
+        name: "#{player.firstname} #{player.lastname}",
+        status: :created
+      )
+      update(team: team)
+    end
+  end
 
   def add_licence_to_entry
     if self.licence_id.nil?

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_073002) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_075018) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -96,11 +96,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_073002) do
     t.bigint "playercat_id"
     t.integer "playing_hcp"
     t.integer "status", default: 0, null: false
+    t.bigint "team_id"
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_entries_on_event_id"
     t.index ["licence_id"], name: "index_entries_on_licence_id"
     t.index ["player_id"], name: "index_entries_on_player_id"
     t.index ["playercat_id"], name: "index_entries_on_playercat_id"
+    t.index ["team_id"], name: "index_entries_on_team_id"
   end
 
   create_table "events", force: :cascade do |t|
@@ -192,6 +194,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_073002) do
     t.check_constraint "hcp_pc >= 0 AND hcp_pc <= 100", name: "hcp_pc_range"
   end
 
+  create_table "teams", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.string "name", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_teams_on_event_id"
+  end
+
   create_table "tees", force: :cascade do |t|
     t.bigint "course_id"
     t.datetime "created_at", null: false
@@ -234,7 +245,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_073002) do
   add_foreign_key "entries", "events"
   add_foreign_key "entries", "playercats"
   add_foreign_key "entries", "players"
+  add_foreign_key "entries", "teams"
   add_foreign_key "events_playercats", "events"
   add_foreign_key "events_playercats", "playercats"
   add_foreign_key "rounds", "events"
+  add_foreign_key "teams", "events"
 end

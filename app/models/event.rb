@@ -5,6 +5,7 @@ class Event < ApplicationRecord
   has_and_belongs_to_many :courses
   has_many :entries, dependent: :destroy
   has_many :rounds, dependent: :destroy
+  has_many :teams, dependent: :destroy
 
   accepts_nested_attributes_for :event_playercats, allow_destroy: true
 
