@@ -2,7 +2,7 @@ ActiveAdmin.register Event do
   belongs_to :tour
   includes :tour
 
-  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, :fee, :fee_member, :actif_round, playercat_ids: [], course_ids: []
+  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, :fee, :fee_member, :actif_round, :scoring, playercat_ids: [], course_ids: []
 
   menu false
   config.batch_actions = false

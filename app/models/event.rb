@@ -26,6 +26,7 @@ class Event < ApplicationRecord
 
   enum :status, [ :created, :online, :registration, :waiting, :running, :terminated, :canceled ]
   enum :format, [ :single, :team, :bigteam ]
+  enum :scoring, [ :stroke_play, :stableford ]
 
   amoeba do
     enable

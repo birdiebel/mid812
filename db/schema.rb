@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_052302) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_054320) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -99,6 +99,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_052302) do
     t.integer "format", default: 0
     t.string "name", null: false
     t.integer "nb_rounds", default: 1
+    t.integer "scoring", default: 0
     t.integer "status", default: 0
     t.bigint "tour_id"
     t.datetime "updated_at", null: false

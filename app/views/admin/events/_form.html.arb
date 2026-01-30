@@ -2,6 +2,7 @@ f.inputs "Event Details" do
   f.input :tour, as: :select, collection: Tour.all.collect { |tour| [ tour.name, tour.id ] }, include_blank: false
   f.input :name
   f.input :format, as: :select, collection: Event.formats.keys
+  f.input :scoring, as: :select, collection: Event.scorings.keys
   f.input :status, as: :select, collection: Event.statuses.keys
   f.input :actif
   f.input :date_event, as: :datepicker, input_html: { value: f.object.date_event.presence || Date.current.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
