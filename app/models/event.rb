@@ -1,9 +1,12 @@
 class Event < ApplicationRecord
   belongs_to :tour
-  has_and_belongs_to_many :playercats
+  has_many :event_playercats, dependent: :destroy
+  has_many :playercats, through: :event_playercats
   has_and_belongs_to_many :courses
   has_many :entries, dependent: :destroy
   has_many :rounds, dependent: :destroy
+
+  accepts_nested_attributes_for :event_playercats, allow_destroy: true
 
   # Set default values
   before_create :set_default_values

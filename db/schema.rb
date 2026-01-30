@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_054320) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_061733) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -106,9 +106,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_054320) do
     t.index ["tour_id"], name: "index_events_on_tour_id"
   end
 
-  create_table "events_playercats", id: false, force: :cascade do |t|
+  create_table "events_playercats", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.bigint "event_id", null: false
     t.bigint "playercat_id", null: false
+    t.integer "scoring"
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "playercat_id"], name: "index_events_playercats_on_event_id_and_playercat_id", unique: true
+    t.index ["event_id"], name: "index_events_playercats_on_event_id"
+    t.index ["playercat_id"], name: "index_events_playercats_on_playercat_id"
   end
 
   create_table "licences", force: :cascade do |t|
@@ -200,5 +206,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_054320) do
   add_foreign_key "entries", "events"
   add_foreign_key "entries", "playercats"
   add_foreign_key "entries", "players"
+  add_foreign_key "events_playercats", "events"
+  add_foreign_key "events_playercats", "playercats"
   add_foreign_key "rounds", "events"
 end

@@ -12,6 +12,10 @@ f.inputs "Event Details" do
   f.input :fee, as: :number, input_html: { step: 0.01, value: f.object.fee.presence || 0.0 }, label: "Fee"
   f.input :fee_member, as: :number, input_html: { step: 0.01, value: f.object.fee_member.presence || 0.0 }, label: "Fee Member"
   f.input :actif_round, as: :number, input_html: { value: f.object.actif_round.presence || 1 }, label: "Active Round"
-  f.input :playercats, as: :check_boxes, collection: Playercat.all.map { |pc| [ pc.name, pc.id ] }
   f.input :courses, as: :check_boxes, collection: Course.all.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }
+end
+
+f.has_many :event_playercats, allow_destroy: true, heading: "Player Categories & Scoring" do |ep|
+  ep.input :playercat, as: :select, collection: Playercat.all.map { |pc| [ pc.name, pc.id ] }, include_blank: false
+  ep.input :scoring, as: :select, collection: EventPlayercat.scorings.keys, label: "Scoring (leave default for event scoring)", include_blank: "Use Event Default"
 end

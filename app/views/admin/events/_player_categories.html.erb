@@ -13,19 +13,22 @@
             <th>Hcp Max</th>
             <th>Version</th>
             <th>Age Cat</th>
+            <th>Scoring</th>
           </tr>
         </thead>
         <tbody>
-          <% event.playercats.each do |playercat| %>
+          <% event.event_playercats.includes(:playercat).each do |event_playercat| %>
             <tr>
-              <td><%= playercat.name %></td>
-              <td><%= playercat.format %></td>
-              <td><%= playercat.sexe %></td>
-              <td><%= playercat.teebox %></td>
-              <td><%= playercat.hcp_min %></td>
-              <td><%= playercat.hcp_max %></td>
-              <td><%= playercat.version %></td>
-              <td><%= playercat.agecats.map(&:name).join(", ") %></td>
+              <td><%= event_playercat.playercat.name %></td>
+              <td><%= event_playercat.playercat.format %></td>
+              <td><%= event_playercat.playercat.sexe %></td>
+              <td><%= event_playercat.playercat.teebox %></td>
+              <td><%= event_playercat.playercat.hcp_min %></td>
+              <td><%= event_playercat.playercat.hcp_max %></td>
+              <td><%= event_playercat.playercat.version %></td>
+              <td><%= event_playercat.playercat.agecats.map(&:name).join(", ") %></td>
+              <% scoring_value = event_playercat.scoring || event.scoring %>
+              <td><span class="status_tag scoring-<%= scoring_value %>"><%= scoring_value.humanize %></span></td>
             </tr>
           <% end %>
         </tbody>
