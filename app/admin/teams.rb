@@ -33,9 +33,10 @@ ActiveAdmin.register Team do
     end
 
     f.inputs "Players in this Team" do
+      can_add_player = f.object.event&.single? == false && f.object.entries.size < (f.object.event&.max_players || 1)
       f.has_many :entries,
                  allow_destroy: false,
-                 new_record: (f.object.event&.single? == false),
+                 new_record: can_add_player,
                  heading: false do |entry_f|
         entry_f.input :player, input_html: { disabled: true }
         entry_f.input :hcp, input_html: { step: :any }

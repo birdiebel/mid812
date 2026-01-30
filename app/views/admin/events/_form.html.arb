@@ -12,6 +12,8 @@ f.inputs "Event Details" do
   f.input :fee, as: :number, input_html: { step: 0.01, value: f.object.fee.presence || 0.0 }, label: "Fee"
   f.input :fee_member, as: :number, input_html: { step: 0.01, value: f.object.fee_member.presence || 0.0 }, label: "Fee Member"
   f.input :actif_round, as: :number, input_html: { value: f.object.actif_round.presence || 1 }, label: "Active Round"
+  f.input :min_players, as: :number, input_html: { value: f.object.min_players.presence || 1 }, label: "Min Players"
+  f.input :max_players, as: :number, input_html: { value: f.object.max_players.presence || 1 }, label: "Max Players"
   f.input :courses, as: :check_boxes, collection: Course.all.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }
 end
 

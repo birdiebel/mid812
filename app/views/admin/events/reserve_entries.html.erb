@@ -18,7 +18,7 @@
                     <%= button_to "Edit", edit_admin_team_path(team), method: :get, class: "btt btt-edit" %>
                   </td>
                   <td>
-                    <% if event.team? || event.bigteam? %>
+                    <% if (event.team? || event.bigteam?) && team.entries.size < event.max_players %>
                       <%= link_to "Add partner", admin_tour_event_path(event.tour, event, team_id: team.id, player_lastname: params[:player_lastname]), method: :get, class: "btt btt-add" %>
                     <% end %>
                   </td>

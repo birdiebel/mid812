@@ -2,7 +2,7 @@ ActiveAdmin.register Event do
   belongs_to :tour
   includes :tour
 
-  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, :fee, :fee_member, :actif_round, :scoring,
+  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, :fee, :fee_member, :actif_round, :scoring, :min_players, :max_players,
                 course_ids: [],
                 playercats_ids: []
 

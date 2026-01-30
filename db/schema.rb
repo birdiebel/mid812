@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_075018) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_215121) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -115,6 +115,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_075018) do
     t.decimal "fee", precision: 8, scale: 2
     t.decimal "fee_member", precision: 8, scale: 2
     t.integer "format", default: 0
+    t.integer "max_players", default: 1
+    t.integer "min_players", default: 1
     t.string "name", null: false
     t.integer "nb_rounds", default: 1
     t.integer "scoring", default: 0
