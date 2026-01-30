@@ -1,5 +1,5 @@
 ActiveAdmin.register Entry do
-  permit_params :event_id, :player_id, :licence_id, :status
+  permit_params :event_id, :player_id, :licence_id, :status, :team_id
 
   menu false
 
@@ -26,8 +26,14 @@ ActiveAdmin.register Entry do
 
     private
       def entry_params
-        params.require(:entry).permit(:event_id, :player_id, :status)
+        params.require(:entry).permit(:event_id, :player_id, :status, :team_id)
       end
+  end
+
+  member_action :remove_from_team, method: :put do
+    entry = Entry.find(params[:id])
+    entry.update(team_id: nil)
+    redirect_to admin_tour_event_path(entry.event.tour_id, entry.event_id), notice: "Player removed from team."
   end
 
   form do |f|

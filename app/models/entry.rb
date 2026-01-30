@@ -9,24 +9,26 @@ class Entry < ApplicationRecord
     [ "created_at", "event_id", "id", "licence_id", "player_id", "status", "updated_at", "playercat_id", "hcp" ]
   end
   def self.ransackable_associations(auth_object = nil)
-    [ "event", "player", "licence", "playercat" ]
+    [ "event", "player", "licence", "playercat", "team" ]
   end
 
   enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
   # enum :status, [ :enter, :refused, :canceled, :disqualified, :noshow ]
 
-  after_create :create_single_team
-  after_create :create_single_team
+  after_create :ensure_team
   after_save :add_licence_to_entry
 
-  def create_single_team
-    if event.single?
-      team = event.teams.create!(
-        name: "#{player.firstname} #{player.lastname}",
-        status: :created
-      )
-      update(team: team)
-    end
+  def ensure_team
+    return if team.present? || event.nil? || player.nil?
+
+    team_name = "#{player.firstname} #{player.lastname}"
+    team_status = status || :enter
+
+    team = event.teams.create!(
+      name: team_name,
+      status: team_status
+    )
+    update(team: team)
   end
 
   def add_licence_to_entry

@@ -1,0 +1,51 @@
+        <% grouped_teams = event.teams.order(status: :asc, created_at: :desc).group_by(&:status) %>
+
+        <% grouped_teams.each do |status, teams| %>
+          <div class="panel-table-subtitre">
+            Status :  <%= status.presence || 'Undefined' %> : <%= teams.count %>
+          </div>
+
+          <table class="index_table">
+            <tbody>
+              <% teams.each do |team| %>
+                <% team_name = team.entries.map { |e| e.player.full_name }.join(" / ") %>
+                <tr>
+                  <td></td>
+                  <td style="background-color: lightgreen;"><strong><%= team_name.presence || team.name %></strong></td>
+                  <td><%= team.status %></td>
+                  <td><%= team.updated_at %></td>
+                  <td>
+                    <%= button_to "Edit", edit_admin_team_path(team), method: :get, class: "btt btt-edit" %>
+                  </td>
+                  <td>
+                    <% if event.team? || event.bigteam? %>
+                      <%= link_to "Add partner", admin_tour_event_path(event.tour, event, team_id: team.id, player_lastname: params[:player_lastname]), method: :get, class: "btt btt-add" %>
+                    <% end %>
+                  </td>
+                  <td>
+                    <%= button_to "Delete", admin_team_path(team), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %>
+                  </td>
+                </tr>
+                <% team.entries.each do |entry| %>
+                  <tr>
+                    <td><%= entry.player.icon_age_category %></td>
+                    <td><%= entry.player.full_name %></td>
+                    <td><%= entry.player.sexe %></td>
+                    <td><%= entry.player.age %></td>
+                    <td><%= entry.player.my_licence %></td>
+                    <td><%= entry.hcp %></td>
+                    <td><%= entry.playercat ? entry.playercat.name : "N/A" %></td>
+                    <td><%= entry.player.my_club %></td>
+                    <td>
+                      <%= button_to "Edit", edit_admin_team_path(team), method: :get, class: "btt btt-edit" %>
+                    </td>
+                    <td>
+                      <%= button_to "Remove", remove_from_team_admin_entry_path(entry), method: :put, data: { confirm: "Remove player from team?" }, class: "btt btt-cancel" %>
+                    </td>
+                  </tr>
+                <% end %>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
+      <% end %>
