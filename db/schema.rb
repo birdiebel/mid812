@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_061733) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_063932) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -49,6 +49,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_061733) do
     t.string "name"
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_clubs_on_name", unique: true
+  end
+
+  create_table "config_teetimes", force: :cascade do |t|
+    t.bigint "course_id", null: false
+    t.datetime "created_at", null: false
+    t.integer "nb_slots"
+    t.integer "nb_teams"
+    t.bigint "round_id", null: false
+    t.integer "start_hole"
+    t.time "start_time", default: "2000-01-01 08:00:00"
+    t.integer "step", default: 10
+    t.datetime "updated_at", null: false
+    t.index ["course_id"], name: "index_config_teetimes_on_course_id"
+    t.index ["round_id"], name: "index_config_teetimes_on_round_id"
   end
 
   create_table "courses", force: :cascade do |t|
@@ -203,6 +217,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_061733) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  add_foreign_key "config_teetimes", "courses"
+  add_foreign_key "config_teetimes", "rounds"
   add_foreign_key "entries", "events"
   add_foreign_key "entries", "playercats"
   add_foreign_key "entries", "players"
