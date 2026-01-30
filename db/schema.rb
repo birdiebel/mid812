@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_29_193629) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_040838) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -88,10 +88,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_29_193629) do
 
   create_table "events", force: :cascade do |t|
     t.boolean "actif", default: true
+    t.integer "actif_round"
     t.datetime "created_at", null: false
     t.date "date_close", default: -> { "CURRENT_DATE" }
     t.date "date_event", default: -> { "CURRENT_DATE" }
     t.date "date_open", default: -> { "CURRENT_DATE" }
+    t.decimal "fee", precision: 8, scale: 2
+    t.decimal "fee_member", precision: 8, scale: 2
     t.integer "format", default: 0
     t.string "name", null: false
     t.integer "nb_rounds", default: 1

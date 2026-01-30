@@ -5,6 +5,18 @@ class Event < ApplicationRecord
   has_many :entries, dependent: :destroy
   has_many :rounds, dependent: :destroy
 
+  # Set default values
+  before_create :set_default_values
+
+  def set_default_values
+    self.date_event ||= Date.current
+    self.date_open ||= Date.current
+    self.date_close ||= Date.current
+    self.actif_round = 1 if self.actif_round.nil?
+    self.fee = 0.0 if self.fee.nil?
+    self.fee_member = 0.0 if self.fee_member.nil?
+  end
+
   def self.ransackable_associations(auth_object = nil)
     [ "tour" ]
   end
@@ -13,7 +25,7 @@ class Event < ApplicationRecord
   end
 
   enum :status, [ :created, :online, :registration, :waiting, :running, :terminated, :canceled ]
-  enum :format, [ :single, :team ]
+  enum :format, [ :single, :team, :bigteam ]
 
   amoeba do
     enable
@@ -48,6 +60,7 @@ class Event < ApplicationRecord
     new_event.name = new_name
     new_event.status = :created
     new_event.actif = false
+    new_event.actif_round = 1
     new_event.save!
     self.playercats.each do |pcat|
       new_event.playercats << pcat

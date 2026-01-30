@@ -2,7 +2,7 @@ ActiveAdmin.register Event do
   belongs_to :tour
   includes :tour
 
-  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, playercat_ids: [], course_ids: []
+  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, :fee, :fee_member, :actif_round, playercat_ids: [], course_ids: []
 
   menu false
   config.batch_actions = false
@@ -237,6 +237,7 @@ ActiveAdmin.register Event do
     div id: "event-details", style: "display:none;" do
       panel "Event Details" do
         attributes_table do
+          row :tour
           row :name
           row :status
           row :format
@@ -245,7 +246,9 @@ ActiveAdmin.register Event do
           row :date_close
           row :actif
           row :nb_rounds
-          row :tour
+          row :actif_round
+          row :fee
+          row :fee_member
         end
       end
     end
@@ -262,11 +265,13 @@ ActiveAdmin.register Event do
       f.input :format, as: :select, collection: Event.formats.keys
       f.input :status, as: :select, collection: Event.statuses.keys
       f.input :actif
-      # f.input :date_event, as: :datepicker, datepicker_options: { dateFormat: "dd/mm/yy" }
-      f.input :date_event, as: :datepicker, input_html: { value: f.object.date_event&.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
-      f.input :date_open, as: :datepicker, input_html: { value: f.object.date_open&.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
-      f.input :date_close, as: :datepicker, input_html: { value: f.object.date_close&.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
+      f.input :date_event, as: :datepicker, input_html: { value: f.object.date_event.presence || Date.current.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
+      f.input :date_open, as: :datepicker, input_html: { value: f.object.date_open.presence || Date.current.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
+      f.input :date_close, as: :datepicker, input_html: { value: f.object.date_close.presence || Date.current.strftime("%m/%d/%Y") }, datepicker_options: { dateFormat: "dd/mm/yy" }
       f.input :nb_rounds, as: :number
+      f.input :fee, as: :number, input_html: { step: 0.01, value: f.object.fee.presence || 0.0 }, label: "Fee"
+      f.input :fee_member, as: :number, input_html: { step: 0.01, value: f.object.fee_member.presence || 0.0 }, label: "Fee Member"
+      f.input :actif_round, as: :number, input_html: { value: f.object.actif_round.presence || 1 }, label: "Active Round"
       f.input :playercats, as: :check_boxes, collection: Playercat.all.map { |pc| [ pc.name, pc.id ] }
       f.input :courses, as: :check_boxes, collection: Course.all.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }
     end
