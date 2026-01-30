@@ -7,7 +7,32 @@ class Event < ApplicationRecord
   has_many :rounds, dependent: :destroy
   has_many :teams, dependent: :destroy
 
-  accepts_nested_attributes_for :event_playercats, allow_destroy: true
+  accepts_nested_attributes_for :event_playercats, allow_destroy: true, reject_if: proc { |attributes| attributes["playercat_id"].blank? }
+
+  after_save :sync_playercats_ids
+
+  def playercats_ids=(ids)
+    @playercats_ids_to_sync = ids.reject(&:blank?).map(&:to_i) if ids.present?
+  end
+
+  def playercats_ids
+    @playercats_ids_to_sync || playercats.pluck(:id)
+  end
+
+  def sync_playercats_ids
+    return unless @playercats_ids_to_sync
+
+    current_ids = event_playercats.pluck(:playercat_id)
+    ids_to_add = @playercats_ids_to_sync - current_ids
+    ids_to_remove = current_ids - @playercats_ids_to_sync
+
+    event_playercats.where(playercat_id: ids_to_remove).destroy_all
+    ids_to_add.each do |playercat_id|
+      event_playercats.create!(playercat_id: playercat_id)
+    end
+
+    @playercats_ids_to_sync = nil
+  end
 
   # Set default values
   before_create :set_default_values

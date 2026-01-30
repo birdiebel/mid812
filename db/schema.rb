@@ -128,7 +128,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_075018) do
     t.datetime "created_at", null: false
     t.bigint "event_id", null: false
     t.bigint "playercat_id", null: false
-    t.integer "scoring"
     t.datetime "updated_at", null: false
     t.index ["event_id", "playercat_id"], name: "index_events_playercats_on_event_id_and_playercat_id", unique: true
     t.index ["event_id"], name: "index_events_playercats_on_event_id"

@@ -1,4 +1,4 @@
-<div id="player-categories" style="display:none;">
+<div id="player-categories">
   <div class="panel">
     <h3>Player Categories</h3>
     <div class="panel_contents">
@@ -13,7 +13,6 @@
             <th>Hcp Max</th>
             <th>Version</th>
             <th>Age Cat</th>
-            <th>Scoring</th>
           </tr>
         </thead>
         <tbody>
@@ -27,8 +26,6 @@
               <td><%= event_playercat.playercat.hcp_max %></td>
               <td><%= event_playercat.playercat.version %></td>
               <td><%= event_playercat.playercat.agecats.map(&:name).join(", ") %></td>
-              <% scoring_value = event_playercat.scoring || event.scoring %>
-              <td><span class="status_tag scoring-<%= scoring_value %>"><%= scoring_value.humanize %></span></td>
             </tr>
           <% end %>
         </tbody>

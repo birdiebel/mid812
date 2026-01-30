@@ -6,7 +6,6 @@ class AddIdToEventsPlayercats < ActiveRecord::Migration[8.1]
     create_table :events_playercats do |t|
       t.references :event, null: false, foreign_key: true
       t.references :playercat, null: false, foreign_key: true
-      t.integer :scoring
       t.timestamps
     end
 
@@ -19,7 +18,6 @@ class AddIdToEventsPlayercats < ActiveRecord::Migration[8.1]
     create_table :events_playercats, id: false do |t|
       t.references :event, null: false, foreign_key: true
       t.references :playercat, null: false, foreign_key: true
-      t.integer :scoring
     end
 
     add_index :events_playercats, [ :event_id, :playercat_id ]

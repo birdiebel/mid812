@@ -115,7 +115,7 @@
             <tbody>
               <% teams.each do |team| %>
                 <% team_name = team.entries.map { |e| e.player.full_name }.join(" / ") %>
-                <tr>
+                <tr style="border-top: 2px solid black;">
                   <td></td>
                   <td style="background-color: lightgreen;"><strong><%= team_name.presence || team.name %></strong></td>
                   <td><%= team.status %></td>
