@@ -1,7 +1,7 @@
 ActiveAdmin.register Round do
   belongs_to :event, optional: true
 
-  permit_params :event_id, :num, :date, :status
+  permit_params :event_id, :num, :date, :status, :hcp_pc
 
   menu false
   config.batch_actions = false
@@ -45,6 +45,7 @@ ActiveAdmin.register Round do
       end
       f.input :num, as: :number, label: "Round Number"
       f.input :date, as: :datepicker
+      f.input :hcp_pc, as: :number, label: "HCP Par/Course", input_html: { value: f.object.hcp_pc || 100, min: 0, max: 100 }
       f.input :status, as: :select, collection: Round.statuses.keys
     end
     f.actions do

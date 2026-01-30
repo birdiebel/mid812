@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_040838) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_052302) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -78,6 +78,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_040838) do
     t.bigint "licence_id"
     t.bigint "player_id", null: false
     t.bigint "playercat_id"
+    t.integer "playing_hcp"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_entries_on_event_id"
@@ -151,10 +152,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_040838) do
     t.datetime "created_at", null: false
     t.date "date"
     t.bigint "event_id", null: false
+    t.integer "hcp_pc", default: 100
     t.integer "num"
     t.integer "status"
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_rounds_on_event_id"
+    t.check_constraint "hcp_pc >= 0 AND hcp_pc <= 100", name: "hcp_pc_range"
   end
 
   create_table "tees", force: :cascade do |t|
