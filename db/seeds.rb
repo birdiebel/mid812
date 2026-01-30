@@ -184,16 +184,16 @@ def seed_admin_user
     puts "Admin User #{user.email}"
 end
 
-def seed_rigenee
+def seed_club_course(club_name, course_name)
     # Club
     club = Club.new
-    club.name = "Golf de Rigenée"
+    club.name = club_name
     club.save
     puts "Club #{club.name}"
     # Course
     course = Course.new
     course.club = club
-    course.name = "Le Château"
+    course.name = course_name
     course.nb_hole = 18
     course.version = "2026"
     course.save
@@ -254,4 +254,6 @@ end
 # seed_tours("Federal Tour")
 #
 # Seed Rigenée Club and Course
-# seed_rigenee
+# seed_club_course("Golf de Rigenée", "Le Chateau")
+# seed_club_course("Golf de Pierpont", "Grand Pierpont")
+# seed_club_course("Golf de Mérignies", "Val de Marque / Rupilly")
