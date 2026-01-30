@@ -13,6 +13,7 @@
               <th>Num</th>
               <th></th>
               <th></th>
+              <th></th>
               <th>HCP %</th>
               <th>Course</th>
               <th>Teams</th>
@@ -28,6 +29,7 @@
                 <td><%= button_to round.num, admin_round_path(round), method: :get, class: "btt btt-edit" %></td>
                 <td><%= round.date %></td>
                 <td><span class="status_tag"><%= round.status %></span></td>
+                <td><%= round.config_teetime&.formula ? round.config_teetime.formula.name : "-" %></td>
                 <td><%= round.hcp_pc %></td>
                 <td><%= round.config_teetime&.course ? "#{round.config_teetime.course.club.name} - #{round.config_teetime.course.name}" : "-" %></td>
                 <td><%= round.config_teetime&.nb_teams || "-" %></td>

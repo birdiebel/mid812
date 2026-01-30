@@ -1,7 +1,7 @@
 ActiveAdmin.register ConfigTeetime do
   belongs_to :round, optional: true
 
-  permit_params :round_id, :course_id, :start_hole, :nb_slots, :step, :nb_teams, :start_time
+  permit_params :round_id, :course_id, :formula_id, :start_hole, :nb_slots, :step, :nb_teams, :start_time
 
   menu false
   config.batch_actions = false
@@ -34,10 +34,13 @@ ActiveAdmin.register ConfigTeetime do
       if round
         f.input :round, as: :select, collection: [ [ "#{round.event.name} - Round #{round.num}", round.id ] ], include_blank: false
         f.input :course, as: :select, collection: round.event.courses.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }, include_blank: false
+        event_format = round.event.format
+        f.input :formula, as: :select, collection: Formula.where(format: event_format).map { |formula| [ formula.name, formula.id ] }, include_blank: "Select a formula"
         default_nb_teams = round.event.entries.where(status: :enter).count
       else
         f.input :round, as: :select, collection: Round.all.map { |r| [ "#{r.event.name} - Round #{r.num}", r.id ] }, include_blank: false
         f.input :course, as: :select, collection: Course.all.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }, include_blank: false
+        f.input :formula, as: :select, collection: Formula.all.map { |formula| [ formula.name, formula.id ] }, include_blank: "Select a formula"
         default_nb_teams = 0
       end
 

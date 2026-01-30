@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_063932) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_30_073002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -54,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_063932) do
   create_table "config_teetimes", force: :cascade do |t|
     t.bigint "course_id", null: false
     t.datetime "created_at", null: false
+    t.bigint "formula_id"
     t.integer "nb_slots"
     t.integer "nb_teams"
     t.bigint "round_id", null: false
@@ -62,6 +63,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_063932) do
     t.integer "step", default: 10
     t.datetime "updated_at", null: false
     t.index ["course_id"], name: "index_config_teetimes_on_course_id"
+    t.index ["formula_id"], name: "index_config_teetimes_on_formula_id"
     t.index ["round_id"], name: "index_config_teetimes_on_round_id"
   end
 
@@ -129,6 +131,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_063932) do
     t.index ["event_id", "playercat_id"], name: "index_events_playercats_on_event_id_and_playercat_id", unique: true
     t.index ["event_id"], name: "index_events_playercats_on_event_id"
     t.index ["playercat_id"], name: "index_events_playercats_on_playercat_id"
+  end
+
+  create_table "formulas", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.integer "format", default: 0
+    t.integer "max_players", default: 1
+    t.integer "min_players", default: 1
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "licences", force: :cascade do |t|
@@ -218,6 +229,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_063932) do
   end
 
   add_foreign_key "config_teetimes", "courses"
+  add_foreign_key "config_teetimes", "formulas"
   add_foreign_key "config_teetimes", "rounds"
   add_foreign_key "entries", "events"
   add_foreign_key "entries", "playercats"
