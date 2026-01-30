@@ -1,0 +1,37 @@
+<div id="rounds" style="display:none;">
+  <div class="panel">
+    <h3>Rounds</h3>
+    <div class="panel_contents">
+      <div style="margin-bottom: 15px;">
+        <%= link_to "Add Round", new_admin_round_path(round: { event_id: event.id }), class: "button" %>
+      </div>
+
+      <% if event.rounds.any? %>
+        <table class="index_table">
+          <thead>
+            <tr>
+              <th>Num</th>
+              <th>Date</th>
+              <th>Status</th>
+              <th></th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% event.rounds.order(:num).each do |round| %>
+              <tr>
+                <td><%= button_to round.num, admin_round_path(round), method: :get, class: "btt btt-edit" %></td>
+                <td><%= round.date %></td>
+                <td><span class="status_tag"><%= round.status %></span></td>
+                <td><%= button_to "Edit", edit_admin_round_path(round), method: :get, class: "btt btt-edit" %></td>
+                <td><%= button_to "Delete", admin_round_path(round), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p>No rounds yet. Click 'Add Round' to create one.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<div id="player-categories" style="display:none;">
+  <div class="panel">
+    <h3>Player Categories</h3>
+    <div class="panel_contents">
+      <table class="index_table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Format</th>
+            <th>Sexe</th>
+            <th>Teebox</th>
+            <th>Hcp Min</th>
+            <th>Hcp Max</th>
+            <th>Version</th>
+            <th>Age Cat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% event.playercats.each do |playercat| %>
+            <tr>
+              <td><%= playercat.name %></td>
+              <td><%= playercat.format %></td>
+              <td><%= playercat.sexe %></td>
+              <td><%= playercat.teebox %></td>
+              <td><%= playercat.hcp_min %></td>
+              <td><%= playercat.hcp_max %></td>
+              <td><%= playercat.version %></td>
+              <td><%= playercat.agecats.map(&:name).join(", ") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

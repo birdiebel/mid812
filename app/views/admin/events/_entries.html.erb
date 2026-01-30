@@ -1,0 +1,100 @@
+<div id="entries">
+  <div class="panel">
+    <h3>Add a Player</h3>
+    <div class="panel_contents">
+      <div>
+        <form action="<%= admin_tour_event_path(event.tour, event) %>" method="get">
+          <div style="display: flex; gap: 10px; align-items: center;">
+            <label>Find by name or licence number :</label>
+            <input type="text" name="player_lastname" value="<%= params[:player_lastname] %>">
+            <button type="submit">Find</button>
+            <button type="button" onclick="window.location='<%= admin_tour_event_path(event.tour, event) %>'">Clear</button>
+          </div>
+        </form>
+      </div>
+
+      <% if params[:player_lastname].present? %>
+        <div>
+          <% players = Player
+            .left_joins(:licences)
+            .where("players.lastname ILIKE :query OR licences.num ILIKE :query", query: "%#{params[:player_lastname].strip}%")
+            .where.not(id: Entry.where(event_id: event.id).select(:player_id))
+            .limit(10) %>
+
+          <h4 style="color: darkred;">Max 10 players show</h4>
+
+          <% if players.any? %>
+            <table>
+              <thead>
+                <tr>
+                  <th>Cat</th>
+                  <th>Nom complet</th>
+                  <th>Genre</th>
+                  <th>Licence</th>
+                  <th>Club</th>
+                  <th>Âge</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% players.each do |player| %>
+                  <tr>
+                    <td><%= player.icon_age_category %></td>
+                    <td><%= player.full_name %></td>
+                    <td><%= player.sexe %></td>
+                    <td><%= player.my_licence %></td>
+                    <td><%= player.my_club %></td>
+                    <td><%= player.age %></td>
+                    <td>
+                      <% if player.licences.exists? %>
+                        <%= link_to "Ajouter", admin_entries_path(entry: { event_id: event.id, player_id: player.id }), method: :post, class: "button" %>
+                      <% else %>
+                        <span style="color: red;">No licence found</span>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          <% else %>
+            <div>Aucun joueur trouvé.</div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h3>Entries list</h3>
+    <div class="panel_contents">
+      <% grouped_entries = event.entries.order(status: :asc, created_at: :desc).group_by(&:status) %>
+
+      <% grouped_entries.each do |status, entries| %>
+        <div class="panel-table-subtitre">
+          Status :  <%= status.presence || 'Undefined' %> : <%= entries.count %>
+        </div>
+
+        <table class="index_table">
+          <tbody>
+            <% entries.each do |entry| %>
+              <tr>
+                <td><%= entry.player.icon_age_category %></td>
+                <td><%= entry.player.full_name %></td>
+                <td><%= entry.player.sexe %></td>
+                <td><%= entry.player.age %></td>
+                <td><%= entry.player.my_licence %></td>
+                <td><%= entry.hcp %></td>
+                <td><%= entry.playercat ? entry.playercat.name : "N/A" %></td>
+                <td><%= entry.player.my_club %></td>
+                <td><%= entry.status %></td>
+                <td><%= entry.updated_at %></td>
+                <td><%= button_to "Edit", edit_admin_entry_path(entry), method: :get, class: "btt btt-edit" %></td>
+                <td><%= button_to "Delete", admin_entry_path(entry), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% end %>
+    </div>
+  </div>
+</div>

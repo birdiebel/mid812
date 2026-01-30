@@ -1,0 +1,27 @@
+<div id="courses" style="display:none;">
+  <div class="panel">
+    <h3>Courses</h3>
+    <div class="panel_contents">
+      <table class="index_table">
+        <thead>
+          <tr>
+            <th>Club</th>
+            <th>Course Name</th>
+            <th>Number of Holes</th>
+            <th>Version</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% event.courses.each do |course| %>
+            <tr>
+              <td><%= course.club.name %></td>
+              <td><%= course.name %></td>
+              <td><%= course.nb_hole %></td>
+              <td><%= course.version %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
