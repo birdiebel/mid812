@@ -75,6 +75,12 @@ body.active_admin {
     font-size: 2em !important;
 }
 
+.table-btn-action {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
+
 .btt {
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
