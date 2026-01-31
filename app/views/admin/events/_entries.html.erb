@@ -3,7 +3,7 @@
   <%= render "admin/events/entries_find_players", event: event %>
 
   <div class="panel">
-    <h3>Teams list</h3>
+    <h3>Entries list : <%= event.teams.joins(:entries).where(status: :enter).where.not(entries: { playercat_id: nil }).distinct.count %></h3>
     <div class="panel_contents">
       <% if event.single? %>
         <%= render "admin/events/entries_list_single", event: event %>

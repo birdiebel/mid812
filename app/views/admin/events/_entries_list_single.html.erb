@@ -1,35 +1,41 @@
-<% teams = event.teams.order(status: :asc, created_at: :desc) %>
-        <table class="index_table">
-          <tbody>
-            <% teams.each do |team| %>
-              <% entry = team.entries.first %>
-              <% next unless entry %>
-              <tr>
-                <td><%= entry.player.icon_age_category %></td>
-                <td><%= entry.player.full_name %></td>
-                <td><%= entry.player.sexe %></td>
-                <td><%= entry.player.age %></td>
-                <td><%= entry.player.my_licence %></td>
-                <td><%= entry.hcp %></td>
-                <% if !entry.playercat.nil?  %>
-                    <td><%= entry.playercat.icon_teebox.html_safe %></td>
-                <% else %>
-                    <td class="is_red is_bold"><span>N/A</span></td>
-                <% end %>
-                <td><%= entry.player.my_club %></td>
-                <td><%= team.status %></td>
-                <td><%= team.updated_at %></td>
-                <td>
-                    <div class="table-btn-action">
-                        <div>
-                            <%= button_to "Edit", edit_admin_team_path(team), method: :get, class: "btt btt-edit" %>
-                        </div>
-                        <div>
-                              <%= button_to "Delete", admin_team_path(team), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %>
-                        </div>
-                    </div>
-                </td>
-              </tr>
+<% teams = event.teams.includes(entries: [:player, :playercat]).order("entries.playercat_id ASC, entries.created_at DESC") %>
+<% teams_by_playercat = teams.group_by { |team| team.entries.first&.playercat } %>
+<% teams_by_playercat.each do |playercat, teams_in_cat| %>
+    <div class="panel-table-subtitre">
+        Cat: <%= playercat&.name || 'Undefined' %> : <%= teams_in_cat.count %>
+    </div>
+    <table class="index_table">
+        <tbody>
+        <% teams_in_cat.each do |team| %>
+            <% entry = team.entries.first %>
+            <% next unless entry %>
+            <tr>
+            <td><%= entry.player.icon_age_category %></td>
+            <td><%= entry.player.full_name %></td>
+            <td><%= entry.player.sexe %></td>
+            <td><%= entry.player.age %></td>
+            <td><%= entry.player.my_licence %></td>
+            <td><%= entry.hcp %></td>
+            <% if !entry.playercat.nil?  %>
+                <td><%= entry.playercat.icon_teebox.html_safe %></td>
+            <% else %>
+                <td class="is_red is_bold"><span>N/A</span></td>
             <% end %>
-          </tbody>
-        </table>
+            <td><%= entry.player.my_club %></td>
+            <td><%= team.status %></td>
+            <td><%= team.updated_at %></td>
+            <td>
+                <div class="table-btn-action">
+                    <div>
+                        <%= button_to "Edit", edit_admin_team_path(team), method: :get, class: "btt btt-edit" %>
+                    </div>
+                    <div>
+                            <%= button_to "Delete", admin_team_path(team), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %>
+                    </div>
+                </div>
+            </td>
+            </tr>
+        <% end %>
+        </tbody>
+    </table>
+<% end %>

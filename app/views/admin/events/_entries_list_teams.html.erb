@@ -1,7 +1,7 @@
 <% grouped_teams = event.teams.order(status: :asc, created_at: :desc).group_by(&:status) %>
 <% grouped_teams.each do |status, teams| %>
     <div class="panel-table-subtitre">
-    Status :  <%= status.presence || 'Undefined' %> : <%= teams.count %>
+        Status :  <%= status.presence || 'Undefined' %> : <%= teams.count %>
     </div>
 
     <table class="index_table">
