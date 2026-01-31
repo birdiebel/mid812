@@ -1,14 +1,18 @@
+<div style="margin-bottom: 15px;">
+  <input type="text" id="search-teams" placeholder="Rechercher par nom de team..." class="search-entries" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+</div>
+
 <% grouped_teams = event.teams.order(status: :asc, created_at: :desc).group_by(&:status) %>
 <% grouped_teams.each do |status, teams| %>
     <div class="panel-table-subtitre">
         Status :  <%= status.presence || 'Undefined' %> : <%= teams.count %>
     </div>
 
-    <table class="index_table">
+    <table class="index_table entries-table-teams">
     <tbody>
         <% teams.each do |team| %>
         <% team_name = team.entries.map { |e| e.player.full_name }.join(" / ") %>
-        <tr style="border-top: 2px solid black;">
+        <tr style="border-top: 2px solid black;" class="team-header-row" data-name="<%= team_name %>" data-team-id="<%= team.id %>">
             <td></td>
             <td style="background-color: lightgreen;"><strong><%= team_name.presence || team.name %></strong></td>
             <td><%= team.status %></td>
@@ -34,7 +38,7 @@
             </td>
         </tr>
         <% team.entries.each do |entry| %>
-            <tr>
+            <tr class="entry-row" data-team-id="<%= team.id %>" data-name="<%= entry.player.full_name %>" data-licence="<%= entry.player.my_licence %>">
             <td><%= entry.player.icon_age_category %></td>
             <td><%= entry.player.full_name %></td>
             <td><%= entry.player.sexe %></td>
@@ -46,7 +50,6 @@
             <% else %>
                 <td class="is_red is_bold"><span>N/A</span></td>
             <% end %>
-            <%# <td><%= entry.playercat ? entry.playercat.icon_teebox : "N/A" %></td> %>
             <td><%= entry.player.my_club %></td>
             <td>
                 <div class="table-btn-action">
@@ -56,7 +59,7 @@
                     <div>
                         <%= button_to "Remove", remove_from_team_admin_entry_path(entry), method: :put, data: { confirm: "Remove player from team?" }, class: "btt btt-cancel" %>
                     </div>
-                <div>
+                </div>
             </td>
             </tr>
         <% end %>
@@ -64,3 +67,50 @@
     </tbody>
     </table>
 <% end %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const searchInput = document.getElementById('search-teams');
+  if (!searchInput) return;
+  
+  searchInput.addEventListener('keyup', function() {
+    const searchTerm = this.value.toLowerCase();
+    const table = document.querySelector('.entries-table-teams');
+    
+    // Get all teams
+    const teamHeaders = table.querySelectorAll('.team-header-row');
+    const entryRows = table.querySelectorAll('.entry-row');
+    
+    // Track which teams match the search - only on team name
+    const visibleTeams = new Set();
+    
+    // Check all team headers - only search on team name
+    teamHeaders.forEach(header => {
+      const teamName = header.getAttribute('data-name').toLowerCase();
+      if (teamName.includes(searchTerm)) {
+        visibleTeams.add(header.getAttribute('data-team-id'));
+      }
+    });
+    
+    // Show all entry rows for visible teams, hide others
+    entryRows.forEach(row => {
+      const teamId = row.getAttribute('data-team-id');
+      if (visibleTeams.has(teamId)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+    
+    // Show/hide team headers
+    teamHeaders.forEach(header => {
+      const teamId = header.getAttribute('data-team-id');
+      if (visibleTeams.has(teamId)) {
+        header.style.display = '';
+      } else {
+        header.style.display = 'none';
+      }
+    });
+  });
+});
+</script>
