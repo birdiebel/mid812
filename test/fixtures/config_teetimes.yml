@@ -1,19 +1,4 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  round: one
-  course: one
-  start_hole: 1
-  nb_slots: 1
-  step: 1
-  nb_teams: 1
-  start_time: 2026-01-30 07:39:32
+# Fixtures removed due to missing course references
 
-two:
-  round: two
-  course: two
-  start_hole: 1
-  nb_slots: 1
-  step: 1
-  nb_teams: 1
-  start_time: 2026-01-30 07:39:32
