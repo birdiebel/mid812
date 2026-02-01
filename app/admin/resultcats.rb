@@ -44,7 +44,9 @@ ActiveAdmin.register Resultcat do
     column "HCP Max", :hcp_max
     column "Version", :version
     column "Priority", :priority
-    column "Actif", :actif
+    column "Actif" do |resultcat|
+      helpers.status_badge(resultcat.actif)
+    end
     column "" do |resultcat|
       div class: "table-btn-action" do
         div do

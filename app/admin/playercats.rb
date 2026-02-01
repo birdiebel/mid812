@@ -27,7 +27,9 @@ ActiveAdmin.register Playercat do
     column "Teebox", :teebox
     column "Version", :version
     column "Priority", :priority
-    column "Active", :actif
+    column "Actif" do |playercat|
+      helpers.status_badge(playercat.actif)
+    end
     column "" do |playercat|
       button_to "Edit", edit_admin_playercat_path(playercat), method: :get, class: "btt btt-edit"
     end

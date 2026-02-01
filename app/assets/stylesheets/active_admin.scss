@@ -15,7 +15,26 @@
 // For example, to change the default status-tag color:
 //
 
+
 .status_tag { background: lightblue; color: black }
+
+.badge-success {
+    background-color: #1b5e20;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    display: inline-block;
+}
+
+.badge-danger {
+    background-color: #b71c1c;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-weight: bold;
+    display: inline-block;
+}
 
 .status_tag.scoring-stroke_play {
   background: yellow;
