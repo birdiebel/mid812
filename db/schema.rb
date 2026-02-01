@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_30_215121) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_01_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -136,6 +136,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_215121) do
     t.index ["playercat_id"], name: "index_events_playercats_on_playercat_id"
   end
 
+  create_table "events_teamcats", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.bigint "teamcat_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_events_teamcats_on_event_id"
+    t.index ["teamcat_id"], name: "index_events_teamcats_on_teamcat_id"
+  end
+
   create_table "formulas", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.integer "format", default: 0
@@ -171,6 +180,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_215121) do
     t.string "version", null: false
   end
 
+  create_table "playercats_teamcats", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "playercat_id", null: false
+    t.bigint "teamcat_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["playercat_id"], name: "index_playercats_teamcats_on_playercat_id"
+    t.index ["teamcat_id"], name: "index_playercats_teamcats_on_teamcat_id"
+  end
+
   create_table "players", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "dob", default: "1970-01-01", null: false
@@ -183,6 +201,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_215121) do
     t.index ["user_id"], name: "index_players_on_user_id"
   end
 
+  create_table "resultcats", force: :cascade do |t|
+    t.boolean "actif", default: true
+    t.bigint "agecat_id", null: false
+    t.datetime "created_at", null: false
+    t.decimal "hcp_max", precision: 3, scale: 1
+    t.decimal "hcp_min", precision: 3, scale: 1
+    t.string "name", null: false
+    t.integer "priority", default: 0
+    t.integer "sexe", default: 0
+    t.datetime "updated_at", null: false
+    t.string "version", null: false
+    t.index ["agecat_id"], name: "index_resultcats_on_agecat_id"
+  end
+
   create_table "rounds", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.date "date"
@@ -193,6 +225,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_215121) do
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_rounds_on_event_id"
     t.check_constraint "hcp_pc >= 0 AND hcp_pc <= 100", name: "hcp_pc_range"
+  end
+
+  create_table "teamcats", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name"
+    t.integer "scoring"
+    t.datetime "updated_at", null: false
   end
 
   create_table "teams", force: :cascade do |t|
@@ -249,6 +288,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_30_215121) do
   add_foreign_key "entries", "teams"
   add_foreign_key "events_playercats", "events"
   add_foreign_key "events_playercats", "playercats"
+  add_foreign_key "events_teamcats", "events"
+  add_foreign_key "events_teamcats", "teamcats"
+  add_foreign_key "playercats_teamcats", "playercats"
+  add_foreign_key "playercats_teamcats", "teamcats"
+  add_foreign_key "resultcats", "agecats"
   add_foreign_key "rounds", "events"
   add_foreign_key "teams", "events"
 end
