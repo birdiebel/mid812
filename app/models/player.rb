@@ -86,7 +86,7 @@ class Player < ApplicationRecord
 
     def icon_age_category
         current_year = Date.today.year
-        agecats = Agecat.where(year: current_year).order(id: :desc)
+        agecats = Agecat.where(year: current_year).order(id: :asc)
         agecats.each do |agecat|
             if age >= agecat.age_low && age <= agecat.age_high
                 age_color = agecat.color.downcase
