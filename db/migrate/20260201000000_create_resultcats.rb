@@ -1,4 +1,4 @@
-class CreateResultcats < ActiveRecord::Migration[7.0]
+class CreateResultcats < ActiveRecord::Migration[8.1]
   def change
     create_table :resultcats do |t|
       t.string :name, null: false

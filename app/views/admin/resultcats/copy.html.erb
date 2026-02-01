@@ -1,0 +1,39 @@
+<% content_for :page_title do %>
+  Copy Result Category - <%= @resultcat.name %>
+<% end %>
+
+<div class="panel">
+  <div class="panel_contents">
+    <div class="attributes_table">
+      <div class="row">
+        <div class="label">Original Name:</div>
+        <div class="value"><strong><%= @resultcat.name %></strong></div>
+      </div>
+    </div>
+
+    <%= form_with(model: @resultcat, local: true, url: "/admin/resultcats/#{@resultcat.id}/create_copy", method: :post) do |form| %>
+      <% if @resultcat.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(@resultcat.errors.count, "error") %> prohibited this resultcat from being saved:</h2>
+          <ul>
+            <% @resultcat.errors.full_messages.each do |message| %>
+              <li><%= message %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <div class="inputs">
+        <div class="input string">
+          <%= form.label :name, "New Name" %>
+          <%= form.text_field :name, placeholder: "#{@resultcat.name} (copy)" %>
+        </div>
+      </div>
+
+      <div class="actions">
+        <%= form.submit "Create Copy", class: "button" %>
+        <%= link_to "Cancel", admin_resultcat_path(@resultcat), class: "button" %>
+      </div>
+    <% end %>
+  </div>
+</div>
