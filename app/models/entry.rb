@@ -4,6 +4,7 @@ class Entry < ApplicationRecord
   belongs_to :licence, optional: true
   belongs_to :playercat, optional: true
   belongs_to :team, optional: true
+  has_many :slots, dependent: :destroy
 
   def self.ransackable_attributes(auth_object = nil)
     [ "created_at", "event_id", "id", "licence_id", "player_id", "status", "updated_at", "playercat_id", "hcp" ]
