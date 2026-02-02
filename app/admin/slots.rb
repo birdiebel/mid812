@@ -8,7 +8,7 @@ ActiveAdmin.register Slot do
   filter :flight, as: :select
   filter :entry, as: :select
   filter :num
-  config.sort_order = "num_asc"
+  config.sort_order = "flight_id_asc"
 
   index do
     column "Num", :num
@@ -23,7 +23,12 @@ ActiveAdmin.register Slot do
   form do |f|
     f.inputs "Slot" do
       f.input :flight, as: :select, collection: Flight.all.map { |fl| [ "Flight #{fl.num}", fl.id ] }
-      f.input :entry, as: :select, collection: Entry.all.map { |e| [ "#{e.player&.name}", e.id ] }, include_blank: true
+      li do
+        label "Entry"
+        div do
+          text_node f.object.entry ? f.object.entry.player&.full_name : "No entry assigned"
+        end
+      end
       f.input :num, as: :number
       f.input :playing_hcp, as: :number
     end
