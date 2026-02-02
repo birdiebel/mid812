@@ -1,0 +1,14 @@
+<div id="round-details">
+  <div class="panel">
+    <h3>Round Details</h3>
+    <div class="panel_contents">
+      <p><strong>Event:</strong> <%= round.event&.name %></p>
+      <p><strong>Round Number:</strong> <%= round.num %></p>
+      <p><strong>Date:</strong> <%= round.date&.strftime("%d/%m/%Y") %></p>
+      <p><strong>HCP Par/Course:</strong> <%= round.hcp_pc %>%</p>
+      <p><strong>Status:</strong> <%= round.status %></p>
+      <p><strong>Total Entries:</strong> <%= round.event.entries.count %></p>
+      <p><strong>Courses:</strong> <%= round.config_teetimes.map(&:course).map(&:name).uniq.join(", ") %></p>
+    </div>
+  </div>
+</div>

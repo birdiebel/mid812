@@ -1,0 +1,45 @@
+<div id="config-times">
+  <div class="panel">
+    <h3>Config Times</h3>
+    <div class="panel_contents">
+        <% if round.config_teetimes.any? %>
+            <table class="admin-table">
+            <thead>
+                <tr>
+                <th>Course</th>
+                <th>Start Hole</th>
+                <th>Nb Slots</th>
+                <th>Step</th>
+                <th>Nb Teams</th>
+                <th>Start Time</th>
+                <th>HCP %</th>
+                <th>Formula</th>
+                <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% round.config_teetimes.each do |config| %>
+                <tr>
+                    <td><%= config.course.name %></td>
+                    <td><%= config.start_hole %></td>
+                    <td><%= config.nb_slots %></td>
+                    <td><%= config.step %></td>
+                    <td><%= config.nb_teams %></td>
+                    <td><%= config.start_time&.strftime("%H:%M") %></td>
+                    <td><%= config.hcp_pc %></td>
+                    <td><%= config.formula&.name %></td>
+                    <td>
+                    <%= link_to "Edit", edit_admin_config_teetime_path(config), class: "button" %>
+                    <%= link_to "Delete", admin_config_teetime_path(config), method: :delete, data: { confirm: "Are you sure?" }, class: "button" %>
+                    </td>
+                </tr>
+                <% end %>
+            </tbody>
+            </table>
+        <% else %>
+            <p>No tee time configuration.</p>
+        <% end %>
+        <%= link_to "Add Config Times", new_admin_config_teetime_path(config_teetime: { round_id: round.id }), class: "button" %>
+    </div>
+  </div> 
+</div>

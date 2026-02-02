@@ -13,12 +13,7 @@
               <th>Num</th>
               <th></th>
               <th></th>
-              <th></th>
               <th>HCP %</th>
-              <th>Course</th>
-              <th>Teams</th>
-              <th>At</th>
-              <th></th>
               <th></th>
               <th></th>
             </tr>
@@ -29,18 +24,7 @@
                 <td><%= button_to round.num, admin_round_path(round), method: :get, class: "btt btt-edit" %></td>
                 <td><%= round.date %></td>
                 <td><span class="status_tag"><%= round.status %></span></td>
-                <td><%= round.config_teetime&.formula ? round.config_teetime.formula.name : "-" %></td>
                 <td><%= round.hcp_pc %></td>
-                <td><%= round.config_teetime&.course ? "#{round.config_teetime.course.club.name} - #{round.config_teetime.course.name}" : "-" %></td>
-                <td><%= round.config_teetime&.nb_teams || "-" %></td>
-                <td><%= round.config_teetime&.start_time&.strftime("%H:%M") || "-" %></td>
-                <td>
-                  <% if round.config_teetime %>
-                    <%= button_to "Edit Config", edit_admin_config_teetime_path(round.config_teetime), method: :get, class: "btt btt-edit" %>
-                  <% else %>
-                    <%= link_to "Create Config", new_admin_config_teetime_path(config_teetime: { round_id: round.id }), class: "button" %>
-                  <% end %>
-                </td>
                 <td><%= button_to "Edit", edit_admin_round_path(round), method: :get, class: "btt btt-edit" %></td>
                 <td><%= button_to "Delete", admin_round_path(round), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %></td>
               </tr>

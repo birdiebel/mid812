@@ -1,6 +1,6 @@
 class Round < ApplicationRecord
   belongs_to :event
-  has_one :config_teetime, dependent: :destroy
+  has_many :config_teetimes, dependent: :destroy
 
   enum :status, [ :pending, :running, :terminated, :suspended, :canceled ]
 

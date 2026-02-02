@@ -1,7 +1,7 @@
 ActiveAdmin.register ConfigTeetime do
   belongs_to :round, optional: true
 
-  permit_params :round_id, :course_id, :formula_id, :start_hole, :nb_slots, :step, :nb_teams, :start_time
+  permit_params :round_id, :course_id, :formula_id, :start_hole, :nb_slots, :step, :nb_teams, :start_time, :hcp_pc
 
   menu false
   config.batch_actions = false
@@ -14,6 +14,7 @@ ActiveAdmin.register ConfigTeetime do
     column :step
     column :nb_teams
     column :start_time
+    column :hcp_pc
     actions
   end
 
@@ -49,14 +50,13 @@ ActiveAdmin.register ConfigTeetime do
       f.input :step, as: :number, input_html: { value: f.object.step || 10 }, label: "Step (minutes)"
       f.input :nb_teams, as: :number, input_html: { value: f.object.nb_teams || default_nb_teams }, label: "Nb Teams"
       f.input :start_time, as: :string, input_html: { type: :time, value: f.object.start_time&.strftime("%H:%M") || "08:00" }
+      f.input :hcp_pc, as: :number, label: "HCP %", input_html: { value: f.object.hcp_pc.presence || round&.hcp_pc }
+      f.input :return_to, as: :hidden, input_html: { value: params.dig(:config_teetime, :return_to) || (round && admin_round_path(round)) }
     end
     f.actions do
       f.action :submit
-      if f.object.round
-        f.cancel_link admin_tour_event_path(f.object.round.event.tour, f.object.round.event)
-      else
-        f.cancel_link :back
-      end
+      return_to = params.dig(:config_teetime, :return_to).presence || (f.object.round && admin_round_path(f.object.round))
+      f.cancel_link(return_to || :back)
     end
   end
 
@@ -64,7 +64,8 @@ ActiveAdmin.register ConfigTeetime do
     def create
       @config_teetime = ConfigTeetime.new(permitted_params[:config_teetime])
       if @config_teetime.save
-        redirect_to admin_tour_event_path(@config_teetime.round.event.tour, @config_teetime.round.event), notice: "Tee time configuration created successfully."
+        return_to = params.dig(:config_teetime, :return_to).presence
+        redirect_to(return_to || admin_round_path(@config_teetime.round), notice: "Tee time configuration created successfully.")
       else
         render :new
       end
@@ -73,7 +74,8 @@ ActiveAdmin.register ConfigTeetime do
     def update
       @config_teetime = ConfigTeetime.find(params[:id])
       if @config_teetime.update(permitted_params[:config_teetime])
-        redirect_to admin_tour_event_path(@config_teetime.round.event.tour, @config_teetime.round.event), notice: "Tee time configuration updated successfully."
+        return_to = params.dig(:config_teetime, :return_to).presence
+        redirect_to(return_to || admin_round_path(@config_teetime.round), notice: "Tee time configuration updated successfully.")
       else
         render :edit
       end
@@ -81,9 +83,9 @@ ActiveAdmin.register ConfigTeetime do
 
     def destroy
       @config_teetime = ConfigTeetime.find(params[:id])
-      event = @config_teetime.round.event
       @config_teetime.destroy
-      redirect_to admin_tour_event_path(event.tour, event), notice: "Tee time configuration deleted successfully."
+      return_to = params.dig(:config_teetime, :return_to).presence || request.referer
+      redirect_to(return_to || admin_round_path(@config_teetime.round), notice: "Tee time configuration deleted successfully.")
     end
   end
 end

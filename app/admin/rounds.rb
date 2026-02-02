@@ -9,21 +9,12 @@ ActiveAdmin.register Round do
   myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date}" }
 
   show title: myTitle do
-    # Menu Navigation with Buttons
-    div name: "round-menu", class: "button-group", style: "margin-top: -30px; margin-bottom: -20px;" do
-      a href: "#start-list", class: "menu-button menu-event-button", data: { target: "#start-list" } do
-        text_node "Start List"
-      end
-      a href: "#scores", class: "menu-button menu-event-button", data: { target: "#scores" } do
-        text_node "Scores"
-      end
-      a href: "#status", class: "menu-button menu-event-button", data: { target: "#status" } do
-        text_node "Status"
-      end
-      a href: "#round-details", class: "menu-button menu-event-button", data: { target: "#round-details" } do
-        text_node "Round Details"
-      end
-    end
+    render "admin/rounds/menu", round: round
+    render "admin/rounds/config_times", round: round
+    render "admin/rounds/start_list", round: round
+    render "admin/rounds/scores", round: round
+    render "admin/rounds/status", round: round
+    render "admin/rounds/round_details", round: round
   end
 
 
