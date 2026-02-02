@@ -271,3 +271,17 @@ body.active_admin {
         background-color: #0d47a1;
     }
 }
+
+.flex-container {
+    display: flex;
+    gap: 10px;
+} 
+
+.entry-item, .slot-item {
+    margin-bottom: 8px;
+    background-color: lightyellow;
+    padding: 5px;
+}
+.slot-item {
+    background-color: lightcyan;
+}

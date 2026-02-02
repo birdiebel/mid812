@@ -2,6 +2,13 @@ Rails.application.routes.draw do
   devise_for :users
   get "admin", to: "home#loadadmin"
 
+  # API routes for drag & drop
+  namespace :api do
+    namespace :v1 do
+      patch "slots/:id", to: "slots#update"
+      put "slots/:id", to: "slots#update"
+    end
+  end
 
   ActiveAdmin.routes(self)
   get "home/index"

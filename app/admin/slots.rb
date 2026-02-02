@@ -37,4 +37,21 @@ ActiveAdmin.register Slot do
        f.cancel_link(url_for(:back))
     end
   end
+
+  controller do
+    def update
+      @slot = Slot.find(params[:id])
+      if @slot.update(permitted_params[:slot])
+        respond_to do |format|
+          format.html { redirect_to admin_slot_path(@slot), notice: "Slot was successfully updated." }
+          format.json { render json: { success: true } }
+        end
+      else
+        respond_to do |format|
+          format.html { render :edit }
+          format.json { render json: { success: false, errors: @slot.errors }, status: :unprocessable_entity }
+        end
+      end
+    end
+  end
 end

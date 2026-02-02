@@ -1,0 +1,35 @@
+<div id="flights" style="width: 500px;">
+  <div class="panel">
+    <h3>Flights</h3>
+    <div class="panel_contents">
+      <% round.config_teetimes.each do |config| %>
+        <div class="config-section">
+          <h5><%= config.course.name %> - Hole <%= config.start_hole %></h5>
+          <% config.flights.order(:num).each do |flight| %>
+            <div class="flight-item">
+              <strong>Flight <%= flight.num %></strong> - <%= flight.status %>
+              <% flight.slots.order(:num).each do |slot| %>
+                <div class="slot-item" 
+                     data-slot-id="<%= slot.id %>"
+                     <% if slot.entry %>
+                       data-entry-id="<%= slot.entry.id %>"
+                       data-player-name="<%= slot.entry.player.full_name %>"
+                       data-player-cat="<%= slot.entry.playercat_id %>"
+                       data-player-cat-name="<%= slot.entry.playercat&.name || 'No Category' %>"
+                       data-team-name="<%= slot.entry.team&.name || 'No team' %>"
+                       data-hcp="<%= slot.entry.hcp %>"
+                     <% end %>>
+                  Slot <%= slot.num %>: 
+                  <%= slot.entry ? slot.entry.player.full_name : "Empty" %>
+                  <% if slot.playing_hcp %>
+                    (HCP: <%= slot.playing_hcp %>)
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

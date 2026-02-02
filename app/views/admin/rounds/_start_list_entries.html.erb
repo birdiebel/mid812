@@ -1,0 +1,26 @@
+<div id="entries">
+  <div class="panel" style="width: 500px;">
+    <h3>Entries (Status: Enter)</h3>
+    <div class="panel_contents">
+      <% entries = round.event.entries.where(status: :enter).includes(:playercat, :player, :team, :slots) %>
+      <% available_entries = entries.reject { |entry| entry.slots.any? } %>
+      <% if available_entries.any? %>
+        <% available_entries.group_by(&:playercat).sort_by { |cat, _| cat&.name || "No Category" }.each do |playercat, cat_entries| %>
+          <div class="playercat-group" data-playercat-id="<%= playercat&.id %>">
+            <h4><%= playercat&.name || "No Category" %></h4>
+            <% cat_entries.each do |entry| %>
+              <div class="entry-item" data-entry-id="<%= entry.id %>">
+                <strong><%= entry.player.full_name %></strong>
+                <br>
+                Team: <%= entry.team&.name || "No team" %>
+                | HCP: <%= entry.hcp %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <p>No entries with status 'enter' found.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

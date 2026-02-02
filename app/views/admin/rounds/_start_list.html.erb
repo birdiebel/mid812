@@ -1,8 +1,474 @@
 <div id="start-list">
   <div class="panel">
     <h3>Start List</h3>
-    <div class="panel_contents">
-      <p>Flight data coming soon...</p>
-    </div>
+    <div class="flex-container">
+      <div>
+        <%= render partial: "admin/rounds/start_list_flights", locals: { round: @round } %>
+      </div>
+      <div>
+        <%= render partial: "admin/rounds/start_list_entries", locals: { round: @round } %>
+      </div>
+    </div>  
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('Starting drag & drop initialization...');
+    
+    // Function to make entries draggable
+    function makeEntriesDraggable() {
+      const entries = document.querySelectorAll('.entry-item');
+      console.log('Found ' + entries.length + ' entries');
+      
+      entries.forEach(entry => {
+        // Only add listeners if not already added
+        if (!entry.dataset.draggableInitialized) {
+          entry.draggable = true;
+          entry.style.cursor = 'move';
+          console.log('Entry', entry.getAttribute('data-entry-id'), 'made draggable');
+          
+          entry.addEventListener('dragstart', function(e) {
+            console.log('Dragging entry:', this.getAttribute('data-entry-id'));
+            this.style.opacity = '0.5';
+            this.style.backgroundColor = '#e8f5e9';
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/plain', this.getAttribute('data-entry-id'));
+          });
+          
+          entry.addEventListener('dragend', function(e) {
+            console.log('Drag ended');
+            this.style.opacity = '1';
+            this.style.backgroundColor = '';
+          });
+          
+          entry.dataset.draggableInitialized = 'true';
+        } else {
+          // Already initialized, just ensure cursor is visible if display changed
+          if (entry.style.display !== 'none') {
+            entry.style.cursor = 'move';
+          }
+        }
+      });
+    }
+    
+    // Initialize entries on page load
+    console.log('Calling makeEntriesDraggable on DOMContentLoaded');
+    setTimeout(() => {
+      makeEntriesDraggable();
+    }, 100);
+
+    // Function to swap or move entries between slots
+    function handleSlotSwap(sourceSlotId, destSlotId) {
+      const sourceSlot = document.querySelector(`[data-slot-id="${sourceSlotId}"]`);
+      const destSlot = document.querySelector(`[data-slot-id="${destSlotId}"]`);
+      
+      if (!sourceSlot || !destSlot) {
+        console.error('One or both slots not found');
+        return;
+      }
+      
+      // Get the entry IDs from both slots
+      const sourceEntryId = sourceSlot.getAttribute('data-entry-id');
+      const destEntryId = destSlot.getAttribute('data-entry-id');
+      
+      console.log('Slot action: source entry', sourceEntryId, ', dest entry', destEntryId);
+      
+      const token = document.querySelector('meta[name="csrf-token"]');
+      if (!token) {
+        console.error('CSRF token not found');
+        return;
+      }
+      
+      // If destination slot is empty, just move the entry
+      if (sourceEntryId && !destEntryId) {
+        console.log('Moving entry', sourceEntryId, 'to empty slot', destSlotId);
+        
+        fetch(`/api/v1/slots/${destSlotId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token.content
+          },
+          body: JSON.stringify({ slot: { entry_id: sourceEntryId } })
+        })
+        .then(response => {
+          if (response.ok) return response.json();
+          throw new Error('Failed to move entry');
+        })
+        .then(data => {
+          console.log('Entry moved successfully');
+          
+          // Clear the source slot
+          sourceSlot.innerHTML = sourceSlot.innerHTML.match(/Slot (\d+):/)[0] + ' Empty';
+          sourceSlot.removeAttribute('data-entry-id');
+          sourceSlot.removeAttribute('data-player-name');
+          sourceSlot.removeAttribute('data-player-cat');
+          sourceSlot.removeAttribute('data-player-cat-name');
+          sourceSlot.removeAttribute('data-team-name');
+          sourceSlot.removeAttribute('data-hcp');
+          
+          // Update the destination slot
+          updateSlotUI(destSlotId, data.slot);
+          
+          // Re-initialize slot draggability
+          makeSlotsDraggable();
+        })
+        .catch(error => {
+          console.error('Move error:', error);
+          alert('Error moving entry');
+        });
+      }
+      // If both slots have entries, swap them
+      else if (sourceEntryId && destEntryId) {
+        console.log('Swapping entries:', sourceEntryId, 'with', destEntryId);
+        
+        // First, update source slot with dest entry
+        fetch(`/api/v1/slots/${sourceSlotId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token.content
+          },
+          body: JSON.stringify({ slot: { entry_id: destEntryId } })
+        })
+        .then(response => {
+          if (response.ok) return response.json();
+          throw new Error('Failed to update source slot');
+        })
+        .then(data1 => {
+          // Then, update dest slot with source entry
+          return fetch(`/api/v1/slots/${destSlotId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': token.content
+            },
+            body: JSON.stringify({ slot: { entry_id: sourceEntryId } })
+          })
+          .then(response => {
+            if (response.ok) return response.json();
+            throw new Error('Failed to update dest slot');
+          })
+          .then(data2 => {
+            console.log('Swap completed successfully');
+            
+            // Update UI for both slots
+            updateSlotUI(sourceSlotId, data1.slot);
+            updateSlotUI(destSlotId, data2.slot);
+            
+            // Re-initialize slot draggability
+            makeSlotsDraggable();
+          });
+        })
+        .catch(error => {
+          console.error('Swap error:', error);
+          alert('Error swapping players');
+        });
+      }
+    }
+    
+    // Helper function to update slot UI
+    function updateSlotUI(slotId, slotData) {
+      const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
+      if (!slotElement || !slotData.entry || !slotData.entry.player) return;
+      
+      const player = slotData.entry.player;
+      const entry = slotData.entry;
+      const fullName = `${player.firstname} ${player.lastname}`;
+      
+      // Get the current HTML and extract the slot number
+      const slotMatch = slotElement.innerHTML.match(/Slot (\d+):/);
+      const slotNum = slotMatch ? slotMatch[1] : '?';
+      
+      // Rebuild the slot content
+      slotElement.innerHTML = `Slot ${slotNum}: ${fullName}`;
+      
+      // Update data attributes
+      slotElement.setAttribute('data-entry-id', entry.id);
+      slotElement.setAttribute('data-player-name', fullName);
+      slotElement.setAttribute('data-player-cat', entry.playercat_id || '');
+      slotElement.setAttribute('data-player-cat-name', entry.playercat ? entry.playercat.name : 'No Category');
+      slotElement.setAttribute('data-team-name', entry.team ? entry.team.name : 'No team');
+      slotElement.setAttribute('data-hcp', entry.hcp || '0');
+    }
+
+    // Make slots with assigned entries draggable
+    function makeSlotsDraggable() {
+      const occupiedSlots = document.querySelectorAll('.slot-item[data-entry-id]');
+      console.log('Found ' + occupiedSlots.length + ' occupied slots');
+      
+      occupiedSlots.forEach(slot => {
+        slot.draggable = true;
+        slot.style.cursor = 'move';
+        slot.addEventListener('dragstart', function(e) {
+          const entryId = this.dataset.entryId;
+          const slotId = this.dataset.slotId;
+          console.log('Dragging slot with entry:', entryId);
+          
+          this.style.opacity = '0.5';
+          this.style.backgroundColor = '#ffebee';
+          
+          e.dataTransfer.effectAllowed = 'move';
+          // Store both slot and entry data
+          e.dataTransfer.setData('slotId', slotId);
+          e.dataTransfer.setData('entryId', entryId);
+          e.dataTransfer.setData('playerName', this.dataset.playerName || '');
+          e.dataTransfer.setData('playerCat', this.dataset.playerCat || '');
+          e.dataTransfer.setData('playerCatName', this.dataset.playerCatName || 'No Category');
+          e.dataTransfer.setData('teamName', this.dataset.teamName || 'No team');
+          e.dataTransfer.setData('hcp', this.dataset.hcp || '0');
+          e.dataTransfer.setData('source', 'slot');
+        });
+        
+        slot.addEventListener('dragend', function(e) {
+          this.style.opacity = '1';
+          this.style.backgroundColor = '';
+        });
+      });
+    }
+    
+    makeSlotsDraggable();
+    
+    // Make slots droppable
+    const slots = document.querySelectorAll('.slot-item');
+    console.log('Found ' + slots.length + ' slots');
+    
+    slots.forEach(slot => {
+      slot.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        this.style.backgroundColor = '#c8e6c9';
+        this.style.borderTop = '3px solid #4CAF50';
+      });
+      
+      slot.addEventListener('dragleave', function(e) {
+        this.style.backgroundColor = '';
+        this.style.borderTop = '';
+      });
+      
+      slot.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        const entryId = e.dataTransfer.getData('text/plain');
+        const sourceSlotId = e.dataTransfer.getData('slotId');
+        const sourceType = e.dataTransfer.getData('source');
+        const destSlotId = this.getAttribute('data-slot-id');
+        const destSlotElement = this;
+        
+        this.style.backgroundColor = '';
+        this.style.borderTop = '';
+        
+        // Check if this is a slot-to-slot swap (drag a slot onto another slot)
+        if (sourceType === 'slot' && sourceSlotId && !entryId) {
+          console.log('Swapping slot', sourceSlotId, 'with slot', destSlotId);
+          handleSlotSwap(sourceSlotId, destSlotId);
+          return;
+        }
+        
+        // Otherwise, this is an entry-to-slot assignment
+        console.log('Dropping entry', entryId, 'on slot', destSlotId);
+        
+        if (!entryId || !destSlotId) {
+          console.error('Missing entry or slot ID');
+          return;
+        }
+        
+        // Check if slot is already occupied
+        const oldEntryId = destSlotElement.getAttribute('data-entry-id');
+        console.log('Slot currently has entry:', oldEntryId);
+        
+        // Get the entry element from the list
+        const entryElement = document.querySelector(`.entry-item[data-entry-id="${entryId}"]`);
+
+        const token = document.querySelector('meta[name="csrf-token"]');
+        if (!token) {
+          console.error('CSRF token not found');
+          return;
+        }
+
+        fetch(`/api/v1/slots/${destSlotId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token.content
+          },
+          body: JSON.stringify({
+            slot: {
+              entry_id: entryId
+            }
+          })
+        })
+        .then(response => {
+          console.log('Response status:', response.status);
+          if (response.ok) {
+            return response.json();
+          } else {
+            alert('Failed to assign entry to slot');
+            throw new Error('Failed to update slot');
+          }
+        })
+        .then(data => {
+          console.log('Success! Data:', data);
+          
+          if (destSlotElement && data.slot && data.slot.entry && data.slot.entry.player) {
+            const player = data.slot.entry.player;
+            const entry = data.slot.entry;
+            const fullName = `${player.firstname} ${player.lastname}`;
+            
+            // Get the current HTML and extract the slot number
+            const slotMatch = destSlotElement.innerHTML.match(/Slot (\d+):/);
+            const slotNum = slotMatch ? slotMatch[1] : '?';
+            
+            // Rebuild the slot content
+            destSlotElement.innerHTML = `Slot ${slotNum}: ${fullName}`;
+            
+            // Add data attributes to make the slot draggable
+            destSlotElement.setAttribute('data-entry-id', entry.id);
+            destSlotElement.setAttribute('data-player-name', fullName);
+            destSlotElement.setAttribute('data-player-cat', entry.playercat_id || '');
+            destSlotElement.setAttribute('data-player-cat-name', entry.playercat ? entry.playercat.name : 'No Category');
+            destSlotElement.setAttribute('data-team-name', entry.team ? entry.team.name : 'No team');
+            destSlotElement.setAttribute('data-hcp', entry.hcp || '0');
+            
+            console.log('Slot updated with:', fullName);
+            
+            // Hide the new entry from the list
+            if (entryElement) {
+              entryElement.style.display = 'none';
+              console.log('New entry hidden from list');
+            }
+            
+            // If there was an old entry in the slot, show it back in the list
+            if (oldEntryId && oldEntryId !== entryId) {
+              const oldEntryElement = document.querySelector(`.entry-item[data-entry-id="${oldEntryId}"]`);
+              if (oldEntryElement) {
+                oldEntryElement.style.display = '';
+                console.log('Old entry re-shown in list');
+                makeEntriesDraggable(); // Re-enable drag on the re-shown entry
+              }
+            }
+            
+            // Re-initialize slot draggability
+            makeSlotsDraggable();
+            makeEntriesDraggable(); // Re-enable drag on remaining visible entries
+          } else {
+            console.error('Missing slot or entry data');
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error assigning entry to slot');
+        });
+      });
+    });
+    
+    // Make entries panel droppable (to remove players from slots)
+    const entriesPanel = document.querySelector('#entries .panel_contents');
+    if (entriesPanel) {
+      entriesPanel.addEventListener('dragover', function(e) {
+        // Check if we're dragging from a slot (has slotId in types)
+        const hasSlotId = e.dataTransfer.types.includes('slotid');
+        if (hasSlotId) {
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'move';
+          this.style.backgroundColor = '#fff3e0';
+          this.style.border = '3px dashed #FF9800';
+        }
+      });
+      
+      entriesPanel.addEventListener('dragleave', function(e) {
+        this.style.backgroundColor = '';
+        this.style.border = '';
+      });
+      
+      entriesPanel.addEventListener('drop', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        this.style.backgroundColor = '';
+        this.style.border = '';
+        
+        const slotId = e.dataTransfer.getData('slotId');
+        const entryId = e.dataTransfer.getData('entryId');
+        const source = e.dataTransfer.getData('source');
+        
+        if (source !== 'slot' || !slotId || !entryId) {
+          console.log('Not a slot drag or missing data');
+          return;
+        }
+        
+        console.log('Removing entry', entryId, 'from slot', slotId);
+        
+        const token = document.querySelector('meta[name="csrf-token"]');
+        if (!token) {
+          console.error('CSRF token not found');
+          return;
+        }
+        
+        // Remove entry from slot (set entry_id to null)
+        fetch(`/api/v1/slots/${slotId}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-Token': token.content
+          },
+          body: JSON.stringify({
+            slot: {
+              entry_id: null
+            }
+          })
+        })
+        .then(response => {
+          if (response.ok) {
+            return response.json();
+          } else {
+            alert('Failed to remove entry from slot');
+            throw new Error('Failed to update slot');
+          }
+        })
+        .then(data => {
+          console.log('Entry removed from slot successfully');
+          
+          // Update slot to show "Empty"
+          const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
+          if (slotElement) {
+            let html = slotElement.innerHTML;
+            html = html.replace(/Slot (\d+): [^(]*/, 'Slot $1: Empty');
+            slotElement.innerHTML = html;
+            
+            // Remove data attributes
+            slotElement.removeAttribute('data-entry-id');
+            slotElement.removeAttribute('data-player-name');
+            slotElement.removeAttribute('data-player-cat');
+            slotElement.removeAttribute('data-team-name');
+            slotElement.removeAttribute('data-hcp');
+            slotElement.draggable = false;
+            slotElement.style.cursor = '';
+          }
+          
+          // Re-show the hidden entry in the entries list
+          const hiddenEntry = document.querySelector(`.entry-item[data-entry-id="${entryId}"]`);
+          
+          if (hiddenEntry) {
+            hiddenEntry.style.display = '';
+            console.log('Entry re-shown in list');
+            makeEntriesDraggable(); // Re-enable drag on the re-shown entry
+          } else {
+            console.error('Hidden entry not found for id:', entryId);
+          }
+          
+          // Re-initialize slot draggability
+          makeSlotsDraggable();
+          makeEntriesDraggable(); // Re-enable drag on all visible entries
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          alert('Error removing entry from slot');
+        });
+      });
+    }
+    
+    console.log('Drag & drop initialization complete');
+  });
+</script>
