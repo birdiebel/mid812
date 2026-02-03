@@ -108,6 +108,7 @@
           sourceSlot.removeAttribute('data-player-cat-name');
           sourceSlot.removeAttribute('data-team-name');
           sourceSlot.removeAttribute('data-hcp');
+          sourceSlot.removeAttribute('data-teebox');
           
           // Update the destination slot
           updateSlotUI(destSlotId, data.slot);
@@ -182,7 +183,8 @@
       const clubName = entry.licence && entry.licence.club ? entry.licence.club : 'No team';
       const hcpValue = entry.hcp ? entry.hcp : 'x';
       const playingHcpHtml = slotData.playing_hcp ? `<strong>(PLAYING HCP: ${slotData.playing_hcp})</strong>` : '';
-      slotElement.innerHTML = `<strong>${fullName}</strong><br>${clubName} ${hcpValue} ${playingHcpHtml}`;
+      const teeboxValue = entry.playercat && entry.playercat.teebox ? entry.playercat.teebox : 'x';
+      slotElement.innerHTML = `<strong>${fullName}</strong><br>${clubName} | ${hcpValue} | ${teeboxValue} | ${playingHcpHtml}`;
       slotElement.classList.remove('slot-item--empty');
       slotElement.classList.add('slot-item--occupied');
       
@@ -193,6 +195,7 @@
       slotElement.setAttribute('data-player-cat-name', entry.playercat ? entry.playercat.name : 'No Category');
       slotElement.setAttribute('data-team-name', entry.team ? entry.team.name : 'No team');
       slotElement.setAttribute('data-hcp', entry.hcp || '0');
+      slotElement.setAttribute('data-teebox', entry.playercat && entry.playercat.teebox ? entry.playercat.teebox : 'x');
     }
 
     // Make slots with assigned entries draggable
@@ -220,6 +223,7 @@
           e.dataTransfer.setData('playerCatName', this.dataset.playerCatName || 'No Category');
           e.dataTransfer.setData('teamName', this.dataset.teamName || 'No team');
           e.dataTransfer.setData('hcp', this.dataset.hcp || '0');
+          e.dataTransfer.setData('teebox', this.dataset.teebox || 'x');
           e.dataTransfer.setData('source', 'slot');
         });
         
@@ -428,6 +432,7 @@
             slotElement.removeAttribute('data-player-cat');
             slotElement.removeAttribute('data-team-name');
             slotElement.removeAttribute('data-hcp');
+            slotElement.removeAttribute('data-teebox');
             slotElement.draggable = false;
             slotElement.style.cursor = '';
           }

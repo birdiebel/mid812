@@ -13,8 +13,16 @@ class Playercat < ApplicationRecord
   enum :teebox, [ "Black", "White", "Yellow", "Blue", "Red" ]
   enum :format, [ :single, :team ]
 
+  def teebox_index
+    self.teebox.index
+  end
   def icon_teebox
     tee_boxcolor = self.teebox.downcase
     "<div class='bloc-teebox "+tee_boxcolor+"'></div>".html_safe
+  end
+
+  def icon_teebox_span
+    tee_boxcolor = self.teebox.downcase
+    "<span class='bloc-teebox "+tee_boxcolor+"'></span>".html_safe
   end
 end

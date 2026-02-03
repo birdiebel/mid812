@@ -18,13 +18,15 @@
                        data-player-cat-name="<%= slot.entry.playercat&.name || 'No Category' %>"
                        data-team-name="<%= slot.entry.licence.club || 'No team' %>"
                        data-hcp="<%= slot.entry.hcp %>"
+                       data-teebox="<%= slot.entry.playercat&.teebox || 'x' %>"
                      <% end %>>
                   <strong><%= slot.entry ? slot.entry.player.full_name : "" %></strong>
                   <br>
-                  <%= slot.entry ? (slot.entry.licence.club || "No team") : "" %> 
-                  <%= slot.entry ? (slot.entry.hcp || "x") : "" %>
+                  <%= slot.entry ? (slot.entry.licence.club || "No team") : "" %> |
+                  <%= slot.entry ? (slot.entry.hcp || "x") : "" %> |
+                  <%= slot.entry ? (slot.entry.playercat&.teebox || "x") : "" %> |
                   <% if slot.playing_hcp %>
-                    <strong>(PLAYING HCP: <%= slot.playing_hcp %>)</strong>
+                    <strong>(PLAYING <%= slot.playing_hcp %>)</strong>
                   <% end %>
                 </div>
               <% end %>

@@ -7,6 +7,7 @@ ActiveAdmin.register Team do
   config.batch_actions = false
 
   index do
+    column :id
     column :event
     column :name
     column :status
