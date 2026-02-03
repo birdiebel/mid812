@@ -4,6 +4,14 @@ class ConfigTeetime < ApplicationRecord
   belongs_to :formula, optional: true
   has_many :flights, dependent: :destroy
 
+  def self.ransackable_attributes(auth_object = nil)
+    [ "course_id", "created_at", "formula_id", "hcp_pc", "id", "id_value", "nb_slots", "nb_teams", "round_id", "start_hole", "start_time", "step", "updated_at" ]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    [ "course", "flights", "formula", "round" ]
+  end
+
   validates :start_hole, inclusion: { in: 1..18 }
   validates :nb_slots, inclusion: { in: 1..4 }
   validates :step, presence: true

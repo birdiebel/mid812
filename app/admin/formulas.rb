@@ -3,6 +3,10 @@ ActiveAdmin.register Formula do
 
   permit_params :name, :format, :min_players, :max_players
 
+  action_item "Close", only: [ :show ] do
+    link_to "Close", admin_formulas_path
+  end
+
   index do
     selectable_column
     id_column

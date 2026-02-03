@@ -6,6 +6,10 @@ ActiveAdmin.register ConfigTeetime do
   menu false
   config.batch_actions = false
 
+  action_item "Close", only: [ :show ] do
+    link_to "Close", admin_config_teetimes_path
+  end
+
   index do
     column :round
     column :course

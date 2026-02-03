@@ -6,6 +6,10 @@ ActiveAdmin.register Round do
   menu false
   config.batch_actions = false
 
+  action_item "Close", only: [ :show ] do
+    link_to "Close", admin_tour_event_path(resource.event.tour, resource.event, anchor: "rounds")
+  end
+
   myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date}" }
 
   show title: myTitle do

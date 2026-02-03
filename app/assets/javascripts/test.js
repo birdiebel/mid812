@@ -35,7 +35,16 @@ $(document).ready(function () {
     setActive(target)
   })
 
-  const initial = sections.find((selector) => $(selector).is(":visible")) || sections[0]
+  // Check if there's a hash in the URL, otherwise use the first visible section
+  let initial = window.location.hash ? window.location.hash : (sections.find((selector) => $(selector).is(":visible")) || sections[0])
+  
+  // Make sure the hash corresponds to a valid section
+  if (window.location.hash && sections.includes(window.location.hash)) {
+    initial = window.location.hash
+  } else {
+    initial = sections.find((selector) => $(selector).is(":visible")) || sections[0]
+  }
+  
   showSection(initial)
   setActive(initial)
 })
