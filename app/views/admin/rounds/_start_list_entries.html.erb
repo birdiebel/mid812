@@ -6,7 +6,7 @@
       <% if entries.any? %>
         <% entries.group_by(&:playercat).sort_by { |cat, _| cat&.name || "No Category" }.each do |playercat, cat_entries| %>
           <div class="playercat-group" data-playercat-id="<%= playercat&.id %>">
-            <h4><%= playercat&.name || "No Category" %></h4>
+            <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= playercat&.name || "No Category" %></h4>
             <% cat_entries.each do |entry| %>
               <div class="entry-item" data-entry-id="<%= entry.id %>" style="<%= entry.slots.any? ? 'display: none;' : '' %>">
                 <strong><%= entry.player.full_name %></strong>
