@@ -11,4 +11,19 @@ class Flight < ApplicationRecord
   def self.ransackable_associations(auth_object = nil)
     [ "config_teetime" ]
   end
+
+  def myTime
+    base_time = config_teetime.start_time
+    step_minutes = config_teetime.step
+    # nb_slots = config_teetime.nb_slots
+
+    # Calculate the total minutes to add based on flight number and slots
+    # total_minutes = (num - 1) * step_minutes * nb_slots
+    total_minutes = (num - 1) * step_minutes
+
+    # Calculate the time for this flight
+    flight_time = base_time + total_minutes.minutes
+
+    flight_time.strftime("%H:%M")
+  end
 end

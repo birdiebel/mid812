@@ -12,7 +12,7 @@ module Api
             success: true,
             slot: @slot.as_json(include: {
               entry: {
-                include: [ :player, :team, :playercat ]
+                include: [ :player, :team, :playercat, :licence ]
               }
             })
           }, status: :ok

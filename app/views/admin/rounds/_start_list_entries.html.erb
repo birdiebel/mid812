@@ -1,18 +1,17 @@
 <div id="entries">
   <div class="panel" style="width: 500px;">
     <h3>Entries (Status: Enter)</h3>
-    <div class="panel_contents">
-      <% entries = round.event.entries.where(status: :enter).includes(:playercat, :player, :team, :slots) %>
-      <% available_entries = entries.reject { |entry| entry.slots.any? } %>
-      <% if available_entries.any? %>
-        <% available_entries.group_by(&:playercat).sort_by { |cat, _| cat&.name || "No Category" }.each do |playercat, cat_entries| %>
+    <div class="panel_contents" style="overflow-y: auto; height: 400px;">
+      <% entries = round.event.entries.where(status: :enter).includes(:playercat, :player, :team, :slots).order(:hcp) %>
+      <% if entries.any? %>
+        <% entries.group_by(&:playercat).sort_by { |cat, _| cat&.name || "No Category" }.each do |playercat, cat_entries| %>
           <div class="playercat-group" data-playercat-id="<%= playercat&.id %>">
             <h4><%= playercat&.name || "No Category" %></h4>
             <% cat_entries.each do |entry| %>
-              <div class="entry-item" data-entry-id="<%= entry.id %>">
+              <div class="entry-item" data-entry-id="<%= entry.id %>" style="<%= entry.slots.any? ? 'display: none;' : '' %>">
                 <strong><%= entry.player.full_name %></strong>
                 <br>
-                Team: <%= entry.team&.name || "No team" %>
+                <%= entry.licence.club || "No team" %>
                 | HCP: <%= entry.hcp %>
               </div>
             <% end %>

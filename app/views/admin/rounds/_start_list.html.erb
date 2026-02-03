@@ -99,7 +99,9 @@
           console.log('Entry moved successfully');
           
           // Clear the source slot
-          sourceSlot.innerHTML = sourceSlot.innerHTML.match(/Slot (\d+):/)[0] + ' Empty';
+          sourceSlot.innerHTML = '<strong></strong><br>';
+          sourceSlot.classList.remove('slot-item--occupied');
+          sourceSlot.classList.add('slot-item--empty');
           sourceSlot.removeAttribute('data-entry-id');
           sourceSlot.removeAttribute('data-player-name');
           sourceSlot.removeAttribute('data-player-cat');
@@ -176,12 +178,13 @@
       const entry = slotData.entry;
       const fullName = `${player.firstname} ${player.lastname}`;
       
-      // Get the current HTML and extract the slot number
-      const slotMatch = slotElement.innerHTML.match(/Slot (\d+):/);
-      const slotNum = slotMatch ? slotMatch[1] : '?';
-      
-      // Rebuild the slot content
-      slotElement.innerHTML = `Slot ${slotNum}: ${fullName}`;
+      // Rebuild the slot content to match initial render
+      const clubName = entry.licence && entry.licence.club ? entry.licence.club : 'No team';
+      const hcpValue = entry.hcp ? entry.hcp : 'x';
+      const playingHcpHtml = slotData.playing_hcp ? `<strong>(PLAYING HCP: ${slotData.playing_hcp})</strong>` : '';
+      slotElement.innerHTML = `<strong>${fullName}</strong><br>${clubName} ${hcpValue} ${playingHcpHtml}`;
+      slotElement.classList.remove('slot-item--empty');
+      slotElement.classList.add('slot-item--occupied');
       
       // Update data attributes
       slotElement.setAttribute('data-entry-id', entry.id);
@@ -312,26 +315,8 @@
           console.log('Success! Data:', data);
           
           if (destSlotElement && data.slot && data.slot.entry && data.slot.entry.player) {
-            const player = data.slot.entry.player;
-            const entry = data.slot.entry;
-            const fullName = `${player.firstname} ${player.lastname}`;
-            
-            // Get the current HTML and extract the slot number
-            const slotMatch = destSlotElement.innerHTML.match(/Slot (\d+):/);
-            const slotNum = slotMatch ? slotMatch[1] : '?';
-            
-            // Rebuild the slot content
-            destSlotElement.innerHTML = `Slot ${slotNum}: ${fullName}`;
-            
-            // Add data attributes to make the slot draggable
-            destSlotElement.setAttribute('data-entry-id', entry.id);
-            destSlotElement.setAttribute('data-player-name', fullName);
-            destSlotElement.setAttribute('data-player-cat', entry.playercat_id || '');
-            destSlotElement.setAttribute('data-player-cat-name', entry.playercat ? entry.playercat.name : 'No Category');
-            destSlotElement.setAttribute('data-team-name', entry.team ? entry.team.name : 'No team');
-            destSlotElement.setAttribute('data-hcp', entry.hcp || '0');
-            
-            console.log('Slot updated with:', fullName);
+            updateSlotUI(destSlotId, data.slot);
+            console.log('Slot updated from entry drop');
             
             // Hide the new entry from the list
             if (entryElement) {
@@ -433,9 +418,9 @@
           // Update slot to show "Empty"
           const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
           if (slotElement) {
-            let html = slotElement.innerHTML;
-            html = html.replace(/Slot (\d+): [^(]*/, 'Slot $1: Empty');
-            slotElement.innerHTML = html;
+            slotElement.innerHTML = '<strong></strong><br>';
+            slotElement.classList.remove('slot-item--occupied');
+            slotElement.classList.add('slot-item--empty');
             
             // Remove data attributes
             slotElement.removeAttribute('data-entry-id');
