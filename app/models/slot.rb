@@ -16,9 +16,12 @@ class Slot < ApplicationRecord
     puts "Before updating Slot #{id}: entry_id=#{entry_id}, flight_id=#{flight_id}, num=#{num}, playing_hcp=#{playing_hcp}"
     if entry_id?
       entry = Entry.find_by(id: entry_id)
+      formula = self.flight.config_teetime.formula.name
       if entry
-        # self.playing_hcp = entry.hcp
-        self.playing_hcp = playing_hcp_single(entry)
+        case formula
+        when "Single"
+          self.playing_hcp = playing_hcp_single(entry)
+        end
       else
         self.playing_hcp = nil
       end
@@ -29,7 +32,7 @@ class Slot < ApplicationRecord
 
   def playing_hcp_single(entry)
     # Teams
-    team = entry.team
+    # team = entry.team
     # Licence
     licence = entry.licence
     # Hcp
