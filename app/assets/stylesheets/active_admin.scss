@@ -284,7 +284,28 @@ body.active_admin {
 .flex-container {
     display: flex;
     gap: 10px;
-} 
+}
+
+// Hide all menu sections by default
+#config-times,
+#start-list,
+#scores-round,
+#status,
+#round-details,
+#event-entries,
+#rounds,
+#courses,
+#player-categories,
+#event-status,
+#event-details {
+    display: none;
+}
+
+// Show the first section by default
+#config-times,
+#event-entries {
+    display: block;
+}
 
 .entry-item, .slot-item {
     margin-bottom: 8px;

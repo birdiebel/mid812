@@ -1,6 +1,7 @@
 class Slot < ApplicationRecord
   belongs_to :flight
   belongs_to :team, optional: true
+  has_many :scores, dependent: :destroy
 
   def self.ransackable_attributes(auth_object = nil)
     [ "created_at", "team_id", "flight_id", "id", "num", "playing_hcp", "updated_at" ]
@@ -15,10 +16,13 @@ class Slot < ApplicationRecord
 
   def before_update_callback
     puts "Before updating Slot #{id}: team_id=#{team_id}, flight_id=#{flight_id}, num=#{num}, playing_hcp=#{playing_hcp}"
+    puts "  team_id changed: #{team_id_changed?}, was: #{team_id_was}, now: #{team_id}"
     if team_id?
       team = Team.find_by(id: team_id)
+      puts "  Found team: #{team&.id} - #{team&.name}"
       formula_name = self.flight&.config_teetime&.formula&.name
       formula_key = normalize_formula_key(formula_name)
+      puts "  Formula: #{formula_name} (#{formula_key})"
       if team && team.entries.exists?
         case
         when formula_key == "single"
@@ -54,13 +58,16 @@ class Slot < ApplicationRecord
   end
 
   def sync_playing_hcps
+    puts "sync_playing_hcps called for Slot #{id}, team_id: #{team_id}"
     return unless team_id?
 
     team = Team.includes(:entries).find_by(id: team_id)
+    puts "  Team found: #{team&.id}, entries: #{team&.entries&.count}"
     return unless team && team.entries.exists?
 
     formula_name = self.flight&.config_teetime&.formula&.name
     formula_key = normalize_formula_key(formula_name)
+    puts "  Formula: #{formula_name} (#{formula_key})"
 
     case
     when formula_key == "single"

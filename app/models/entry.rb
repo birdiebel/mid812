@@ -4,12 +4,13 @@ class Entry < ApplicationRecord
   belongs_to :licence, optional: true
   belongs_to :playercat, optional: true
   belongs_to :team, optional: true
+  has_many :scores, dependent: :destroy
 
   def self.ransackable_attributes(auth_object = nil)
     [ "created_at", "event_id", "id", "licence_id", "player_id", "status", "updated_at", "playercat_id", "hcp", "playing_hcp" ]
   end
   def self.ransackable_associations(auth_object = nil)
-    [ "event", "player", "licence", "playercat", "team" ]
+    [ "event", "player", "licence", "playercat", "team", "scores" ]
   end
 
   ransacker :playing_hcp do

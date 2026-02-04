@@ -1,8 +1,45 @@
-<div id="scores">
+<div id="scores-round">
   <div class="panel">
     <h3>Scores</h3>
     <div class="panel_contents">
-        <p>Scores data coming soon...</p>
+      <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? } %>
+      
+      <% if slots.any? %>
+        <table class="index_table">
+          <thead>
+            <tr>
+              <th>Time</th>
+              <th>Start at</th>
+              <th>Team #</th>
+              <th>Team Name</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% slots.each do |slot| %>
+              <% score = Score.find_or_create_by(round_id: round.id, slot_id: slot.id) do |s|
+                s.entry = slot.team.entries.first
+                s.status = :partial
+              end %>
+              <tr>
+                <td><%= slot.flight.myTime %></td>
+                <td><%= score.start_hole %></td>
+                <td><%= slot.team.num %></td>
+                <td><%= slot.team.name %></td>
+                <td>
+                  <span class="status_tag <%= score.status %>"><%= score.status.humanize %></span>
+                </td>
+                <td>
+                  <%= link_to "Edit Score", edit_admin_score_path(score), class: "button" %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <p>No slots with teams assigned for this round.</p>
+      <% end %>
     </div>
   </div>
 </div>

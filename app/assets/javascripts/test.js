@@ -8,7 +8,7 @@ $(document).ready(function () {
     sections = ["#event-entries", "#rounds", "#courses", "#player-categories", "#event-status", "#event-details"]
   }
   if (CallMenu == "round-menu") {
-    sections = [ "#config-times", "#start-list", "#scores", "#status", "#round-details"]
+    sections = [ "#config-times", "#start-list", "#scores-round", "#status", "#round-details"]
   }
 
   function showSection(target) {
