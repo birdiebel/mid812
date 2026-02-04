@@ -10,7 +10,7 @@ module Api
         if @slot.update(slot_params)
           # Reload to get the updated playing_hcp from callbacks
           @slot.reload
-          
+
           render json: {
             success: true,
             slot: @slot.as_json(include: {
