@@ -204,6 +204,17 @@
       occupiedSlots.forEach(slot => {
         slot.draggable = true;
         slot.style.cursor = 'move';
+        
+        // Double-click to remove team from slot
+        slot.addEventListener('dblclick', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          const slotId = this.dataset.slotId;
+          const teamId = this.dataset.teamId;
+          console.log('Double-clicked slot', slotId, 'with team', teamId);
+          removeTeamFromSlot(slotId, teamId);
+        });
+        
         slot.addEventListener('dragstart', function(e) {
           const teamId = this.dataset.teamId;
           const slotId = this.dataset.slotId;
@@ -226,6 +237,91 @@
           this.style.opacity = '1';
           this.style.backgroundColor = '';
         });
+      });
+    }
+    
+    // Function to remove team from slot
+    function removeTeamFromSlot(slotId, teamId) {
+      const token = document.querySelector('meta[name="csrf-token"]');
+      if (!token) {
+        console.error('CSRF token not found');
+        return;
+      }
+      
+      fetch(`/api/v1/slots/${slotId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-Token': token.content
+        },
+        body: JSON.stringify({
+          slot: {
+            team_id: null
+          }
+        })
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else {
+          alert('Failed to remove team from slot');
+          throw new Error('Failed to update slot');
+        }
+      })
+      .then(data => {
+        console.log('Team removed from slot successfully');
+        
+        // Update slot to show "Empty"
+        const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
+        if (slotElement) {
+          slotElement.innerHTML = '<strong></strong><br>';
+          slotElement.classList.remove('slot-item--occupied');
+          slotElement.classList.add('slot-item--empty');
+          
+          // Remove data attributes
+          slotElement.removeAttribute('data-team-id');
+          slotElement.removeAttribute('data-team-name');
+          slotElement.removeAttribute('data-hcp');
+          slotElement.removeAttribute('data-teebox');
+          slotElement.draggable = false;
+          slotElement.style.cursor = '';
+        }
+        
+        // Show the team in the teams list
+        const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
+        if (teamElement) {
+          teamElement.style.display = '';
+          console.log('Team shown in list');
+          makeEntriesDraggable();
+        } else {
+          console.log('Team element not found, attempting to reload panel');
+          // Fallback: reload the teams panel
+          const teamsPanel = document.querySelector('#teams .panel_contents');
+          if (teamsPanel) {
+            fetch(window.location.pathname, {
+              headers: { 'Accept': 'text/html' }
+            })
+            .then(response => response.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const newDoc = parser.parseFromString(html, 'text/html');
+              const newTeamsPanel = newDoc.querySelector('#teams .panel_contents');
+              if (newTeamsPanel) {
+                teamsPanel.innerHTML = newTeamsPanel.innerHTML;
+                makeEntriesDraggable();
+                console.log('Teams panel reloaded');
+              }
+            })
+            .catch(error => console.error('Error reloading teams panel:', error));
+          }
+        }
+        
+        // Re-initialize slot draggability
+        makeSlotsDraggable();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error removing team from slot');
       });
     }
     
@@ -412,7 +508,7 @@
           }
         })
         .then(data => {
-          console.log('Team removed from slot successfully');
+          console.log('Team removed from slot successfully, teamId:', teamId);
           
           // Update slot to show "Empty"
           const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
@@ -430,20 +526,37 @@
             slotElement.style.cursor = '';
           }
           
-          // Re-show the hidden team in the entries list
-          const hiddenTeam = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
-          
-          if (hiddenTeam) {
-            hiddenTeam.style.display = '';
-            console.log('Team re-shown in list');
-            makeEntriesDraggable(); // Re-enable drag on the re-shown team
+          // Show the team in the teams list
+          const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
+          if (teamElement) {
+            teamElement.style.display = '';
+            console.log('Team shown in list');
+            makeEntriesDraggable();
           } else {
-            console.error('Hidden team not found for id:', teamId);
+            console.log('Team element not found, attempting to reload panel');
+            // Fallback: reload the teams panel
+            const teamsPanel = document.querySelector('#teams .panel_contents');
+            if (teamsPanel) {
+              fetch(window.location.pathname, {
+                headers: { 'Accept': 'text/html' }
+              })
+              .then(response => response.text())
+              .then(html => {
+                const parser = new DOMParser();
+                const newDoc = parser.parseFromString(html, 'text/html');
+                const newTeamsPanel = newDoc.querySelector('#teams .panel_contents');
+                if (newTeamsPanel) {
+                  teamsPanel.innerHTML = newTeamsPanel.innerHTML;
+                  makeEntriesDraggable();
+                  console.log('Teams panel reloaded');
+                }
+              })
+              .catch(error => console.error('Error reloading teams panel:', error));
+            }
           }
           
           // Re-initialize slot draggability
           makeSlotsDraggable();
-          makeEntriesDraggable(); // Re-enable drag on all visible entries
         })
         .catch(error => {
           console.error('Error:', error);

@@ -5,7 +5,7 @@ $(document).ready(function () {
   CallMenu = $buttons.parent().attr("name")
 
   if (CallMenu == "event-menu") {
-    sections = ["#entries", "#rounds", "#courses", "#player-categories", "#event-details"]
+    sections = ["#event-entries", "#rounds", "#courses", "#player-categories", "#event-details"]
   }
   if (CallMenu == "round-menu") {
     sections = [ "#config-times", "#start-list", "#scores", "#status", "#round-details"]
@@ -14,9 +14,9 @@ $(document).ready(function () {
   function showSection(target) {
     sections.forEach((selector) => {
       if (selector === target) {
-        $(selector).show()
+        $(selector).css('display', 'block')
       } else {
-        $(selector).hide()
+        $(selector).css('display', 'none')
       }
     })
   }
@@ -35,14 +35,11 @@ $(document).ready(function () {
     setActive(target)
   })
 
-  // Check if there's a hash in the URL, otherwise use the first visible section
-  let initial = window.location.hash ? window.location.hash : (sections.find((selector) => $(selector).is(":visible")) || sections[0])
+  // Check if there's a hash in the URL, otherwise use the first section
+  let initial = sections[0]
   
-  // Make sure the hash corresponds to a valid section
   if (window.location.hash && sections.includes(window.location.hash)) {
     initial = window.location.hash
-  } else {
-    initial = sections.find((selector) => $(selector).is(":visible")) || sections[0]
   }
   
   showSection(initial)

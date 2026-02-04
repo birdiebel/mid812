@@ -4,12 +4,14 @@
     <div class="panel_contents" style="overflow-y: auto; height: 400px;">
       <% teams = round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots) %>
       <% available_teams = teams.reject { |team| team.slots.any? } %>
-      <% if available_teams.any? %>
-        <% available_teams.group_by(&:resultcat).sort_by { |cat, _| cat&.name || "No Category" }.each do |resultcat, cat_teams| %>
-          <div class="resultcat-group" data-resultcat-id="<%= resultcat&.id %>">
-            <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= resultcat&.name || "No Category" %></h4>
+      <% resultcats = round.event.resultcats.sort_by(&:name) %>
+      <% if resultcats.any? %>
+        <% resultcats.each do |resultcat| %>
+          <% cat_teams = available_teams.select { |team| team.resultcat_id == resultcat.id } %>
+          <div class="resultcat-group" data-resultcat-id="<%= resultcat.id %>">
+            <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= resultcat.name %></h4>
             <% cat_teams.each do |team| %>
-              <div class="team-item" data-team-id="<%= team.id %>" style="<%= team.slots.any? ? 'display: none;' : '' %>">
+              <div class="team-item" data-team-id="<%= team.id %>" data-resultcat-id="<%= team.resultcat_id %>" style="<%= team.slots.any? ? 'display: none;' : '' %>">
                 <strong><%= team.team_name %></strong>
                 <br>
                 HCP: <%= team.total_hcp %>
