@@ -5,15 +5,22 @@
       <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? } %>
       
       <% if slots.any? %>
-        <table class="index_table">
+        <div style="margin-bottom: 15px;">
+          <input type="text" id="search-team-num" placeholder="Search team #..." style="padding: 8px; width: 200px; font-size: 1em;">
+        </div>
+        <table class="index_table" id="scores-table">
           <thead>
             <tr>
-              <th>Time</th>
-              <th>Start at</th>
-              <th>Team #</th>
-              <th>Team Name</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th></th>
+              <th>@</th>
+              <th>#</th>
+              <th>Name</th>
+              <th>Holes</th>
+              <th>+-</th>
+              <th>Brut</th>
+              <th>Net</th>
+              <th>Stb</th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -25,8 +32,17 @@
               <tr>
                 <td><%= slot.flight.myTime %></td>
                 <td><%= score.start_hole %></td>
-                <td><%= slot.team.num %></td>
-                <td><%= slot.team.name %></td>
+                <td class="team-num"><%= slot.team.num %></td>
+                <td class="text-left"><%= slot.team.name %></td>
+                <td><%= score.hole_played %></td>
+                <% sp_score = score.stroke_play_score %>
+                <%# dans active admin views helper %>
+                <td> 
+                  <div class="div-against-par" style="<%= style_for_stroke_play(sp_score) %>"><strong><%= sp_score %></strong></div>
+                </td>
+                <td><%= score.brut("total") %></td>
+                <td><%= score.net("total") %></td>
+                <td><%= score.stb("total") %></td>
                 <td>
                   <span class="status_tag <%= score.status %>"><%= score.status.humanize %></span>
                 </td>
@@ -43,3 +59,78 @@
     </div>
   </div>
 </div>
+<script>
+function init_search_team() {
+  var searchInput = $('#search-team-num');
+  var scoresRound = $('#scores-round');
+  
+  if (searchInput.length > 0 && scoresRound.is(':visible')) {
+    searchInput.focus();
+    searchInput.val('');
+  }
+}
+
+$(document).ready(function() {
+  init_search_team();
+  
+  // Watch for visibility changes on scores-round
+  var scoresRoundObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+      if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+        if ($('#scores-round').is(':visible')) {
+          setTimeout(function() {
+            init_search_team();
+          }, 100);
+        }
+      }
+    });
+  });
+  
+  var scoresRound = document.getElementById('scores-round');
+  if (scoresRound) {
+    scoresRoundObserver.observe(scoresRound, {
+      attributes: true,
+      attributeFilter: ['style', 'class']
+    });
+  }
+  
+  // Also listen to turbo events
+  $(document).on('turbo:load', function() {
+    init_search_team();
+  });
+  
+  $(document).on('keyup', '#search-team-num', function() {
+    var searchValue = $(this).val().trim();
+    var rows = $('#scores-table tbody tr');
+    
+    if (searchValue === '') {
+      rows.show();
+      return;
+    }
+    
+    rows.each(function() {
+      var teamNum = $(this).find('.team-num').text().trim();
+      if (teamNum === searchValue) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  });
+  
+  $(document).on('keypress', '#search-team-num', function(e) {
+    if (e.which == 13) { // Enter key
+      e.preventDefault();
+      var searchValue = $(this).val().trim();
+      var visibleRows = $('#scores-table tbody tr:visible');
+      
+      if (visibleRows.length === 1) {
+        var editButton = visibleRows.find('a.button').first();
+        if (editButton.length) {
+          window.location.href = editButton.attr('href');
+        }
+      }
+    }
+  });
+});
+</script>

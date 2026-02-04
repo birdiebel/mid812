@@ -31,18 +31,19 @@ ActiveAdmin.register Score do
   filter :start_hole
 
   form do |f|
-    f.inputs "Score Details" do
-      f.input :round, as: :select, collection: Round.all.map { |r| [ "Round #{r.id} - #{r.event.name}", r.id ] }
-      f.input :slot, as: :select, collection: Slot.all.map { |s| [ "Slot #{s.num} - Flight #{s.flight_id}", s.id ] }
-      f.input :entry, as: :select, collection: Entry.all.includes(:player).map { |e| [ e.player.full_name, e.id ] }
-      f.input :status, as: :select, collection: Score.statuses.keys
-      f.input :hole_played
-      f.input :start_hole
-      f.input :brut_str
-      f.input :net_str
-      f.input :stb_str
-      f.input :recu_str, input_html: { disabled: true }, hint: "Auto-calculated based on playing_hcp and stroke index"
+    # f.inputs "Score Details" do
+    #   f.input :round, as: :select, collection: Round.all.map { |r| [ "Round #{r.id} - #{r.event.name}", r.id ] }
+    #   f.input :slot, as: :select, collection: Slot.all.map { |s| [ "Slot #{s.num} - Flight #{s.flight_id}", s.id ] }
+    #   f.input :entry, as: :select, collection: Entry.all.includes(:player).map { |e| [ e.player.full_name, e.id ] }
+    #   f.input :status, as: :select, collection: Score.statuses.keys
+    #   f.input :hole_played
+    #   f.input :start_hole
+    # end
+
+    f.inputs "Result-Card" do
+      render "admin/scores/result_card", f: f, score: f.object
     end
+
     f.actions do
       f.action :submit
       f.cancel_link admin_round_path(f.object.round, anchor: "scores-round")

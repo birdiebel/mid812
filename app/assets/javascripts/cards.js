@@ -1,8 +1,12 @@
-$(document).ready(function() {
+function init_cards() {
+    if ($("#nb_cards").length === 0) {
+        return;
+    }
 
     console.log("Card js is ready");
 
     var nb_players = parseInt($("#nb_cards").text(), 10) || 0;
+    var nb_hole = get_nb_hole();
 
     // Store Card_player score_txt values to inputs:brut and array
     for (var player = 1; player <= nb_players ; player++) {
@@ -13,8 +17,8 @@ $(document).ready(function() {
 
         // Store each input:brut from brut_array
         var i;
-        for (i = 0; i <= 17 ; i++) {
-            var brut_value = brut_array[i] !== undefined ? brut_array[i] : "0";
+        for (i = 0; i < nb_hole ; i++) {
+            var brut_value = brut_array[i] !== undefined ? brut_array[i] : "";
             $(select_input(player, i)).val(brut_value);
         }
 
@@ -29,9 +33,9 @@ $(document).ready(function() {
 
     }
 
-    // Change Brut input player
+    // Change Brut input player (instant update)
     for (var p = 1; p <= nb_players; p++) {
-        $(select_all_input(p)).change(function () {
+        $(select_all_input(p)).off("input change.cards").on("input change.cards", function () {
             var currentPlayer = parseInt($(this).attr("player"), 10);
             if (!currentPlayer) {
                 return;
@@ -42,9 +46,9 @@ $(document).ready(function() {
         });
     }
 
-    // Select first free input (value 0)
+    // Select first free input (value empty)
     $("input.brut").each(function(){
-        if ($(this).val() === "0" ) {
+        if ($(this).val() === "" ) {
             $(this).select();
             return false;
         }
@@ -52,9 +56,29 @@ $(document).ready(function() {
 
     $('.brut').ForceNumericOnly();
 
+    // Handle backspace to go to previous input and delete its content
     $('.brut').keydown(function(e){
         var key = e.charCode || e.keyCode || 0;
         var value = $(this).val();
+        
+        // If backspace and input is empty, go to previous input and clear it
+        if (key === 8 && value.length === 0) {
+            e.preventDefault();
+            var inputs = $(this).closest('.input-scorecard').find('.brut');
+            var currentIndex = inputs.index(this);
+            if (currentIndex > 0) {
+                var prevInput = inputs.eq(currentIndex - 1);
+                prevInput.val('').focus();
+                // Trigger recalculation
+                var player = parseInt(prevInput.attr("player"), 10);
+                if (player) {
+                    write_initial_brut(player);
+                    show_totaux(player);
+                }
+            }
+            return false;
+        }
+        
         if ( value.length === 0 && key === 9) {
             console.log("KEYDOWN TAB AND EMPTY");
             return false
@@ -97,10 +121,22 @@ $(document).ready(function() {
         }
     });
 
+}
+
+$(document).ready(function() {
+    init_cards();
+});
+
+$(document).on("turbo:load", function() {
+    init_cards();
 });
 
 function read_initial_brut(player) {
     return "input.initial_brut[player='"+player+"']";
+}
+
+function read_initial_zone(zone, player) {
+    return "input.initial_"+zone+"[player='"+player+"']";
 }
 
 function write_initial_brut(player) {
@@ -152,34 +188,47 @@ function select_par_value(player,hole) {
 }
 
 function show_computed_net(player) {
+    var nb_hole = get_nb_hole();
+    var netValues = [];
     var i;
-    for (i = 0; i <= 17 ; i++) {
+    for (i = 0; i < nb_hole ; i++) {
         var brut = select_input_value(player, i);
         var recu = select_computed_td_value("recu", player, i);
         var net = get_value_net(brut, recu, i);
         $(select_computed_td("net", player, i)).text(net)
+        netValues.push(net === undefined || net === null ? "" : net);
     }
+
+    write_initial_zone_values("net", player, netValues);
 
 }
 
 function show_computed_stb(player) {
+    var nb_hole = get_nb_hole();
+    var stbValues = [];
     var i;
-    for (i = 0; i <= 17 ; i++) {
+    for (i = 0; i < nb_hole ; i++) {
         var par = select_par_value(player,i);
         var brut = select_input_value(player, i);
         var recu = select_computed_td_value("recu", player, i);
         var net = get_value_net(brut, recu, i);
         var stb = get_value_stb(par, net, brut);
         $(select_computed_td("stb", player, i)).text(stb)
+        stbValues.push(stb === undefined || stb === null ? "" : stb);
     }
+
+    write_initial_zone_values("stb", player, stbValues);
 }
 
 function get_value_net(brut, recu, hole) {
-    if (!brut) {
+    if (!brut && brut !== 0) {
         return "";
     }
-    if (brut === 0) {
+    if (brut === "") {
         return "";
+    }
+    if (brut == 0) {
+        return "x";
     }
     if (!recu) {
         recu = 0;
@@ -190,8 +239,14 @@ function get_value_net(brut, recu, hole) {
 }
 
 function get_value_stb(par, net, brut) {
-    if (!brut) {
+    if (!brut && brut !== 0) {
         return "";
+    }
+    if (brut === "") {
+        return "";
+    }
+    if (brut == 0) {
+        return "x";
     }
 
     var stb = (par - net) +2;
@@ -209,6 +264,7 @@ function show_totaux(player) {
 }
 
 function show_totaux_brut(zone, player) {
+    var nb_hole = get_nb_hole();
     var frontPoints = 0;
     var backPoints = 0;
     var totalPoints = 0;
@@ -222,10 +278,11 @@ function show_totaux_brut(zone, player) {
             brut_valid = false;
             brut = "0";
         }
+        if ( brut === "" ) { brut = "0"; }
         if ( !brut ) { brut = "0"; }
         if(i <= 8 ) {
             frontPoints += parseInt(brut);
-        } else {
+        } else if (nb_hole > 9) {
             backPoints += parseInt(brut);
         }
         i += 1;
@@ -248,14 +305,15 @@ function show_totaux_brut(zone, player) {
         totalPoints = "x";
     }
 
-    $("."+zone+"_front[player='"+player+"']").text(frontPoints);
-    $("."+zone+"_back[player='"+player+"']").text(backPoints);
-    $("."+zone+"_total[player='"+player+"']").text(totalPoints);
+    set_total_if_present(zone + "_front", player, frontPoints);
+    set_total_if_present(zone + "_back", player, backPoints);
+    set_total_if_present(zone + "_total", player, totalPoints);
 
     return true
 }
 
 function show_totaux_zone(zone, player) {
+    var nb_hole = get_nb_hole();
     var frontPoints = 0;
     var backPoints = 0;
     var totalPoints = 0;
@@ -266,7 +324,7 @@ function show_totaux_zone(zone, player) {
         if ( !value ) { value = 0}
         if(i <= 8 ) {
             frontPoints += value;
-        } else {
+        } else if (nb_hole > 9) {
             backPoints += value;
         }
         i += 1;
@@ -275,9 +333,28 @@ function show_totaux_zone(zone, player) {
     if (frontPoints === 0) { frontPoints = "" }
     if (backPoints === 0) { backPoints = "" }
     if (totalPoints === 0) { totalPoints = "" }
-    $("."+zone+"_front[player='"+player+"']").text(frontPoints);
-    $("."+zone+"_back[player='"+player+"']").text(backPoints);
-    $("."+zone+"_total[player='"+player+"']").text(totalPoints);
+    set_total_if_present(zone + "_front", player, frontPoints);
+    set_total_if_present(zone + "_back", player, backPoints);
+    set_total_if_present(zone + "_total", player, totalPoints);
 
     return true
+}
+
+function write_initial_zone_values(zone, player, values) {
+    var input = $(read_initial_zone(zone, player));
+    if (input.length === 0) {
+        return;
+    }
+    input.val(values.join(","));
+}
+
+function set_total_if_present(selectorClass, player, value) {
+    var target = $("."+selectorClass+"[player='"+player+"']");
+    if (target.length > 0) {
+        target.text(value);
+    }
+}
+
+function get_nb_hole() {
+    return parseInt($("#nb_hole").text(), 10) || 18;
 }

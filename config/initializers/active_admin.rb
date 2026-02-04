@@ -374,4 +374,5 @@ ActiveAdmin.setup do |config|
   # My
   config.register_javascript "test.js"
   config.register_javascript "cards_edit.js"
+  config.register_javascript "cards.js"
 end
