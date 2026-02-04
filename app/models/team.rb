@@ -1,20 +1,24 @@
 class Team < ApplicationRecord
   belongs_to :event
+  belongs_to :resultcat, optional: true
   has_many :entries, dependent: :destroy
+  has_many :slots, dependent: :destroy
 
   accepts_nested_attributes_for :entries, allow_destroy: false, reject_if: :all_blank
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "created_at", "event_id", "id", "id_value", "name", "status", "updated_at" ]
+    [ "created_at", "event_id", "id", "id_value", "name", "resultcat_id", "status", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    [ "entries", "event" ]
+    [ "entries", "event", "slots" ]
   end
 
   validates :name, presence: true
 
   enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
+
+  after_save :update_resultcat, if: -> { !@skip_resultcat_update }
 
   def total_age
     entries.includes(:player).sum { |entry| entry.player&.age || 0 }
@@ -22,5 +26,74 @@ class Team < ApplicationRecord
 
   def total_hcp
     entries.sum(:hcp)
+  end
+
+  def team_name
+    entries.map { |e| e.player.full_name }.join(" / ")
+  end
+
+  def update_resultcat
+    @skip_resultcat_update = true
+    get_resultcat
+    @skip_resultcat_update = false
+  end
+
+  def get_resultcat
+    # Reload entries to ensure fresh data
+    self.reload
+    return if event.nil? || entries.empty?
+
+    # Force reload of event.resultcats
+    event.resultcats.reload
+
+    hcp = total_hcp
+    sexes = entries.map { |e| e.player&.sexe }.compact.uniq
+    ages = entries.map { |e| e.player&.age }.compact
+
+    puts "[Team#get_resultcat] Team #{id}: hcp=#{hcp}, sexes=#{sexes}, ages=#{ages}"
+    puts "  Event has #{event.resultcats.count} resultcats"
+
+    event.resultcats.each do |resultcat|
+      puts "  Checking resultcat #{resultcat.id} (#{resultcat.name}): hcp_min=#{resultcat.hcp_min}, hcp_max=#{resultcat.hcp_max}, sexe=#{resultcat.sexe}"
+
+      # Check HCP range
+      next unless resultcat.hcp_min <= hcp && resultcat.hcp_max >= hcp
+      puts "    HCP match!"
+
+      # Check age range (if agecats exist with limits; otherwise no limit)
+      if resultcat.agecats.exists?
+        age_match = ages.all? do |age|
+          resultcat.agecats.any? do |agecat|
+            agecat.age_low.present? && agecat.age_high.present? &&
+            agecat.age_low <= age && agecat.age_high >= age
+          end
+        end
+
+        unless age_match
+          puts "    Age doesn't match: ages #{ages} don't fit any agecat"
+          next
+        end
+        puts "    Age match!"
+      else
+        puts "    No age restriction"
+      end
+
+      # Check sexe (All matches everything, otherwise must match)
+      if resultcat.sexe == "All"
+        puts "    Sexe match (All)!"
+        self.update_column(:resultcat_id, resultcat.id)
+        return resultcat
+      elsif sexes.all? { |sexe| sexe.to_s == resultcat.sexe.to_s }
+        puts "    Sexe match (#{sexes} == #{resultcat.sexe})!"
+        self.update_column(:resultcat_id, resultcat.id)
+        return resultcat
+      else
+        puts "    Sexe doesn't match: #{sexes} vs #{resultcat.sexe}"
+      end
+    end
+
+    # No category found
+    puts "  No resultcat found for team #{id}"
+    nil
   end
 end

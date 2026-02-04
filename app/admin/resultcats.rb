@@ -1,5 +1,5 @@
 ActiveAdmin.register Resultcat do
-  permit_params :name, :agecat_id, :sexe, :hcp_min, :hcp_max, :version, :priority, :actif
+  permit_params :name, :sexe, :hcp_min, :hcp_max, :version, :priority, :actif, agecat_ids: []
 
   config.batch_actions = false
 
@@ -29,7 +29,6 @@ ActiveAdmin.register Resultcat do
   end
 
   filter :name_cont, as: :string, label: "Name"
-  filter :agecat, as: :select
   filter :version_cont, as: :string, label: "Version"
   config.sort_order = "id_asc"
 
@@ -38,7 +37,9 @@ ActiveAdmin.register Resultcat do
     column "Name" do |resultcat|
       link_to resultcat.name, admin_resultcat_path(resultcat), method: :get
     end
-    column "Age Category", :agecat
+    column "Age Categories" do |resultcat|
+      resultcat.agecats.map(&:name).join(", ")
+    end
     column "Sexe", :sexe
     column "HCP Min", :hcp_min
     column "HCP Max", :hcp_max
@@ -62,7 +63,7 @@ ActiveAdmin.register Resultcat do
   form do |f|
     f.inputs "Result Category" do
       f.input :name
-      f.input :agecat, as: :select
+      f.input :agecats, as: :check_boxes, collection: Agecat.all.map { |a| [ a.name, a.id ] }
       f.input :sexe
       f.input :hcp_min
       f.input :hcp_max

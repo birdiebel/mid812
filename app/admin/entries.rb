@@ -1,8 +1,6 @@
 ActiveAdmin.register Entry do
   permit_params :event_id, :player_id, :licence_id, :status, :team_id
 
-  menu false
-
   includes :event, :player, :licence
   config.batch_actions = false
 

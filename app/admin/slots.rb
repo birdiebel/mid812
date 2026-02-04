@@ -1,19 +1,19 @@
 ActiveAdmin.register Slot do
-  permit_params :flight_id, :entry_id, :num, :playing_hcp
+  permit_params :flight_id, :team_id, :num, :playing_hcp
 
   config.batch_actions = false
 
   menu label: "Slots", parent: "Config", priority: 11
 
   filter :flight, as: :select
-  filter :entry, as: :select
+  filter :team, as: :select
   filter :num
   config.sort_order = "flight_id_asc"
 
   index do
     column "Num", :num
     column "Flight", :flight
-    column "Entry", :entry
+    column "Team", :team
     column "Playing HCP", :playing_hcp
     column "" do |slot|
       button_to "Edit", edit_admin_slot_path(slot), method: :get, class: "btt btt-edit"
@@ -24,9 +24,9 @@ ActiveAdmin.register Slot do
     f.inputs "Slot" do
       f.input :flight, as: :select, collection: Flight.all.map { |fl| [ "Flight #{fl.num}", fl.id ] }
       li do
-        label "Entry"
+        label "Team"
         div do
-          text_node f.object.entry ? f.object.entry.player&.full_name : "No entry assigned"
+          text_node f.object.team ? f.object.team.name : "No team assigned"
         end
       end
       f.input :num, as: :number

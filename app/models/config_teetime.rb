@@ -60,7 +60,7 @@ class ConfigTeetime < ApplicationRecord
     (1..nb_slots).each do |num|
       slot = existing_slots.find { |s| s.num == num }
       unless slot
-        flight.slots.create!(num: num, entry_id: nil, playing_hcp: nil)
+        flight.slots.create!(num: num, team_id: nil, playing_hcp: nil)
       end
     end
 

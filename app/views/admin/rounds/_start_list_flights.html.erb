@@ -9,24 +9,19 @@
             <div class="flight-item">
               <h4 style="background-color: lightblue; padding: 5px; font-weight: bold;"><strong>Flight <%= flight.num %></strong> - <strong><%= flight.myTime %></strong></h4>
               <% flight.slots.order(:num).each do |slot| %>
-                 <div class="slot-item <%= slot.entry ? 'slot-item--occupied' : 'slot-item--empty' %>" 
+                 <div class="slot-item <%= slot.team ? 'slot-item--occupied' : 'slot-item--empty' %>" 
                      data-slot-id="<%= slot.id %>"
-                     <% if slot.entry %>
-                       data-entry-id="<%= slot.entry.id %>"
-                       data-player-name="<%= slot.entry.player.full_name %>"
-                       data-player-cat="<%= slot.entry.playercat_id %>"
-                       data-player-cat-name="<%= slot.entry.playercat&.name || 'No Category' %>"
-                       data-team-name="<%= slot.entry.licence.club || 'No team' %>"
-                       data-hcp="<%= slot.entry.hcp %>"
-                       data-teebox="<%= slot.entry.playercat&.teebox || 'x' %>"
+                     <% if slot.team %>
+                       data-team-id="<%= slot.team.id %>"
+                       data-team-name="<%= slot.team.team_name %>"
+                       data-hcp="<%= slot.team.total_hcp %>"
                      <% end %>>
-                  <strong><%= slot.entry ? slot.entry.player.full_name : "" %></strong>
+                  <strong><%= slot.team ? slot.team.team_name : "" %></strong>
                   <br>
-                  <%= slot.entry ? (slot.entry.licence.club || "No team") : "" %> |
-                  <%= slot.entry ? (slot.entry.hcp || "x") : "" %> |
-                  <%= slot.entry ? (slot.entry.playercat&.teebox || "x") : "" %> |
-                  <% if slot.playing_hcp %>
-                    <strong>(PLAYING <%= slot.playing_hcp %>)</strong>
+                  <%= slot.team ? (slot.team.total_hcp || "x") : "" %> |
+                  <% if slot.team %>
+                    <% playing_hcps = slot.team.entries.map { |e| e.playing_hcp || "x" } %>
+                    <strong>PHCP: <%= playing_hcps.join(" / ") %></strong>
                   <% end %>
                 </div>
               <% end %>

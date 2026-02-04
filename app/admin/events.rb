@@ -4,7 +4,8 @@ ActiveAdmin.register Event do
 
   permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, :fee, :fee_member, :actif_round, :scoring, :min_players, :max_players,
                 course_ids: [],
-                playercats_ids: []
+                playercats_ids: [],
+                resultcats_ids: []
 
   menu false
   config.batch_actions = false
@@ -16,7 +17,7 @@ ActiveAdmin.register Event do
   myTitle = proc { |event| "#{event.tour.name} : #{event.name}" }
   filter :name_cont, as: :string, label: "Name"
 
-  includes :entries, :playercats
+  includes :entries, :playercats, :resultcats
 
 
   index do

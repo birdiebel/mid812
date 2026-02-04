@@ -1,5 +1,7 @@
 class Resultcat < ApplicationRecord
-  belongs_to :agecat
+  has_and_belongs_to_many :agecats
+  has_many :event_resultcats, dependent: :destroy
+  has_many :events, through: :event_resultcats
 
   def self.ransackable_attributes(auth_object = nil)
     [ "actif", "agecat_id", "created_at", "hcp_max", "hcp_min", "id", "name", "priority", "sexe", "updated_at", "version" ]
@@ -8,5 +10,5 @@ class Resultcat < ApplicationRecord
     [ "agecat" ]
   end
 
-  enum :sexe, [ :Men, :Ladies, :Unknown ]
+  enum :sexe, [ :Men, :Ladies, :All ]
 end

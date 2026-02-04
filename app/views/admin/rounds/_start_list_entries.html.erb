@@ -1,25 +1,24 @@
-<div id="entries">
+<div id="teams">
   <div class="panel" style="width: 500px;">
-    <h3>Entries (Status: Enter)</h3>
+    <h3>Teams (Status: Enter)</h3>
     <div class="panel_contents" style="overflow-y: auto; height: 400px;">
-      <% entries = round.event.entries.where(status: :enter).includes(:playercat, :player, :team, :slots).order(:hcp) %>
-      <% if entries.any? %>
-        <% entries.group_by(&:playercat).sort_by { |cat, _| cat&.name || "No Category" }.each do |playercat, cat_entries| %>
-          <div class="playercat-group" data-playercat-id="<%= playercat&.id %>">
-            <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= playercat&.name || "No Category" %></h4>
-            <% cat_entries.each do |entry| %>
-              <div class="entry-item" data-entry-id="<%= entry.id %>" style="<%= entry.slots.any? ? 'display: none;' : '' %>">
-                <strong><%= entry.player.full_name %></strong>
+      <% teams = round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots) %>
+      <% available_teams = teams.reject { |team| team.slots.any? } %>
+      <% if available_teams.any? %>
+        <% available_teams.group_by(&:resultcat).sort_by { |cat, _| cat&.name || "No Category" }.each do |resultcat, cat_teams| %>
+          <div class="resultcat-group" data-resultcat-id="<%= resultcat&.id %>">
+            <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= resultcat&.name || "No Category" %></h4>
+            <% cat_teams.each do |team| %>
+              <div class="team-item" data-team-id="<%= team.id %>" style="<%= team.slots.any? ? 'display: none;' : '' %>">
+                <strong><%= team.team_name %></strong>
                 <br>
-                <%= entry.licence.club || "No team" %>
-                | HCP: <%= entry.hcp %>
-                | TEE: <%= entry.playercat.teebox %>
+                HCP: <%= team.total_hcp %>
               </div>
             <% end %>
           </div>
         <% end %>
       <% else %>
-        <p>No entries with status 'enter' found.</p>
+        <p>No teams with status 'enter' found.</p>
       <% end %>
     </div>
   </div>

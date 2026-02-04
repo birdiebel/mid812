@@ -3,13 +3,15 @@ ActiveAdmin.register Team do
 
   permit_params :event_id, :name, :status, entries_attributes: [ :id, :hcp ]
 
-  menu false
+  menu label: "Teams", parent: "Config", priority: 12
+
   config.batch_actions = false
 
   index do
     column :id
     column :event
     column :name
+    column :resultcat.name
     column :status
     column "Total Age" do |team|
       team.total_age

@@ -2,14 +2,18 @@ class Event < ApplicationRecord
   belongs_to :tour
   has_many :event_playercats, dependent: :destroy
   has_many :playercats, through: :event_playercats
+  has_many :event_resultcats, dependent: :destroy
+  has_many :resultcats, through: :event_resultcats
   has_and_belongs_to_many :courses
   has_many :entries, dependent: :destroy
   has_many :rounds, dependent: :destroy
   has_many :teams, dependent: :destroy
 
   accepts_nested_attributes_for :event_playercats, allow_destroy: true, reject_if: proc { |attributes| attributes["playercat_id"].blank? }
+  accepts_nested_attributes_for :event_resultcats, allow_destroy: true, reject_if: proc { |attributes| attributes["resultcat_id"].blank? }
 
   after_save :sync_playercats_ids
+  after_save :sync_resultcats_ids
 
   def playercats_ids=(ids)
     @playercats_ids_to_sync = ids.reject(&:blank?).map(&:to_i) if ids.present?
@@ -17,6 +21,14 @@ class Event < ApplicationRecord
 
   def playercats_ids
     @playercats_ids_to_sync || playercats.pluck(:id)
+  end
+
+  def resultcats_ids=(ids)
+    @resultcats_ids_to_sync = ids.reject(&:blank?).map(&:to_i) if ids.present?
+  end
+
+  def resultcats_ids
+    @resultcats_ids_to_sync || resultcats.pluck(:id)
   end
 
   def sync_playercats_ids
@@ -32,6 +44,21 @@ class Event < ApplicationRecord
     end
 
     @playercats_ids_to_sync = nil
+  end
+
+  def sync_resultcats_ids
+    return unless @resultcats_ids_to_sync
+
+    current_ids = event_resultcats.pluck(:resultcat_id)
+    ids_to_add = @resultcats_ids_to_sync - current_ids
+    ids_to_remove = current_ids - @resultcats_ids_to_sync
+
+    event_resultcats.where(resultcat_id: ids_to_remove).destroy_all
+    ids_to_add.each do |resultcat_id|
+      event_resultcats.create!(resultcat_id: resultcat_id)
+    end
+
+    @resultcats_ids_to_sync = nil
   end
 
   # Set default values
@@ -60,6 +87,7 @@ class Event < ApplicationRecord
   amoeba do
     enable
     include_associations :playercats
+    include_associations :resultcats
   end
 
   def my_playercats(licence)
@@ -94,6 +122,9 @@ class Event < ApplicationRecord
     new_event.save!
     self.playercats.each do |pcat|
       new_event.playercats << pcat
+    end
+    self.resultcats.each do |rcat|
+      new_event.resultcats << rcat
     end
     new_event
   end

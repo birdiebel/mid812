@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_03_091000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,6 +42,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
   create_table "agecats_playercats", id: false, force: :cascade do |t|
     t.bigint "agecat_id", null: false
     t.bigint "playercat_id", null: false
+  end
+
+  create_table "agecats_resultcats", id: false, force: :cascade do |t|
+    t.bigint "agecat_id", null: false
+    t.bigint "resultcat_id", null: false
+    t.index ["agecat_id", "resultcat_id"], name: "index_agecats_resultcats_on_agecat_id_and_resultcat_id"
+    t.index ["resultcat_id", "agecat_id"], name: "index_agecats_resultcats_on_resultcat_id_and_agecat_id"
   end
 
   create_table "clubs", force: :cascade do |t|
@@ -137,6 +144,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
     t.index ["playercat_id"], name: "index_events_playercats_on_playercat_id"
   end
 
+  create_table "events_resultcats", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.bigint "resultcat_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "resultcat_id"], name: "index_events_resultcats_on_event_id_and_resultcat_id", unique: true
+    t.index ["event_id"], name: "index_events_resultcats_on_event_id"
+    t.index ["resultcat_id"], name: "index_events_resultcats_on_resultcat_id"
+  end
+
   create_table "events_teamcats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.bigint "event_id", null: false
@@ -213,7 +230,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
 
   create_table "resultcats", force: :cascade do |t|
     t.boolean "actif", default: true
-    t.bigint "agecat_id", null: false
     t.datetime "created_at", null: false
     t.decimal "hcp_max", precision: 3, scale: 1
     t.decimal "hcp_min", precision: 3, scale: 1
@@ -222,7 +238,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
     t.integer "sexe", default: 0
     t.datetime "updated_at", null: false
     t.string "version", null: false
-    t.index ["agecat_id"], name: "index_resultcats_on_agecat_id"
   end
 
   create_table "rounds", force: :cascade do |t|
@@ -239,13 +254,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
 
   create_table "slots", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.bigint "entry_id"
     t.bigint "flight_id", null: false
     t.integer "num"
     t.decimal "playing_hcp", precision: 4, scale: 1
+    t.bigint "team_id"
     t.datetime "updated_at", null: false
-    t.index ["entry_id"], name: "index_slots_on_entry_id"
     t.index ["flight_id"], name: "index_slots_on_flight_id"
+    t.index ["team_id"], name: "index_slots_on_team_id"
   end
 
   create_table "teamcats", force: :cascade do |t|
@@ -259,9 +274,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
     t.datetime "created_at", null: false
     t.bigint "event_id", null: false
     t.string "name", null: false
+    t.bigint "resultcat_id"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["event_id"], name: "index_teams_on_event_id"
+    t.index ["resultcat_id"], name: "index_teams_on_resultcat_id"
   end
 
   create_table "tees", force: :cascade do |t|
@@ -309,14 +326,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_02_110000) do
   add_foreign_key "entries", "teams"
   add_foreign_key "events_playercats", "events"
   add_foreign_key "events_playercats", "playercats"
+  add_foreign_key "events_resultcats", "events"
+  add_foreign_key "events_resultcats", "resultcats"
   add_foreign_key "events_teamcats", "events"
   add_foreign_key "events_teamcats", "teamcats"
   add_foreign_key "flights", "config_teetimes"
   add_foreign_key "playercats_teamcats", "playercats"
   add_foreign_key "playercats_teamcats", "teamcats"
-  add_foreign_key "resultcats", "agecats"
   add_foreign_key "rounds", "events"
-  add_foreign_key "slots", "entries"
   add_foreign_key "slots", "flights"
+  add_foreign_key "slots", "teams"
   add_foreign_key "teams", "events"
+  add_foreign_key "teams", "resultcats"
 end

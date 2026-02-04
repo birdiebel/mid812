@@ -11,8 +11,13 @@ module Api
           render json: {
             success: true,
             slot: @slot.as_json(include: {
-              entry: {
-                include: [ :player, :team, :playercat, :licence ]
+              team: {
+                include: {
+                  entries: {
+                    include: [ :player, :playercat, :licence ]
+                  },
+                  resultcat: {}
+                }
               }
             })
           }, status: :ok
@@ -24,7 +29,7 @@ module Api
       private
 
       def slot_params
-        params.require(:slot).permit(:entry_id)
+        params.require(:slot).permit(:team_id)
       end
     end
   end

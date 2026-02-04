@@ -8,7 +8,7 @@
           <table class="index_table">
             <tbody>
               <% teams.each do |team| %>
-                <% team_name = team.entries.map { |e| e.player.full_name }.join(" / ") %>
+                <% team_name = team.team_name %>
                 <tr>
                   <td></td>
                   <td style="background-color: lightgreen;"><strong><%= team_name.presence || team.name %></strong></td>

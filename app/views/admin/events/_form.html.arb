@@ -20,3 +20,7 @@ end
 f.inputs "Player Categories" do
   f.input :playercats_ids, as: :check_boxes, collection: playercat_checkboxes_collection, label: false
 end
+
+f.inputs "Result Categories" do
+  f.input :resultcats_ids, as: :check_boxes, collection: helpers.resultcat_checkboxes_collection, label: false
+end
