@@ -5,8 +5,11 @@
       <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? } %>
       
       <% if slots.any? %>
-        <div style="margin-bottom: 15px;">
+        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
           <input type="text" id="search-team-num" placeholder="Search team #..." style="padding: 8px; width: 200px; font-size: 1em;">
+          <button id="refresh-scores-btn" style="padding: 8px 16px; font-size: 1em; cursor: pointer; background-color: #1e88e5; color: white; border: none; border-radius: 4px;">
+            Refresh
+          </button>
         </div>
         <table class="index_table" id="scores-table">
           <thead>
@@ -71,7 +74,28 @@ function init_search_team() {
 }
 
 $(document).ready(function() {
+  // Check if we should show scores section after refresh
+  if (sessionStorage.getItem('showScores') === 'true') {
+    sessionStorage.removeItem('showScores');
+    
+    // Hide all sections
+    $('#config-times, #start-list, #scores-round, #status, #round-details').hide();
+    
+    // Show only scores section
+    $('#scores-round').show();
+    
+    // Update menu buttons
+    $('.menu-event-button').removeClass('is-active');
+    $('a[href="#scores-round"]').addClass('is-active');
+  }
+  
   init_search_team();
+  
+  // Refresh button handler
+  $('#refresh-scores-btn').on('click', function() {
+    sessionStorage.setItem('showScores', 'true');
+    location.reload();
+  });
   
   // Watch for visibility changes on scores-round
   var scoresRoundObserver = new MutationObserver(function(mutations) {
