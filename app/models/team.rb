@@ -2,7 +2,7 @@ class Team < ApplicationRecord
   belongs_to :event
   belongs_to :resultcat, optional: true
   has_many :entries, dependent: :destroy
-  has_many :slots, dependent: :destroy
+  has_many :slots, dependent: :nullify
 
   accepts_nested_attributes_for :entries, allow_destroy: false, reject_if: :all_blank
 
