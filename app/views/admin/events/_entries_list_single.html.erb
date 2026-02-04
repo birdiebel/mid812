@@ -27,7 +27,7 @@
             <% end %>
             <td><%= entry.player.my_club %></td>
             <% if team.status == "enter" %>
-                <td class="is_green is_bold"><span>ENTERED</span></td>
+                <td class="is_green is_bold"><span><%= team.status.upcase %></span></td>
             <% else %>
                 <td class="is_red is_bold"><span><%= team.status.upcase %></span></td>
             <% end %>

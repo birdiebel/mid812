@@ -18,6 +18,7 @@ class Team < ApplicationRecord
 
   enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
 
+  before_update :sync_entries_status
   after_save :update_resultcat, if: -> { !@skip_resultcat_update }
 
   def total_age
@@ -95,5 +96,13 @@ class Team < ApplicationRecord
     # No category found
     puts "  No resultcat found for team #{id}"
     nil
+  end
+
+  def sync_entries_status
+    if status_changed?
+      entries.each do |entry|
+        entry.update_column(:status, status)
+      end
+    end
   end
 end
