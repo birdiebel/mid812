@@ -1,16 +1,16 @@
 
-$( document ).ready(function() {
+$(document).ready(function() {
 
-    var zones = ['par_str','dist_str']
+    var zones = ['par_str','dist_str'];
 
     // Select first input
-    $(".score-input").first().select(); 
+    $(".score-input").first().select();
 
     // Visual val = 0
     $(".score-input").each(function() {
         if($(this).val() == 0) {
-            $(this).css("background-color","pink")
-            $(this).val("")
+            $(this).css("background-color","pink");
+            $(this).val("");
         }    
     })
 
@@ -23,11 +23,11 @@ $( document ).ready(function() {
     });
 
     // Show all totals
-    show_all_total(zones)
+    show_all_total(zones);
 
-    create_db_field('par_str')
-    create_db_field('dist_str')
-    create_db_field('stroke_str')
+    create_db_field('par_str');
+    create_db_field('dist_str');
+    create_db_field('stroke_str');
 
 
     // Number Only
@@ -38,12 +38,12 @@ $( document ).ready(function() {
 
 });
 
-$.fn.GetScoreInput = function(e) {
+$.fn.GetScoreInput = function() {
     $('.score-input').keyup(function(e) {
-            e.preventDefault()
-            keyCode = e.keyCode
-            limit = parseInt($(this).attr("limit"))
-            zone = $(this).attr("zone")
+            e.preventDefault();
+            var keyCode = e.keyCode;
+            var limit = parseInt($(this).attr("limit"), 10);
+            var zone = $(this).attr("zone");
             switch (keyCode) {
                 case 9 :
                     break
@@ -53,7 +53,7 @@ $.fn.GetScoreInput = function(e) {
                     break
                 default:
                     
-                    if ($(this).val() > limit) {        
+                    if (!isNaN(limit) && $(this).val() > limit) {        
                         $(this).blur();
                         var inputs = $(this).closest('.table-card').find('.score-input');
                         inputs.eq(inputs.index(this) + 1).focus().select();
@@ -64,8 +64,8 @@ $.fn.GetScoreInput = function(e) {
                     }                    
             }
 
-            show_total(zone)
-            create_db_field(zone)
+            show_total(zone);
+            create_db_field(zone);
 
         });        
 }
@@ -88,10 +88,9 @@ $.fn.ForceNumericOnly = function(e) {
 function create_db_field(zone) {
 
     inputValues = $("input[zone='"+zone+"'][hole]").map(function() {
-        return parseInt($(this).val());
+        return parseInt($(this).val(), 10);
     }).toArray();
-    console.log(inputValues)
-    $('#tee_'+zone).val(inputValues.join(','))
+    $('#tee_'+zone).val(inputValues.join(','));
 
 }
 
@@ -115,7 +114,7 @@ function sum_input(zone, start, stop, to_id) {
             total += parseInt($(this).val(), 10) || 0;
         }
     });
-    $("#"+to_id).text(total)
+    $("#"+to_id).text(total);
 }
 
 // Show zone totals

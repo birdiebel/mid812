@@ -1,22 +1,21 @@
-$( document ).ready(function() {
+$(document).ready(function() {
 
     console.log("Card js is ready");
 
-    var nb_players = +($("#nb_cards").text());
-
-    var player;
+    var nb_players = parseInt($("#nb_cards").text(), 10) || 0;
 
     // Store Card_player score_txt values to inputs:brut and array
-    for (player = 1; player <= nb_players ; player++) {
+    for (var player = 1; player <= nb_players ; player++) {
 
         // Create brut_array from form.score_txt
         var initial_score = $(read_initial_brut(player)).val();
-        var brut_array = initial_score.split(",");
+        var brut_array = (initial_score || "").split(",");
 
         // Store each input:brut from brut_array
         var i;
         for (i = 0; i <= 17 ; i++) {
-            $(select_input(player, i)).val(brut_array[i]);
+            var brut_value = brut_array[i] !== undefined ? brut_array[i] : "0";
+            $(select_input(player, i)).val(brut_value);
         }
 
         // Show net row values
@@ -31,26 +30,17 @@ $( document ).ready(function() {
     }
 
     // Change Brut input player
-    $(select_all_input(1)).change(function () {
-        write_initial_brut(1);
-        // Show Totaux
-        show_totaux(1);
-    });
-    $(select_all_input(2)).change(function () {
-        write_initial_brut(2);
-        // Show Totaux
-        show_totaux(2);
-    });
-    $(select_all_input(3)).change(function () {
-        write_initial_brut(3);
-        // Show Totaux
-        show_totaux(3);
-    });
-    $(select_all_input(4)).change(function () {
-        write_initial_brut(4);
-        // Show Totaux
-        show_totaux(4);
-    });
+    for (var p = 1; p <= nb_players; p++) {
+        $(select_all_input(p)).change(function () {
+            var currentPlayer = parseInt($(this).attr("player"), 10);
+            if (!currentPlayer) {
+                return;
+            }
+            write_initial_brut(currentPlayer);
+            // Show Totaux
+            show_totaux(currentPlayer);
+        });
+    }
 
     // Select first free input (value 0)
     $("input.brut").each(function(){
@@ -228,7 +218,10 @@ function show_totaux_brut(zone, player) {
 
     $( select_all_input(player) ).each(function(){
         brut = $(this).val();
-        if ( brut === "*") { brut_valid = false }
+        if ( brut === "*") {
+            brut_valid = false;
+            brut = "0";
+        }
         if ( !brut ) { brut = "0"; }
         if(i <= 8 ) {
             frontPoints += parseInt(brut);
