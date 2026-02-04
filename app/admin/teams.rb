@@ -9,6 +9,7 @@ ActiveAdmin.register Team do
 
   index do
     column :id
+    column :num
     column :event
     column :name
     column :resultcat.name

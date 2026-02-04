@@ -7,7 +7,7 @@ class Team < ApplicationRecord
   accepts_nested_attributes_for :entries, allow_destroy: false, reject_if: :all_blank
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "created_at", "event_id", "id", "id_value", "name", "resultcat_id", "status", "updated_at" ]
+    [ "created_at", "event_id", "id", "id_value", "name", "num", "resultcat_id", "status", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -15,9 +15,11 @@ class Team < ApplicationRecord
   end
 
   validates :name, presence: true
+  validates :num, uniqueness: { scope: :event_id }, allow_nil: true
 
   enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
 
+  before_create :assign_num
   before_update :sync_entries_status
   after_save :update_resultcat, if: -> { !@skip_resultcat_update }
 
@@ -104,5 +106,13 @@ class Team < ApplicationRecord
         entry.update_column(:status, status)
       end
     end
+  end
+
+  private
+
+  def assign_num
+    return if num.present?
+    max_num = Team.where(event_id: event_id).maximum(:num) || 0
+    self.num = max_num + 1
   end
 end
