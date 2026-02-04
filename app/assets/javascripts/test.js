@@ -5,7 +5,7 @@ $(document).ready(function () {
   CallMenu = $buttons.parent().attr("name")
 
   if (CallMenu == "event-menu") {
-    sections = ["#event-entries", "#rounds", "#courses", "#player-categories", "#event-details"]
+    sections = ["#event-entries", "#rounds", "#courses", "#player-categories", "#event-status", "#event-details"]
   }
   if (CallMenu == "round-menu") {
     sections = [ "#config-times", "#start-list", "#scores", "#status", "#round-details"]

@@ -14,7 +14,7 @@ ActiveAdmin.register Event do
     link_to "Close", admin_tour_path(resource.tour_id)
   end
 
-  myTitle = proc { |event| "#{event.tour.name} : #{event.name}" }
+  myTitle = proc { |event| "#{event.tour.name} : #{event.name} : #{event.status.upcase}" }
   filter :name_cont, as: :string, label: "Name"
 
   includes :entries, :playercats, :resultcats
@@ -42,6 +42,7 @@ ActiveAdmin.register Event do
     render "admin/events/rounds", event: event
     render "admin/events/player_categories", event: event
     render "admin/events/event_details", event: event
+    render "admin/events/event_status", event: event
   end
 
   form do |f|

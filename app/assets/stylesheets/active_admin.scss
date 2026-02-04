@@ -270,6 +270,13 @@ body.active_admin {
     .menu-button.is-active {
         background-color: #0d47a1;
     }
+
+    .menu-button-status {
+        background-color: darkred;
+    } 
+    .menu-button-status.is-active {
+        background-color: #b71c1c;
+    }
 }
 
 .flex-container {
