@@ -50,10 +50,6 @@ ActiveAdmin.register Round do
   end
 
   controller do
-    before_action :disable_turbo_cache, only: :show
-    def disable_turbo_cache
-      response.headers["Turbo-Cache-Control"] = "no-cache"
-    end
     def create
       @round = Round.new(permitted_params[:round])
       if @round.save
