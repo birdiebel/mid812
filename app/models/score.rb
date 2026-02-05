@@ -10,6 +10,7 @@ class Score < ApplicationRecord
   before_validation :assign_start_hole, if: -> { start_hole.blank? }
   before_save :calculate_recu_str
   before_save :update_hole_played_and_status
+  after_save :update_team_score
 
   def self.ransackable_attributes(auth_object = nil)
     [ "brut_str", "created_at", "entry_id", "hole_played", "id", "id_value", "net_str", "recu_str", "round_id", "slot_id", "start_hole", "status", "stb_str", "updated_at" ]
@@ -161,5 +162,13 @@ class Score < ApplicationRecord
         self.status = :partial
       end
     end
+  end
+
+  def update_team_score
+    team = entry&.team
+    return unless team && round
+
+    team_score = TeamScore.find_or_create_by(team: team, round: round)
+    team_score.recalculate!
   end
 end

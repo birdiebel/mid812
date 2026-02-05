@@ -3,6 +3,7 @@ class Team < ApplicationRecord
   belongs_to :resultcat, optional: true
   has_many :entries, dependent: :destroy
   has_many :slots, dependent: :nullify
+  has_many :team_scores, dependent: :destroy
 
   accepts_nested_attributes_for :entries, allow_destroy: false, reject_if: :all_blank
 
@@ -11,7 +12,7 @@ class Team < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    [ "entries", "event", "slots" ]
+    [ "entries", "event", "slots", "team_scores" ]
   end
 
   validates :name, presence: true
