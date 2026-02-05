@@ -2,7 +2,8 @@ class TeamScore < ApplicationRecord
   belongs_to :team
   belongs_to :round
 
-  enum :status, { partial: 0, complete: 1, validated: 2, dnf: 3, dns: 4, dsq: 5 }
+  enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
+  # enum :status, { partial: 0, complete: 1, validated: 2, dnf: 3, dns: 4, dsq: 5 }
 
   validates :team_id, uniqueness: { scope: :round_id }
 
@@ -13,6 +14,16 @@ class TeamScore < ApplicationRecord
 
   def self.ransackable_associations(auth_object = nil)
     [ "round", "team" ]
+  end
+
+  def show_status_ts
+    if status.nil?
+      "N/A"
+    elsif status != "enter"
+      "<span style=\"color: red;\">#{status.to_s.humanize}</span>".html_safe
+    else
+      "Enter"
+    end
   end
 
   # Recalcule le score du team selon la formule
@@ -35,7 +46,8 @@ class TeamScore < ApplicationRecord
   end
 
   def start_hole
-    team.entries.first&.score&.start_hole || 1
+    score = team.entries.first&.scores&.find_by(round: round)
+    score&.start_hole || 1
   end
 
   private
@@ -53,7 +65,7 @@ class TeamScore < ApplicationRecord
     return unless score
 
     self.hole_played = score.hole_played || 0
-    self.status = score.status
+    self.status = team.status
     self.brut_total = score.brut("total").to_i
     self.net_total = score.net("total").to_i
     self.stb_total = score.stb("total").to_i

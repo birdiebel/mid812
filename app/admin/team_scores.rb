@@ -22,7 +22,7 @@ ActiveAdmin.register TeamScore do
       link_to ts.round.event.name, admin_round_path(ts.round)
     end
     column :status do |ts|
-      status_tag ts.status
+      ts.show_status_ts
     end
     column :hole_played
     column "SP Score", :stroke_play_score do |ts|
@@ -72,7 +72,7 @@ ActiveAdmin.register TeamScore do
         link_to ts.round.event.name, admin_round_path(ts.round)
       end
       row :formula do |ts|
-        formula = ts.team.resultcat&.formula
+        formula = ts.team.slots.first&.flight&.config_teetime&.formula
         if formula
           "#{formula.name} (#{formula.nb_cards} card#{formula.nb_cards > 1 ? 's' : ''})"
         else

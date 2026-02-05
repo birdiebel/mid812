@@ -2,7 +2,7 @@
   <div class="panel">
     <h3>Scores</h3>
     <div class="panel_contents">
-      <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? }.sort_by { |s| [s.flight.flight_time, s.num] } %>
+      <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? }.sort_by { |s| [s.flight.flight_time, s.team.num] } %>
       
       <% if slots.any? %>
         <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
@@ -30,38 +30,41 @@
           </thead>
           <tbody>
             <% slots.each do |slot| %>
-              <% entry = slot.team.entries.first %>
-              <% score = Score.find_or_create_by(round_id: round.id, entry_id: entry.id) do |s|
-                s.slot = slot
-                s.status = :partial
-              end %>
+              <% team_score = TeamScore.find_or_create_by(team: slot.team, round: round) %>
+              <% team_score.recalculate! if team_score.persisted? && team_score.brut_total.nil? %>
               <% scoring_class = "scoring-#{slot.team.resultcat&.scoring_short.downcase}" %>
               <% scoring_mode = slot.team.resultcat&.scoring_short.downcase %>
-              <tr>
+              <% entry = slot.team.entries.first %>
+              <% score = entry ? Score.find_or_create_by(round_id: round.id, entry_id: entry.id) { |s| s.slot = slot; s.status = :partial } : nil %>
+              <% score.update_column(:slot_id, slot.id) if score && score.slot_id != slot.id %>
+              
+              <!-- Ligne TeamScore -->
+              <tr style="background-color: #e8f5e9; font-weight: bold; border-top: 2px solid #4caf50;">
                 <td><%= slot.flight.myTime %></td>
-                <td><%= score.start_hole %></td>
-                <td class="team-num"><%= slot.num %></td>
-                <td class="text-left"><%= slot.team.name %></td>
+                <td><%= slot.flight.config_teetime.start_hole %></td>
+                <td class="team-num"><%= slot.team.num %></td>
+                <td class="text-left">
+                  <strong><%= slot.team.name %></strong>
+                </td>
                 <td><%= slot.team.show_status %></td>
                 <td>
                   <div class="<%= scoring_class %>">  
                     <%= slot.team.resultcat&.scoring_short %>
                   </div>
                 </td>
-                <td><%= score.hole_played %></td>
-                <% scoring_mode == "sp" ? sp_score = score.stroke_play_score : sp_score = "x" %>
-                <%# dans active admin views helper %>
+                <td><%= team_score.hole_played %></td>
+                <% scoring_mode == "sp" ? ts_score = team_score.stroke_play_score : ts_score = "x" %>
                 <td> 
-                  <div class="div-against-par" style="<%= style_for_stroke_play(sp_score) %>"><strong><%= sp_score %></strong></div>
+                  <div class="div-against-par" style="<%= style_for_stroke_play(ts_score) %>"><strong><%= ts_score %></strong></div>
                 </td>
-                <td><%= scoring_mode == "sp" ? score.brut("total") : "x" %></td>
-                <td><%= scoring_mode == "sp" ? score.net("total") : "x" %></td>
-                <td><%= score.stb("total") %></td>
+                <td><%= scoring_mode == "sp" ? team_score.brut_total : "x" %></td>
+                <td><%= scoring_mode == "sp" ? team_score.net_total : "x" %></td>
+                <td><%= team_score.stb_total %></td>
                 <td>
-                  <span class="status_tag <%= score.status %>"><%= score.status.humanize %></span>
+                  <span class="status_tag <%= team_score.status %>"><%= team_score.status.humanize %></span>
                 </td>
                 <td>
-                  <%= link_to "Edit Score", edit_admin_score_path(score), class: "button" %>
+                  <%= link_to "Scores", edit_admin_score_path(score), class: "button" if score %>
                 </td>
               </tr>
             <% end %>

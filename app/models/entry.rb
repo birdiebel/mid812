@@ -66,7 +66,7 @@ class Entry < ApplicationRecord
     if event_format == "team" || event_format == "bigteam"
       new_status = reloaded_team.entries.all?(&:enter?) ? :enter : :refused
     else
-      new_status = status
+      new_status = reloaded_team.status
     end
 
     reloaded_team.update_column(:status, new_status) if new_status.present?
