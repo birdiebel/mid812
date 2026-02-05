@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_04_092554) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_05_033712) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -235,6 +235,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_04_092554) do
     t.decimal "hcp_min", precision: 3, scale: 1
     t.string "name", null: false
     t.integer "priority", default: 0
+    t.integer "scoring", default: 0
     t.integer "sexe", default: 0
     t.datetime "updated_at", null: false
     t.string "version", null: false

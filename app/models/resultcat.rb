@@ -11,4 +11,5 @@ class Resultcat < ApplicationRecord
   end
 
   enum :sexe, [ :Men, :Ladies, :All ]
+  enum :scoring, [ :stroke_play, :stableford ]
 end

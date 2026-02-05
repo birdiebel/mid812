@@ -1,5 +1,5 @@
 ActiveAdmin.register Resultcat do
-  permit_params :name, :sexe, :hcp_min, :hcp_max, :version, :priority, :actif, agecat_ids: []
+  permit_params :name, :sexe, :hcp_min, :hcp_max, :version, :priority, :actif, :scoring, agecat_ids: []
 
   config.batch_actions = false
 
@@ -43,6 +43,7 @@ ActiveAdmin.register Resultcat do
     column "Sexe", :sexe
     column "HCP Min", :hcp_min
     column "HCP Max", :hcp_max
+    column "Scoring", :scoring
     column "Version", :version
     column "Priority", :priority
     column "Actif" do |resultcat|
@@ -69,6 +70,7 @@ ActiveAdmin.register Resultcat do
       f.input :hcp_max
       f.input :version
       f.input :priority
+      f.input :scoring
       f.input :actif
     end
     f.actions do
