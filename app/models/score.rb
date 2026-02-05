@@ -147,15 +147,17 @@ class Score < ApplicationRecord
     self.hole_played = played
 
     # Check if stroke_play and if there are any zeros
-    event = round&.event
+    team = slot&.team
     has_zero = brut_values.any? { |v| v.present? && v.to_i == 0 }
 
-    if event && event.scoring == "stroke_play" && has_zero
+    if team&.resultcat&.scoring == "stroke_play" && has_zero
       self.status = :invalide
-    elsif played >= nb_hole && !has_zero
-      self.status = :completed
     else
-      self.status = :partial
+      if played >= nb_hole
+        self.status = :completed
+      else
+        self.status = :partial
+      end
     end
   end
 end

@@ -364,3 +364,23 @@ tbody td {
         vertical-align: middle;
     }
 }
+
+.scoring-sp, .scoring-stb, .scoring-net {
+    border-radius: 3px;
+    display: inline-block;
+    font-weight: bold;
+    padding: 4px 8px;
+    margin: 2px;
+}   
+.scoring-sp {
+    background-color: lightgreen;
+    color: black;
+}
+.scoring-stb {
+    background-color: lightyellow;
+    color: black;
+}   
+.scoring-net {
+    background-color: lightblue;
+    color: black;
+}

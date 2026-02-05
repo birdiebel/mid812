@@ -12,4 +12,14 @@ class Resultcat < ApplicationRecord
 
   enum :sexe, [ :Men, :Ladies, :All ]
   enum :scoring, [ :stroke_play, :stableford ]
+  def scoring_short
+    case scoring
+    when "stroke_play"
+      "SP"
+    when "stableford"
+      "STB"
+    else
+      ""
+    end
+  end
 end

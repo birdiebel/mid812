@@ -18,6 +18,7 @@
               <th>@</th>
               <th>#</th>
               <th>Name</th>
+              <th></th>
               <th>Holes</th>
               <th>+-</th>
               <th>Brut</th>
@@ -32,19 +33,26 @@
                 s.entry = slot.team.entries.first
                 s.status = :partial
               end %>
+              <% scoring_class = "scoring-#{slot.team.resultcat&.scoring_short.downcase}" %>
+              <% scoring_mode = slot.team.resultcat&.scoring_short.downcase %>
               <tr>
                 <td><%= slot.flight.myTime %></td>
                 <td><%= score.start_hole %></td>
                 <td class="team-num"><%= slot.team.num %></td>
                 <td class="text-left"><%= slot.team.name %></td>
+                <td>
+                  <div class="<%= scoring_class %>">  
+                    <%= slot.team.resultcat&.scoring_short %>
+                  </div>
+                </td>
                 <td><%= score.hole_played %></td>
-                <% sp_score = score.stroke_play_score %>
+                <% scoring_mode == "sp" ? sp_score = score.stroke_play_score : sp_score = "x" %>
                 <%# dans active admin views helper %>
                 <td> 
                   <div class="div-against-par" style="<%= style_for_stroke_play(sp_score) %>"><strong><%= sp_score %></strong></div>
                 </td>
-                <td><%= score.brut("total") %></td>
-                <td><%= score.net("total") %></td>
+                <td><%= scoring_mode == "sp" ? score.brut("total") : "x" %></td>
+                <td><%= scoring_mode == "sp" ? score.net("total") : "x" %></td>
                 <td><%= score.stb("total") %></td>
                 <td>
                   <span class="status_tag <%= score.status %>"><%= score.status.humanize %></span>
