@@ -96,7 +96,7 @@ class Event < ApplicationRecord
     sexe = player.sexe
     matched_playercats = nil
     self.playercats.each do |pcat|
-      if pcat.sexe == 2
+      if pcat.sexe == 2 # unisex
         if pcat.hcp_max <= hcp && pcat.hcp_min >= hcp && pcat.match_agecat(player.age_category_id)
           matched_playercats = pcat.name
         end
