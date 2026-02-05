@@ -13,12 +13,14 @@ ActiveAdmin.register Round do
   myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date}" }
 
   show title: myTitle do
-    render "admin/rounds/menu", round: round
-    render "admin/rounds/config_times", round: round
-    render "admin/rounds/start_list", round: round
-    render "admin/rounds/scores", round: round
-    render "admin/rounds/status", round: round
-    render "admin/rounds/round_details", round: round
+    div(data: { turbo_cache: false }) do
+      render "admin/rounds/menu", round: round
+      render "admin/rounds/config_times", round: round
+      render "admin/rounds/start_list", round: round
+      render "admin/rounds/scores", round: round
+      render "admin/rounds/status", round: round
+      render "admin/rounds/round_details", round: round
+    end
   end
 
 
@@ -50,6 +52,13 @@ ActiveAdmin.register Round do
   end
 
   controller do
+    def show
+      super
+      response.headers["Cache-Control"] = "no-store, must-revalidate, private, max-age=0"
+      response.headers["Pragma"] = "no-cache"
+      response.headers["Expires"] = "0"
+    end
+
     def create
       @round = Round.new(permitted_params[:round])
       if @round.save
