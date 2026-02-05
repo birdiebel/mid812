@@ -26,6 +26,10 @@ class TeamScore < ApplicationRecord
     end
   end
 
+  def hole_played_show
+    hole_played
+  end
+
   # Recalcule le score du team selon la formule
   def recalculate!
     # Récupère la formule depuis le slot du team
