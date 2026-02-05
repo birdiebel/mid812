@@ -30,8 +30,9 @@
           </thead>
           <tbody>
             <% slots.each do |slot| %>
-              <% score = Score.find_or_create_by(round_id: round.id, slot_id: slot.id) do |s|
-                s.entry = slot.team.entries.first
+              <% entry = slot.team.entries.first %>
+              <% score = Score.find_or_create_by(round_id: round.id, entry_id: entry.id) do |s|
+                s.slot = slot
                 s.status = :partial
               end %>
               <% scoring_class = "scoring-#{slot.team.resultcat&.scoring_short.downcase}" %>
