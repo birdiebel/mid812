@@ -23,6 +23,16 @@ class Team < ApplicationRecord
   before_update :sync_entries_status
   after_save :update_resultcat, if: -> { !@skip_resultcat_update }
 
+  def show_status
+    if status.nil?
+      "N/A"
+    elsif status != "enter"
+      "<span style=\"color: red;\">#{status.to_s.humanize}</span>".html_safe
+    else
+      ""
+    end
+  end
+
   def total_age
     entries.includes(:player).sum { |entry| entry.player&.age || 0 }
   end

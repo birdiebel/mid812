@@ -18,10 +18,14 @@
                      <% end %>>
                   <strong><%= slot.team ? slot.team.team_name : "" %></strong>
                   <br>
-                  <%= slot.team ? (slot.team.total_hcp || "x") : "" %> |
                   <% if slot.team %>
-                    <% playing_hcps = slot.team.entries.map { |e| e.playing_hcp || "x" } %>
-                    <strong>PHCP: <%= playing_hcps.join(" / ") %></strong>
+                    <% slot.team.entries.each do |p| %>
+                      <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+                        <div><strong>PHCP: <%= p.playing_hcp %></strong></div> 
+                        <div>|</div> 
+                        <div><%= p.playercat.icon_teebox.html_safe %></div>
+                      </div>
+                    <% end %>
                   <% end %>
                 </div>
               <% end %>

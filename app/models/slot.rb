@@ -3,6 +3,8 @@ class Slot < ApplicationRecord
   belongs_to :team, optional: true
   has_many :scores, dependent: :destroy
 
+  accepts_nested_attributes_for :team
+
   def self.ransackable_attributes(auth_object = nil)
     [ "created_at", "team_id", "flight_id", "id", "num", "playing_hcp", "updated_at" ]
   end

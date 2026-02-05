@@ -61,6 +61,13 @@ function init_cards() {
         var key = e.charCode || e.keyCode || 0;
         var value = $(this).val();
         
+        // If Enter key, submit the form
+        if (key === 13) {
+            e.preventDefault();
+            $(this).closest('form').submit();
+            return false;
+        }
+        
         // If backspace and input is empty, go to previous input and clear it
         if (key === 8 && value.length === 0) {
             e.preventDefault();

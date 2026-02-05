@@ -14,7 +14,11 @@
               <div class="team-item" data-team-id="<%= team.id %>" data-resultcat-id="<%= team.resultcat_id %>" style="<%= team.slots.any? ? 'display: none;' : '' %>">
                 <strong><%= team.team_name %></strong>
                 <br>
-                HCP: <%= team.total_hcp %>
+                <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+                  <div>HCP: <%= team.total_hcp %></div> 
+                  <div>|</div> 
+                  <div><%= team.entries.first.playercat.icon_teebox.html_safe %></div>
+                </div>
               </div>
             <% end %>
           </div>

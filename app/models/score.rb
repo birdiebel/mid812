@@ -3,6 +3,8 @@ class Score < ApplicationRecord
   belongs_to :slot
   belongs_to :entry
 
+  accepts_nested_attributes_for :slot
+
   enum :status, { partial: 0, completed: 1, invalide: 2 }
 
   before_validation :assign_start_hole, if: -> { start_hole.blank? }

@@ -1,5 +1,6 @@
 ActiveAdmin.register Score do
-  permit_params :round_id, :slot_id, :entry_id, :status, :brut_str, :net_str, :stb_str, :hole_played, :start_hole
+  permit_params :round_id, :slot_id, :entry_id, :status, :brut_str, :net_str, :stb_str, :hole_played, :start_hole,
+                slot_attributes: [ :id, team_attributes: [ :id, :status ] ]
 
   menu label: "Scores", parent: "Config", priority: 13
 
@@ -73,6 +74,13 @@ ActiveAdmin.register Score do
   controller do
     def update
       @score = Score.find(params[:id])
+
+      # Update team status if provided
+      if params[:team_id].present? && params[:team_status].present?
+        team = Team.find_by(id: params[:team_id])
+        team.update(status: params[:team_status]) if team
+      end
+
       if @score.update(permitted_params[:score])
         redirect_to admin_round_path(@score.round, anchor: "scores-round"), notice: "Score updated successfully."
       else

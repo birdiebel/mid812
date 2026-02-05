@@ -1,9 +1,9 @@
-<div id="start-list">
+<div id="start-list" data-turbo-cache="false">
   <div class="panel" style="text-align: center;">
     <h3>Start List</h3>
     <div class="flex-container" style="gap: 20px; justify-content: center; align-items: flex-start;">
       <div>
-        <%= render partial: "admin/rounds/start_list_flights", locals: { round: @round } %>
+        <%= render partial: "admin/rounds/start_list_flights", locals: { round: @round }, cache: false %>
       </div>
       <div>
         <%= render partial: "admin/rounds/start_list_entries", locals: { round: @round } %>

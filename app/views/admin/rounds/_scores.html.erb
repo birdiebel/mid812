@@ -19,6 +19,7 @@
               <th>#</th>
               <th>Name</th>
               <th></th>
+              <th></th>
               <th>Holes</th>
               <th>+-</th>
               <th>Brut</th>
@@ -40,6 +41,7 @@
                 <td><%= score.start_hole %></td>
                 <td class="team-num"><%= slot.team.num %></td>
                 <td class="text-left"><%= slot.team.name %></td>
+                <td><%= slot.team.show_status %></td>
                 <td>
                   <div class="<%= scoring_class %>">  
                     <%= slot.team.resultcat&.scoring_short %>

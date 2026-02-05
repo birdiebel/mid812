@@ -22,14 +22,24 @@
 
 <div class="panel">
   <h3 style="display: flex; justify-content: space-between; align-items: center;">
-    <span>
-      <% if slot&.team %>
-        <%= slot.team.num %> - <%= slot.team.name %>
-        <% if score.round %>
-          - Round <%= score.round.num %>
+    <span style="display: flex; gap: 10px; align-items: center;">
+      <span>
+        <% if slot&.team %>
+          <%= slot.team.num %> - <%= slot.team.name %>
+          <% if score.round %>
+            - Round <%= score.round.num %>
+          <% end %>
+        <% else %>
+          Result-Card
         <% end %>
-      <% else %>
-        Result-Card
+      </span>
+      <% if slot&.team %>
+        <select name="team_status" style="width: auto;">
+          <% Team.statuses.keys.each do |status_key| %>
+            <option value="<%= status_key %>" <%= 'selected' if slot.team.status == status_key %>><%= status_key.capitalize %></option>
+          <% end %>
+        </select>
+        <%= hidden_field_tag 'team_id', slot.team.id %>
       <% end %>
     </span>
     <span style="display: flex; gap: 5px;">
