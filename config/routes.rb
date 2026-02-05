@@ -1,5 +1,5 @@
 Rails.application.routes.draw do
-  devise_for :users
+  devise_for :users, {}
   get "admin", to: "home#loadadmin"
 
   # API routes for drag & drop

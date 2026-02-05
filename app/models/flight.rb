@@ -26,4 +26,11 @@ class Flight < ApplicationRecord
 
     flight_time.strftime("%H:%M")
   end
+
+  def flight_time
+    base_time = config_teetime.start_time
+    step_minutes = config_teetime.step
+    total_minutes = (num - 1) * step_minutes
+    base_time + total_minutes.minutes
+  end
 end

@@ -1,6 +1,6 @@
 <div id="flights" style="width: 500px;">
   <div class="panel">
-    <h3>flights</h3>
+    <h3>Flights</h3>
     <div class="panel_contents" style="overflow-y: auto; height: 400px;">
       <% round.config_teetimes.each do |config| %>
         <div class="config-section">
@@ -19,14 +19,18 @@
                   <strong><%= slot.team ? slot.team.team_name : "" %></strong>
                   <br>
                   <% if slot.team %>
-                    <% slot.team.entries.each do |p| %>
-                      <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-                        <div><strong>PHCP: <%= p.playing_hcp %></strong></div> 
-                        <div>|</div> 
-                        <div><%= p.playercat.icon_teebox.html_safe %></div>
-                      </div>
-                    <% end %>
-                  <% end %>
+  <% slot.team.entries.each do |p| %>
+    <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+      <div><strong>PHCP: <%= p.playing_hcp %></strong></div> 
+      <div>|</div> 
+      <% if p.playercat && p.playercat.icon_teebox.present? %>
+        <div><%= p.playercat.icon_teebox.html_safe %></div>
+      <% else %>
+        <div style="color: red;">NO ICON</div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
                 </div>
               <% end %>
             </div>

@@ -4,6 +4,8 @@ module Api
       skip_before_action :verify_authenticity_token, only: [ :update ]
       before_action :authenticate_user!
 
+      puts "V1::SlotsController loaded"
+
       def update
         @slot = Slot.find(params[:id])
 
@@ -12,18 +14,23 @@ module Api
           @slot.reload
 
           render json: {
-            success: true,
-            slot: @slot.as_json(include: {
-              team: {
-                include: {
-                  entries: {
-                    include: [ :player, :playercat, :licence ]
-                  },
-                  resultcat: {}
-                }
+          success: true,
+          slot: @slot.as_json(include: {
+            team: {
+              methods: [ :team_name, :total_hcp ],
+              include: {
+                entries: {
+                  include: {
+                    player: {},
+                    playercat: { methods: [ :icon_teebox ] },
+                    licence: {}
+                  }
+                },
+                resultcat: {}
               }
-            })
-          }, status: :ok
+            }
+          })
+        }, status: :ok
         else
           render json: { success: false, errors: @slot.errors }, status: :unprocessable_entity
         end

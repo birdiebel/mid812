@@ -83,13 +83,29 @@
       if (sourceTeamId && !destTeamId) {
         console.log('Moving team', sourceTeamId, 'to empty slot', destSlotId);
         
-        fetch(`/api/v1/slots/${destSlotId}`, {
+        // First, clear the source slot in DB
+        fetch(`/api/v1/slots/${sourceSlotId}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
             'X-CSRF-Token': token.content
           },
-          body: JSON.stringify({ slot: { team_id: sourceTeamId } })
+          body: JSON.stringify({ slot: { team_id: null } })
+        })
+        .then(response => {
+          if (!response.ok) throw new Error('Failed to clear source slot');
+          return response.json();
+        })
+        .then(() => {
+          // Then move team to destination slot
+          return fetch(`/api/v1/slots/${destSlotId}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-CSRF-Token': token.content
+            },
+            body: JSON.stringify({ slot: { team_id: sourceTeamId } })
+          });
         })
         .then(response => {
           if (response.ok) return response.json();
@@ -98,7 +114,7 @@
         .then(data => {
           console.log('Team moved successfully');
           
-          // Clear the source slot
+          // Clear the source slot UI
           sourceSlot.innerHTML = '<strong></strong><br>';
           sourceSlot.classList.remove('slot-item--occupied');
           sourceSlot.classList.add('slot-item--empty');
@@ -167,34 +183,40 @@
       }
     }
     
-    // Helper function to update slot UI
-    function updateSlotUI(slotId, slotData) {
-      const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
-      if (!slotElement || !slotData.team || !slotData.team.entries) return;
+    // Dans votre fonction updateSlotUI()
+function updateSlotUI(slotId, slotData) {
+  const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
+  if (!slotElement || !slotData.team || !slotData.team.entries) return;
 
-      const team = slotData.team;
-      const teamName = team.entries
-        .map(entry => entry.player ? `${entry.player.firstname} ${entry.player.lastname}` : '')
-        .filter(Boolean)
-        .join(' / ');
-      const hcpValue = team.entries.reduce((sum, entry) => {
-        const hcp = entry.hcp === null || entry.hcp === undefined ? 0 : parseFloat(entry.hcp);
-        return sum + (Number.isNaN(hcp) ? 0 : hcp);
-      }, 0);
-      const playingHcps = team.entries.map(entry => {
-        if (entry.playing_hcp === null || entry.playing_hcp === undefined) return 'x';
-        return entry.playing_hcp;
-      }).join(' / ');
-      const playingHcpHtml = `<strong>PHCP: ${playingHcps}</strong>`;
-      slotElement.innerHTML = `<strong>${teamName}</strong><br>${hcpValue} | ${playingHcpHtml}`;
-      slotElement.classList.remove('slot-item--empty');
-      slotElement.classList.add('slot-item--occupied');
-      
-      // Update data attributes
-      slotElement.setAttribute('data-team-id', team.id);
-      slotElement.setAttribute('data-team-name', teamName);
-      slotElement.setAttribute('data-hcp', hcpValue || '0');
-    }
+  const team = slotData.team;
+  const teamName = team.team_name || '';
+  
+  // Générer le HTML pour chaque entry (joueur)
+  const entriesHtml = slotData.team.entries.map(p => {
+    const playingHcp = p.playing_hcp || 'x';
+    const iconTeebox = p.playercat?.icon_teebox || '';
+    
+    return `<div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+      <div><strong>PHCP: ${playingHcp}</strong></div> 
+      <div>|</div> 
+      <div>${iconTeebox}</div>
+    </div>`;
+  }).join('');
+
+  // Construire le HTML final du slot
+  slotElement.innerHTML = `
+    <strong>${teamName}</strong>
+    <br>
+    ${entriesHtml}
+  `;
+
+  // Mettre à jour les data attributes
+  slotElement.setAttribute('data-team-id', team.id);
+  slotElement.setAttribute('data-team-name', team.team_name);
+  slotElement.setAttribute('data-hcp', team.total_hcp);
+  slotElement.classList.remove('slot-item--empty');
+  slotElement.classList.add('slot-item--occupied');
+}
 
     // Make slots with assigned teams draggable
     function makeSlotsDraggable() {

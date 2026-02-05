@@ -2,7 +2,7 @@
   <div class="panel">
     <h3>Scores</h3>
     <div class="panel_contents">
-      <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? } %>
+      <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? }.sort_by { |s| [s.flight.flight_time, s.num] } %>
       
       <% if slots.any? %>
         <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
@@ -39,7 +39,7 @@
               <tr>
                 <td><%= slot.flight.myTime %></td>
                 <td><%= score.start_hole %></td>
-                <td class="team-num"><%= slot.team.num %></td>
+                <td class="team-num"><%= slot.num %></td>
                 <td class="text-left"><%= slot.team.name %></td>
                 <td><%= slot.team.show_status %></td>
                 <td>
