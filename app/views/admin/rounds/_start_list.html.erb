@@ -309,33 +309,36 @@ function updateSlotUI(slotId, slotData) {
           slotElement.style.cursor = '';
         }
         
-        // Show the team in the teams list
-        const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
-        if (teamElement) {
-          teamElement.style.display = '';
-          console.log('Team shown in list');
-          makeEntriesDraggable();
-        } else {
-          console.log('Team element not found, attempting to reload panel');
-          // Fallback: reload the teams panel
-          const teamsPanel = document.querySelector('#teams .panel_contents');
-          if (teamsPanel) {
-            fetch(window.location.pathname, {
-              headers: { 'Accept': 'text/html' }
-            })
-            .then(response => response.text())
-            .then(html => {
-              const parser = new DOMParser();
-              const newDoc = parser.parseFromString(html, 'text/html');
-              const newTeamsPanel = newDoc.querySelector('#teams .panel_contents');
-              if (newTeamsPanel) {
-                teamsPanel.innerHTML = newTeamsPanel.innerHTML;
-                makeEntriesDraggable();
-                console.log('Teams panel reloaded');
-              }
-            })
-            .catch(error => console.error('Error reloading teams panel:', error));
-          }
+        // Always reload the teams panel to ensure the team appears
+        console.log('Reloading teams panel to ensure team appears');
+        const teamsPanel = document.querySelector('#teams .panel_contents');
+        if (teamsPanel) {
+          fetch(window.location.pathname, {
+            headers: { 'Accept': 'text/html' }
+          })
+          .then(response => response.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const newDoc = parser.parseFromString(html, 'text/html');
+            const newTeamsPanel = newDoc.querySelector('#teams .panel_contents');
+            if (newTeamsPanel) {
+              teamsPanel.innerHTML = newTeamsPanel.innerHTML;
+              makeEntriesDraggable();
+              console.log('Teams panel reloaded successfully');
+            } else {
+              console.error('Could not find teams panel in response');
+            }
+          })
+          .catch(error => {
+            console.error('Error reloading teams panel:', error);
+            // Fallback: try to show the team element if it exists
+            const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
+            if (teamElement) {
+              teamElement.style.display = '';
+              console.log('Fallback: Team shown in list');
+              makeEntriesDraggable();
+            }
+          });
         }
         
         // Re-initialize slot draggability
@@ -548,33 +551,36 @@ function updateSlotUI(slotId, slotData) {
             slotElement.style.cursor = '';
           }
           
-          // Show the team in the teams list
-          const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
-          if (teamElement) {
-            teamElement.style.display = '';
-            console.log('Team shown in list');
-            makeEntriesDraggable();
-          } else {
-            console.log('Team element not found, attempting to reload panel');
-            // Fallback: reload the teams panel
-            const teamsPanel = document.querySelector('#teams .panel_contents');
-            if (teamsPanel) {
-              fetch(window.location.pathname, {
-                headers: { 'Accept': 'text/html' }
-              })
-              .then(response => response.text())
-              .then(html => {
-                const parser = new DOMParser();
-                const newDoc = parser.parseFromString(html, 'text/html');
-                const newTeamsPanel = newDoc.querySelector('#teams .panel_contents');
-                if (newTeamsPanel) {
-                  teamsPanel.innerHTML = newTeamsPanel.innerHTML;
-                  makeEntriesDraggable();
-                  console.log('Teams panel reloaded');
-                }
-              })
-              .catch(error => console.error('Error reloading teams panel:', error));
-            }
+          // Always reload the teams panel to ensure the team appears
+          console.log('Reloading teams panel to ensure team appears');
+          const teamsPanel = document.querySelector('#teams .panel_contents');
+          if (teamsPanel) {
+            fetch(window.location.pathname, {
+              headers: { 'Accept': 'text/html' }
+            })
+            .then(response => response.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const newDoc = parser.parseFromString(html, 'text/html');
+              const newTeamsPanel = newDoc.querySelector('#teams .panel_contents');
+              if (newTeamsPanel) {
+                teamsPanel.innerHTML = newTeamsPanel.innerHTML;
+                makeEntriesDraggable();
+                console.log('Teams panel reloaded successfully');
+              } else {
+                console.error('Could not find teams panel in response');
+              }
+            })
+            .catch(error => {
+              console.error('Error reloading teams panel:', error);
+              // Fallback: try to show the team element if it exists
+              const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
+              if (teamElement) {
+                teamElement.style.display = '';
+                console.log('Fallback: Team shown in list');
+                makeEntriesDraggable();
+              }
+            });
           }
           
           // Re-initialize slot draggability
