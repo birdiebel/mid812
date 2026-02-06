@@ -10,7 +10,7 @@ ActiveAdmin.register Round do
     link_to "Close", admin_tour_event_path(resource.event.tour, resource.event, anchor: "rounds")
   end
 
-  myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date}" }
+  myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date} | #{round.status.upcase}" }
 
   show title: myTitle do
     render "admin/rounds/menu", round: round
@@ -62,7 +62,7 @@ ActiveAdmin.register Round do
     def update
       @round = Round.find(params[:id])
       if @round.update(permitted_params[:round])
-        redirect_to admin_tour_event_path(@round.event.tour, @round.event), notice: "Round updated successfully."
+        redirect_to admin_event_round_path(@round.event, @round), notice: "Round updated successfully."
       else
         render :edit
       end
