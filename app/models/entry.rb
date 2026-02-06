@@ -63,10 +63,24 @@ class Entry < ApplicationRecord
     reloaded_team = Team.includes(:entries, :event).find(team.id)
     event_format = reloaded_team.event&.format
 
-    if event_format == "team" || event_format == "bigteam"
-      new_status = reloaded_team.entries.all?(&:enter?) ? :enter : :refused
+    # Determine new status based on entries' statuses
+    new_status = if event_format == "team" || event_format == "bigteam"
+      # For team/bigteam: if all entries are 'enter', team is 'enter', otherwise check the most restrictive status
+      statuses = reloaded_team.entries.pluck(:status).uniq
+      if statuses.all? { |s| s == "enter" }
+        :enter
+      elsif statuses.any? { |s| s == "disqualified" }
+        :disqualified
+      elsif statuses.any? { |s| s == "canceled" }
+        :canceled
+      elsif statuses.any? { |s| s == "noshow" }
+        :noshow
+      else
+        :refused
+      end
     else
-      new_status = reloaded_team.status
+      # For individual formats, use the entry's status
+      self.status
     end
 
     reloaded_team.update_column(:status, new_status) if new_status.present?
