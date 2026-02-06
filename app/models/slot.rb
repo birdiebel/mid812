@@ -14,7 +14,7 @@ class Slot < ApplicationRecord
   end
 
   before_update :before_update_callback
-  after_commit :sync_playing_hcps, on: [ :create, :update ]
+  # after_commit :sync_playing_hcps, on: [ :create, :update ]
 
   def before_update_callback
     puts "Before updating Slot #{id}: team_id=#{team_id}, flight_id=#{flight_id}, num=#{num}, playing_hcp=#{playing_hcp}"
@@ -27,11 +27,13 @@ class Slot < ApplicationRecord
       puts "  Formula: #{formula_name} (#{formula_key})"
       if team && team.entries.exists?
         case
+
         when formula_key == "single"
           entry = team.entries.first
           computed_hcp = playing_hcp_single(entry)
           self.playing_hcp = computed_hcp
           entry.update_column(:playing_hcp, computed_hcp) if entry
+
         when formula_key.include?("4bbb") || formula_key.include?("fourball") || formula_key.include?("four ball")
           # Calculate playing_hcp for each player individually
           computed_hcps = team.entries.map do |entry|
@@ -41,6 +43,7 @@ class Slot < ApplicationRecord
           end
           # Set slot playing_hcp to the best (lowest) of the team
           self.playing_hcp = computed_hcps.compact.min
+
         when formula_key.include?("foursome") || formula_key.include?("greensome")
           # Calculate playing_hcp based on team total_hcp, apply to both players
           computed_hcp = playing_hcp_team(team)
@@ -115,11 +118,14 @@ class Slot < ApplicationRecord
     rating = tee.rating
     slope = tee.slope
     par = tee.sum_str("par_str")
+    # hcp pourcentage from config_teetime
+    hcp_pc = self.flight&.config_teetime&.hcp_pc || 100
+    hcp_pd = hcp_pc.to_f / 100.0
     if rating && slope
       # Compute playing_hcp
-      hcp = ((hcp * slope) / 113.0 + (rating - par)).round
+      hcp = (((hcp * slope) / 113.0 + (rating - par)) * hcp_pd).round
     end
-    # return hcp
+    # return hcp with adjustment hcp_pc
     hcp
   end
 
