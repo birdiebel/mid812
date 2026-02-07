@@ -14,7 +14,7 @@ ActiveAdmin.register_page "Dashboard" do
 
     columns do
       column do
-        panel "Recent Events" do
+        panel "Recent Events mec" do
           ul do
             Event.all.each do |event|
               li link_to(event.name, admin_tour_event_path(event.tour, event))
@@ -25,7 +25,9 @@ ActiveAdmin.register_page "Dashboard" do
 
       column do
         panel "Info" do
-          para "Welcome to ActiveAdmin."
+          para class: "black is_bold" do
+            "Infos"
+          end
         end
       end
     end

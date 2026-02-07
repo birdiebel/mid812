@@ -26,6 +26,12 @@ Rails.application.configure do
     config.public_file_server.headers = { "cache-control" => "no-cache, no-store, must-revalidate" }
   end
 
+  # Add by jp
+  config.cache_classes = false
+  config.action_controller.perform_caching = false
+  config.reload_classes_only_on_change = true
+  config.watchable_dirs[File.join(config.root, "app/admin")] = ["rb"]
+
   # Change to :null_store to avoid any caching.
   config.cache_store = :memory_store
 
