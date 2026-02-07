@@ -22,6 +22,23 @@ class ConfigTeetime < ApplicationRecord
   before_validation :set_default_nb_teams, on: :create
   after_save :create_or_update_flights
 
+  after_initialize :set_default_values
+  
+  def set_default_values
+    return unless new_record?
+    
+    if round&.event
+      case round.event.format
+      when 'single'
+        self.nb_slots ||= 3
+      when 'team'
+        self.nb_slots ||= 2
+      when 'bigteam'
+        self.nb_slots ||= 2
+      end
+    end
+  end
+
   def set_default_nb_teams
     if nb_teams.nil? && round&.event
       self.nb_teams = round.event.entries.where(status: :enter).count

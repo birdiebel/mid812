@@ -14,9 +14,22 @@ class Event < ApplicationRecord
 
   validates :name, presence: true
   validate :at_least_one_resultcat
+  validate :at_least_one_playercat
 
   after_save :sync_playercats_ids
   after_save :sync_resultcats_ids
+
+  def at_least_one_resultcat
+    if resultcats.empty? && (!@resultcats_ids_to_sync || @resultcats_ids_to_sync.empty?)
+      errors.add(:base, "Event must have at least one result category")
+    end
+  end
+
+  def at_least_one_playercat
+    if playercats.empty? && (!@playercats_ids_to_sync || @playercats_ids_to_sync.empty?)
+      errors.add(:base, "Event must have at least one player category")
+    end
+  end
 
   def playercats_ids=(ids)
     @playercats_ids_to_sync = ids.reject(&:blank?).map(&:to_i) if ids.present?
@@ -64,11 +77,7 @@ class Event < ApplicationRecord
     @resultcats_ids_to_sync = nil
   end
 
-  def at_least_one_resultcat
-    if resultcats.empty? && (!@resultcats_ids_to_sync || @resultcats_ids_to_sync.empty?)
-      errors.add(:base, "L'événement doit avoir au moins une catégorie de résultat")
-    end
-  end
+  
 
   # Set default values
   before_create :set_default_values

@@ -42,15 +42,17 @@ ActiveAdmin.register ConfigTeetime do
         event_format = round.event.format
         f.input :formula, as: :select, collection: Formula.where(format: event_format).map { |formula| [ formula.name, formula.id ] }, include_blank: "Select a formula"
         default_nb_teams = round.event.entries.where(status: :enter).count
+        default_nb_slots = event_format == 'single' ? 3 : 2
       else
         f.input :round, as: :select, collection: Round.all.map { |r| [ "#{r.event.name} - Round #{r.num}", r.id ] }, include_blank: false
         f.input :course, as: :select, collection: Course.all.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }, include_blank: false
         f.input :formula, as: :select, collection: Formula.all.map { |formula| [ formula.name, formula.id ] }, include_blank: "Select a formula"
         default_nb_teams = 0
+        default_nb_slots = 1
       end
 
       f.input :start_hole, as: :number, input_html: { min: 1, max: 18, value: f.object.start_hole || 1 }
-      f.input :nb_slots, as: :number, input_html: { min: 1, max: 4, value: f.object.nb_slots || 1 }, label: "Nb Slots (1-4)"
+      f.input :nb_slots, as: :number, input_html: { min: 1, max: 4, value: f.object.nb_slots || default_nb_slots }, label: "Nb Slots (1-4)"
       f.input :step, as: :number, input_html: { value: f.object.step || 10 }, label: "Step (minutes)"
       f.input :nb_teams, as: :number, input_html: { value: f.object.nb_teams || default_nb_teams }, label: "Nb Teams"
       f.input :start_time, as: :string, input_html: { type: :time, value: f.object.start_time&.strftime("%H:%M") || "08:00" }
