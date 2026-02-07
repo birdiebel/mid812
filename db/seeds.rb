@@ -239,12 +239,12 @@ def seed_club_course(club_name, course_name)
 end
 
 # Seed Admin User
-# seed_admin_user
+seed_admin_user
 
-# # Seed Players
+# Seed Players
 # seed_players(50, 30)
 
-# # Seed Agecats
+# Seed Agecats
 # seed_agecats
 
 # Seed Playercats
@@ -252,7 +252,7 @@ end
 
 # Seed Tours and Events
 # seed_tours("Federal Tour")
-#
+
 # Seed Rigenée Club and Course
 # seed_club_course("Golf de Rigenée", "Le Chateau")
 # seed_club_course("Golf de Pierpont", "Grand Pierpont")

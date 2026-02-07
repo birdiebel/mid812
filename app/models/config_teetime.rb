@@ -16,6 +16,7 @@ class ConfigTeetime < ApplicationRecord
   validates :nb_slots, inclusion: { in: 1..4 }
   validates :step, presence: true
   validates :start_time, presence: true
+  validates :formula, presence: true
 
   # Set default nb_teams based on entries with status :enter
   before_validation :set_default_nb_teams, on: :create

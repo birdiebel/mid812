@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_05_033712) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_05_161309) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -178,6 +178,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_033712) do
     t.integer "max_players", default: 1
     t.integer "min_players", default: 1
     t.string "name", null: false
+    t.integer "nb_cards", default: 1
     t.datetime "updated_at", null: false
   end
 
@@ -282,6 +283,22 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_033712) do
     t.index ["team_id"], name: "index_slots_on_team_id"
   end
 
+  create_table "team_scores", force: :cascade do |t|
+    t.integer "brut_total", default: 0
+    t.datetime "created_at", null: false
+    t.integer "hole_played", default: 0
+    t.integer "net_total", default: 0
+    t.bigint "round_id", null: false
+    t.integer "status", default: 0
+    t.integer "stb_total", default: 0
+    t.integer "stroke_play_score", default: 0
+    t.bigint "team_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["round_id"], name: "index_team_scores_on_round_id"
+    t.index ["team_id", "round_id"], name: "index_team_scores_on_team_id_and_round_id", unique: true
+    t.index ["team_id"], name: "index_team_scores_on_team_id"
+  end
+
   create_table "teamcats", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
@@ -360,6 +377,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_033712) do
   add_foreign_key "scores", "slots"
   add_foreign_key "slots", "flights"
   add_foreign_key "slots", "teams"
+  add_foreign_key "team_scores", "rounds"
+  add_foreign_key "team_scores", "teams"
   add_foreign_key "teams", "events"
   add_foreign_key "teams", "resultcats"
 end

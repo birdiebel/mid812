@@ -12,6 +12,9 @@ class Event < ApplicationRecord
   accepts_nested_attributes_for :event_playercats, allow_destroy: true, reject_if: proc { |attributes| attributes["playercat_id"].blank? }
   accepts_nested_attributes_for :event_resultcats, allow_destroy: true, reject_if: proc { |attributes| attributes["resultcat_id"].blank? }
 
+  validates :name, presence: true
+  validate :at_least_one_resultcat
+
   after_save :sync_playercats_ids
   after_save :sync_resultcats_ids
 
@@ -59,6 +62,12 @@ class Event < ApplicationRecord
     end
 
     @resultcats_ids_to_sync = nil
+  end
+
+  def at_least_one_resultcat
+    if resultcats.empty? && (!@resultcats_ids_to_sync || @resultcats_ids_to_sync.empty?)
+      errors.add(:base, "L'événement doit avoir au moins une catégorie de résultat")
+    end
   end
 
   # Set default values
