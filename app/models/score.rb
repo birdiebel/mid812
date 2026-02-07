@@ -158,12 +158,11 @@ class Score < ApplicationRecord
     if team&.resultcat&.scoring == "stroke_play" && has_zero
       self.status = :invalide
     else
-      self.status = :enter
-      # if played >= nb_hole
-      #   self.status = :completed
-      # else
-      #   self.status = :partial
-      # end
+      if played >= nb_hole
+        self.status = :completed
+      else
+        self.status = :partial
+      end
     end
   end
 
