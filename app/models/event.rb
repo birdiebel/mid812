@@ -146,4 +146,14 @@ class Event < ApplicationRecord
     end
     new_event
   end
+
+  def seed_register_player
+    Player.all.each do |player|
+      next if self.entries.exists?(player_id: player.id)  
+      entry = Entry.new
+      entry.player = player
+      entry.event = self
+      entry.save
+    end
+  end
 end

@@ -153,14 +153,17 @@ class Score < ApplicationRecord
     team = slot&.team
     has_zero = brut_values.any? { |v| v.present? && v.to_i == 0 }
 
+    puts "HAS_ZERO: #{has_zero}, TEAM RESULTCAT SCORING: #{team&.resultcat&.scoring}"
+
     if team&.resultcat&.scoring == "stroke_play" && has_zero
       self.status = :invalide
     else
-      if played >= nb_hole
-        self.status = :completed
-      else
-        self.status = :partial
-      end
+      self.status = :enter
+      # if played >= nb_hole
+      #   self.status = :completed
+      # else
+      #   self.status = :partial
+      # end
     end
   end
 
