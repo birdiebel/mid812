@@ -56,8 +56,7 @@
                 <td><%= team_score.hole_played_show %></td>
                 <% scoring_mode == "sp" ? ts_score = team_score.stroke_play_score : ts_score = "x" %>
                 <td> 
-                  <div class="div-against-par" style="<%= style_for_stroke_play(ts_score) %>"><strong><%= ts_score %></strong></div>
-                </td>
+                  <div class="div-against-par" style="<%= team_score.style_for_stroke_play(ts_score) %>"><strong><%= ts_score %></strong></div>
                 <td><%= scoring_mode == "sp" ? team_score.brut_total : "x" %></td>
                 <td><%= scoring_mode == "sp" ? team_score.net_total : "x" %></td>
                 <td><%= team_score.stb_total %></td>
@@ -176,7 +175,7 @@ $(document).ready(function() {
       var visibleRows = $('#scores-table tbody tr:visible');
       
       if (visibleRows.length === 1) {
-        var editButton = visibleRows.find('a.button').first();
+        var editButton = visibleRows.find('a.btt-add').first();
         if (editButton.length) {
           window.location.href = editButton.attr('href');
         }

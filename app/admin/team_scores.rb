@@ -25,13 +25,8 @@ ActiveAdmin.register TeamScore do
       ts.show_status_ts
     end
     column :hole_played
-    column "SP Score", :stroke_play_score do |ts|
-      if ts.stroke_play_score && ts.stroke_play_score != 0
-        score_class = ts.stroke_play_score > 0 ? "positive" : (ts.stroke_play_score < 0 ? "negative" : "")
-        span ts.stroke_play_score, class: score_class
-      else
-        "N/A"
-      end
+    column "+-" do |ts|
+      ts.stroke_play_score
     end
     column :brut_total
     column :net_total

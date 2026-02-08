@@ -73,6 +73,26 @@ class TeamScore < ApplicationRecord
     score&.start_hole || 1
   end
 
+  def parse_stroke_play_score(sp_score)
+    return 0 if sp_score.nil? || sp_score == "N.A."
+    return 0 if sp_score == "even"
+
+    # Convertir "+2" => 2, "-3" => -3
+    sp_score.to_s.gsub("+", "").to_i
+  end
+
+  def style_for_stroke_play(sp_score)
+    if sp_score.nil? || sp_score == "N.A."
+      ""
+    elsif sp_score.to_i == 0
+      "color: green;"
+    elsif sp_score.to_i < 0
+      "color: red;"
+    else
+      "color: blue;"
+    end
+  end 
+
   private
 
   def copy_from_single_score
@@ -122,13 +142,5 @@ class TeamScore < ApplicationRecord
     # Calcul du stroke play score
     sp_scores = scores.map { |s| parse_stroke_play_score(s.stroke_play_score) }.compact
     self.stroke_play_score = sp_scores.min || 0
-  end
-
-  def parse_stroke_play_score(sp_score)
-    return 0 if sp_score.nil? || sp_score == "N.A."
-    return 0 if sp_score == "even"
-
-    # Convertir "+2" => 2, "-3" => -3
-    sp_score.to_s.gsub("+", "").to_i
   end
 end
