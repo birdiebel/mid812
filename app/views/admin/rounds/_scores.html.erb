@@ -25,6 +25,8 @@
               <th>Brut</th>
               <th>Net</th>
               <th>Stb</th>
+              <th></th>
+              <th>Status</th>
             </tr>
           </thead>
           <tbody>
@@ -60,7 +62,22 @@
                 <td><%= scoring_mode == "sp" ? team_score.net_total : "x" %></td>
                 <td><%= team_score.stb_total %></td>
                 <td>
-                  <%= link_to "Scores", edit_admin_score_path(score), class: "button" if score %>
+                  <%= link_to "Scores", edit_admin_score_path(score), class: "btt btt-add" if score %>
+                </td>
+                <td>
+                  <% if scoring_mode == "sp" && slot.team.status != "disqualified" %>
+                    <%= form_with model: slot.team, url: admin_team_path(slot.team), method: :patch, local: true, style: "display: inline-flex; gap: 5px; align-items: center;" do |f| %>
+                      <%= hidden_field_tag :round_id, round.id %>                    
+                      <%= f.select :status, Team.statuses.keys.map { |s| [s.humanize, s] }, { selected: slot.team.status }, { style: "padding: 4px; font-size: 0.9em;" } %>
+                      <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>
+                    <% end %>
+                  <% elsif scoring_mode != "sp" %>
+                      <%= form_with model: slot.team, url: admin_team_path(slot.team), method: :patch, local: true, style: "display: inline-flex; gap: 5px; align-items: center;" do |f| %>
+                        <%= hidden_field_tag :round_id, round.id %>                    
+                        <%= f.select :status, Team.statuses.keys.map { |s| [s.humanize, s] }, { selected: slot.team.status }, { style: "padding: 4px; font-size: 0.9em;" } %>
+                        <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>                    
+                      <% end %>
+                  <% end %>
                 </td>
               </tr>
             <% end %>

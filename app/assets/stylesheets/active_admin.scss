@@ -115,19 +115,20 @@ tbody td {
 }
 
 .btt {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0px;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0px !important;
     font-family: Arial;
     padding: 5px;
-    text-decoration: none;
+    text-decoration: none !important;
+    font-weight: normal !important;
 }
 
 /* In app/assets/stylesheets/active_admin.css.scss */
 .submit-button {
-    -webkit-border-radius: 0;
-    -moz-border-radius: 0;
-    border-radius: 0px;
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0px !important;
     font-family: Arial;
     padding: 5px;
     text-decoration: none;
@@ -139,8 +140,6 @@ tbody td {
 .btt-add {
     color: #ffffff !important;
     background: darkblue !important;
-    text-decoration: none !important;
-    font-weight: bold !important;
 }
 
 .btt-edit {
@@ -149,8 +148,8 @@ tbody td {
 }
 
 .btt-cancel {
-    color: #ffffff;
-    background: darkred;
+    color: #ffffff !important;
+    background: darkred !important;
 }
 
 .panel h3 {

@@ -1,7 +1,7 @@
 ActiveAdmin.register Team do
   belongs_to :event, optional: true
 
-  permit_params :event_id, :name, :status, entries_attributes: [ :id, :hcp ]
+  permit_params :event_id, :name, :status, :round_id, entries_attributes: [ :id, :hcp ]
 
   menu label: "Teams", parent: "Config", priority: 12
 
@@ -69,7 +69,20 @@ ActiveAdmin.register Team do
     def update
       @team = Team.find(params[:id])
       if @team.update(permitted_params[:team])
-        redirect_to admin_tour_event_path(@team.event.tour, @team.event), notice: "Team updated successfully."
+        # Check if we came from the scores page (via round_id parameter or referer)
+        if params[:round_id].present?
+          redirect_to admin_round_path(params[:round_id], anchor: "scores-round"), notice: "Team status updated successfully."
+        elsif request.referer&.include?("/admin/rounds/")
+          # Extract round_id from referer if possible
+          round_id = request.referer.match(/\/admin\/rounds\/(\d+)/)[1] rescue nil
+          if round_id
+            redirect_to admin_round_path(round_id, anchor: "scores-round"), notice: "Team status updated successfully."
+          else
+            redirect_to admin_tour_event_path(@team.event.tour, @team.event), notice: "Team updated successfully."
+          end
+        else
+          redirect_to admin_tour_event_path(@team.event.tour, @team.event), notice: "Team updated successfully."
+        end
       else
         render :edit
       end

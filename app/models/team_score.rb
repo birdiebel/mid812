@@ -38,11 +38,12 @@ class TeamScore < ApplicationRecord
     # Récupère la formule depuis le slot du team
     slot = team.slots.joins(:flight).where(flights: { config_teetime_id: round.config_teetimes.pluck(:id) }).first
     formula = slot&.flight&.config_teetime&.formula
+    scoring_mode = self.team&.resultcat&.scoring
     return unless formula
 
     # new_status = :enter # Valeur par défaut
 
-    if score_status.present? && score_status == "invalide"
+    if score_status.present? && scoring_mode == "stroke_play" && score_status == "invalide"
       self.team.status = :disqualified
     else
       self.team.status = :enter   

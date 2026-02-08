@@ -25,6 +25,7 @@ class Team < ApplicationRecord
   before_update :sync_entries_status
   after_save :update_resultcat, if: -> { !@skip_resultcat_update }
 
+
   def show_status
     if status.nil?
       "N/A"
