@@ -1,6 +1,6 @@
 ActiveAdmin.register Score do
   permit_params :round_id, :slot_id, :entry_id, :status, :brut_str, :net_str, :stb_str, :hole_played, :start_hole,
-                slot_attributes: [ :id, team_attributes: [ :id, :status ] ]
+                slot_attributes: [ :id, team_attributes: [ :id, :status ]]
 
   menu label: "Scores", parent: "Config", priority: 13
 
@@ -72,11 +72,42 @@ ActiveAdmin.register Score do
   end
 
   controller do
+    def permitted_params
+      params.permit(
+        :_method,
+        :authenticity_token,
+        :commit,
+        :id,
+        :team_id,
+        :team_status,
+        { brut_inputs: {} },
+        score: [
+          :round_id,
+          :slot_id,
+          :entry_id,
+          :status,
+          :brut_str,
+          :net_str,
+          :stb_str,
+          :hole_played,
+          :start_hole,
+          { slot_attributes: [ :id, { team_attributes: [ :id, :status ] } ] }
+        ]
+      )
+    end
+    
     def update
+      
+      # all_params = params.to_h   
+      # puts "Received params: #{all_params.inspect}"
+     
+      puts "Updating team #{params[:team_id]} status to #{params[:team_status]}" 
+
       @score = Score.find(params[:id])
 
       # Update team status if provided
       if params[:team_id].present? && params[:team_status].present?
+        puts "Finding team with ID: #{params[:team_id]} with status: #{params[:team_status]}"
         team = Team.find_by(id: params[:team_id])
         team.update(status: params[:team_status]) if team
       end
@@ -86,6 +117,13 @@ ActiveAdmin.register Score do
       else
         render :edit
       end
+
+      # if @score.update(permitted_params[:score])
+      #   redirect_to admin_round_path(@score.round, anchor: "scores-round"), notice: "Score updated successfully."
+      # else
+      #   render :edit
+      # end
+
     end
 
     def create

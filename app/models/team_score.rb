@@ -31,11 +31,23 @@ class TeamScore < ApplicationRecord
   end
 
   # Recalcule le score du team selon la formule
-  def recalculate!
+  def recalculate!(score_status = nil)
     # Récupère la formule depuis le slot du team
     slot = team.slots.joins(:flight).where(flights: { config_teetime_id: round.config_teetimes.pluck(:id) }).first
     formula = slot&.flight&.config_teetime&.formula
     return unless formula
+
+    # new_status = :enter # Valeur par défaut
+
+    if score_status.present? && score_status == "invalide"
+      self.team.status = :disqualified
+      self.team.save!
+    end
+
+    puts "Setting team #{team_id} status to #{self.team.status} due to score status #{score_status}"
+
+    # Update le status du team si fourni
+    self.status = self.team.status 
 
     case formula.nb_cards
     when 1

@@ -134,6 +134,7 @@ class Score < ApplicationRecord
   end
 
   def update_hole_played_and_status
+    puts "Calculating hole_played and status for Score ID: #{id}, brut_str: #{brut_str}"
     return unless brut_str.present?
 
     # Get course to determine total holes
@@ -171,6 +172,6 @@ class Score < ApplicationRecord
     return unless team && round
 
     team_score = TeamScore.find_or_create_by(team: team, round: round)
-    team_score.recalculate!
+    team_score.recalculate!(self.status)
   end
 end
