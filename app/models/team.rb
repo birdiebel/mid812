@@ -19,6 +19,7 @@ class Team < ApplicationRecord
   validates :num, uniqueness: { scope: :event_id }, allow_nil: true
 
   enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
+  
 
   before_create :assign_num
   before_update :sync_entries_status

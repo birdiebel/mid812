@@ -18,7 +18,6 @@ class Entry < ApplicationRecord
   end
 
   enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
-  # enum :status, [ :enter, :refused, :canceled, :disqualified, :noshow ]
 
   after_create :ensure_team
   after_save :add_licence_to_entry
