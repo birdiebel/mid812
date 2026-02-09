@@ -1,36 +1,36 @@
 <div id="flights" style="width: 500px;">
   <div class="panel">
     <h3>Flights</h3>
-    <div class="panel_contents" style="overflow-y: auto; height: 400px;">
-      <% round.config_teetimes.each do |config| %>
-        <div class="config-section">
-          <h4 style="background-color: green; color: white; padding: 5px; font-weight: bold;"><%= config.course.name %> - Hole <%= config.start_hole %></h4>
-          <% config.flights.order(:num).each do |flight| %>
-            <div class="flight-item">
-              <h4 style="background-color: lightblue; padding: 5px; font-weight: bold;"><strong>Flight <%= flight.num %></strong> - <strong><%= flight.myTime %></strong></h4>
-              <% flight.slots.order(:num).each do |slot| %>
-                 <div class="slot-item <%= slot.team ? 'slot-item--occupied' : 'slot-item--empty' %>" 
-                     data-slot-id="<%= slot.id %>"
-                     <% if slot.team %>
-                       data-team-id="<%= slot.team.id %>"
-                       data-team-name="<%= slot.team.team_name %>"
-                       data-hcp="<%= slot.team.total_hcp %>"
-                     <% end %>>
-                  <strong><%= slot.team ? slot.team.team_name : "" %></strong>
-                  <br>
-                  <% if slot.team %>
-  <% slot.team.entries.each do |p| %>
-    <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-      <div><strong>PHCP: <%= p.playing_hcp %></strong></div> 
-      <div>|</div> 
-      <% if p.playercat && p.playercat.icon_teebox.present? %>
-        <div><%= p.playercat.icon_teebox.html_safe %></div>
-      <% else %>
-        <div style="color: red;">NO ICON</div>
-      <% end %>
-    </div>
-  <% end %>
-<% end %>
+          <div class="panel_contents" style="overflow-y: auto; height: 400px;">
+            <% round.config_teetimes.each do |config| %>
+              <div class="config-section">
+                <h4 style="background-color: green; color: white; padding: 5px; font-weight: bold;"><%= config.course.name %> - Hole <%= config.start_hole %></h4>
+                <% config.flights.order(:num).each do |flight| %>
+                  <div class="flight-item">
+                    <h4 style="background-color: lightblue; padding: 5px; font-weight: bold;"><strong>Flight <%= flight.num %></strong> - <strong><%= flight.myTime %></strong></h4>
+                    <% flight.slots.order(:num).each do |slot| %>
+                      <div class="slot-item <%= slot.team ? 'slot-item--occupied' : 'slot-item--empty' %>" 
+                          data-slot-id="<%= slot.id %>"
+                          <% if slot.team %>
+                            data-team-id="<%= slot.team.id %>"
+                            data-team-name="<%= slot.team.team_name %>"
+                            data-hcp="<%= slot.team.total_hcp %>"
+                          <% end %>>
+                        <strong><%= slot.team ? slot.team.team_name : "" %></strong>
+                        <br>
+                        <% if slot.team %>
+                        <% slot.team.entries.each do |p| %>
+                          <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+                            <div><strong>PHCP: <%= p.playing_hcp %></strong></div> 
+                            <div>|</div> 
+                            <% if p.playercat && p.playercat.icon_teebox.present? %>
+                              <div><%= p.playercat.icon_teebox.html_safe %></div>
+                            <% else %>
+                              <div style="color: red;">NO ICON</div>
+                            <% end %>
+                          </div>
+                        <% end %>
+                  <% end %>
                 </div>
               <% end %>
             </div>

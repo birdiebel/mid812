@@ -79,3 +79,7 @@ gem "rails-i18n"
 group :development do
   gem "rails_live_reload"
 end
+
+group :development do
+  gem "ruby-lsp", require: false
+end

@@ -33,15 +33,7 @@
           Result-Card
         <% end %>
       </span>
-      <% if slot&.team %>
-        <select name="team_status" style="width: auto;">
-          <% Team.statuses.keys.each do |status_key| %>
-            <option value="<%= status_key %>" <%= 'selected' if slot.team.status == status_key %>><%= status_key.capitalize %></option>
-          <% end %>
-        </select>
-        <%= hidden_field_tag 'team_id', slot.team.id %>
-      <% end %>
-    </span>
+      
     <span style="display: flex; gap: 5px;">
       <span class="brut_total scoring-sp" player="<%= player %>"></span>
       <span class="net_total scoring-net" player="<%= player %>"></span>
