@@ -7,8 +7,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const formatSelect = formatLabel ? formatLabel.querySelector('select') : null;
   const playercatsCheckboxes = document.querySelectorAll('input.playercat-checkbox');
   
-  console.log('formatSelect:', formatSelect);
-  console.log('playercatsCheckboxes count:', playercatsCheckboxes.length);
+  // console.log('formatSelect:', formatSelect);
+  // console.log('playercatsCheckboxes count:', playercatsCheckboxes.length);
   
   if (!formatSelect || playercatsCheckboxes.length === 0) {
     console.log('Early return: no formatSelect or no checkboxes');
@@ -17,14 +17,14 @@ document.addEventListener('DOMContentLoaded', function() {
   
   function filterPlayercats() {
     const selectedFormat = formatSelect.value;
-    console.log('Filtering by format:', selectedFormat);
+    // console.log('Filtering by format:', selectedFormat);
     
     playercatsCheckboxes.forEach(checkbox => {
       const label = checkbox.closest('label');
       if (!label) return;
       
       const pcFormat = checkbox.getAttribute('data-format');
-      console.log('Checkbox:', checkbox.value, 'pcFormat:', pcFormat, 'selectedFormat:', selectedFormat);
+      // console.log('Checkbox:', checkbox.value, 'pcFormat:', pcFormat, 'selectedFormat:', selectedFormat);
       
       if (selectedFormat && pcFormat && pcFormat !== selectedFormat) {
         label.style.display = 'none';

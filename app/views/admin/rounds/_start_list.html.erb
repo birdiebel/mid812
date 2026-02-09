@@ -39,20 +39,21 @@
         });
       }
     }
+    
     // Function to make teams draggable
     function makeEntriesDraggable() {
       const entries = document.querySelectorAll('.team-item');
-      console.log('Found ' + entries.length + ' teams');
+      // console.log('Found ' + entries.length + ' teams');
       
       entries.forEach(team => {
         // Only add listeners if not already added
         if (!team.dataset.draggableInitialized) {
           team.draggable = true;
           team.style.cursor = 'move';
-          console.log('Team', team.getAttribute('data-team-id'), 'made draggable');
+          // console.log('Team', team.getAttribute('data-team-id'), 'made draggable');
           
           team.addEventListener('dragstart', function(e) {
-            console.log('Dragging team:', this.getAttribute('data-team-id'));
+            // console.log('Dragging team:', this.getAttribute('data-team-id'));
             this.style.opacity = '0.5';
             this.style.backgroundColor = '#e8f5e9';
             e.dataTransfer.effectAllowed = 'move';
@@ -60,7 +61,7 @@
           });
           
           team.addEventListener('dragend', function(e) {
-            console.log('Drag ended');
+            // console.log('Drag ended');
             this.style.opacity = '1';
             this.style.backgroundColor = '';
           });
@@ -76,7 +77,7 @@
     }
     
     // Initialize teams on page load
-    console.log('Calling makeEntriesDraggable on DOMContentLoaded');
+    // console.log('Calling makeEntriesDraggable on DOMContentLoaded');
     setTimeout(() => {
       makeEntriesDraggable();
     }, 100);
@@ -95,7 +96,7 @@
       const sourceTeamId = sourceSlot.getAttribute('data-team-id');
       const destTeamId = destSlot.getAttribute('data-team-id');
       
-      console.log('Slot action: source team', sourceTeamId, ', dest team', destTeamId);
+      // console.log('Slot action: source team', sourceTeamId, ', dest team', destTeamId);
       
       const token = document.querySelector('meta[name="csrf-token"]');
       if (!token) {
@@ -105,7 +106,7 @@
       
       // If destination slot is empty, just move the team
       if (sourceTeamId && !destTeamId) {
-        console.log('Moving team', sourceTeamId, 'to empty slot', destSlotId);
+        // console.log('Moving team', sourceTeamId, 'to empty slot', destSlotId);
         
         // First, clear the source slot in DB
         fetch(`/api/v1/slots/${sourceSlotId}`, {
@@ -136,7 +137,7 @@
           throw new Error('Failed to move team');
         })
         .then(data => {
-          console.log('Team moved successfully');
+          // console.log('Team moved successfully');
           
           // Clear the source slot UI
           sourceSlot.innerHTML = '<strong></strong><br>';
@@ -163,7 +164,7 @@
       }
       // If both slots have teams, swap them
       else if (sourceTeamId && destTeamId) {
-        console.log('Swapping entries:', sourceTeamId, 'with', destTeamId);
+        // console.log('Swapping entries:', sourceTeamId, 'with', destTeamId);
         
         // First, update source slot with dest team
         fetch(`/api/v1/slots/${sourceSlotId}`, {
@@ -193,7 +194,7 @@
             throw new Error('Failed to update dest slot');
           })
           .then(data2 => {
-            console.log('Swap completed successfully');
+            // console.log('Swap completed successfully');
             
             // Update UI for both slots
             updateSlotUI(sourceSlotId, data1.slot);
@@ -248,7 +249,7 @@ function updateSlotUI(slotId, slotData) {
     // Make slots with assigned teams draggable
     function makeSlotsDraggable() {
       const occupiedSlots = document.querySelectorAll('.slot-item[data-team-id]');
-      console.log('Found ' + occupiedSlots.length + ' occupied slots');
+      // console.log('Found ' + occupiedSlots.length + ' occupied slots');
       
       occupiedSlots.forEach(slot => {
         slot.draggable = true;
@@ -260,14 +261,14 @@ function updateSlotUI(slotId, slotData) {
           e.stopPropagation();
           const slotId = this.dataset.slotId;
           const teamId = this.dataset.teamId;
-          console.log('Double-clicked slot', slotId, 'with team', teamId);
+          // console.log('Double-clicked slot', slotId, 'with team', teamId);
           removeTeamFromSlot(slotId, teamId);
         });
         
         slot.addEventListener('dragstart', function(e) {
           const teamId = this.dataset.teamId;
           const slotId = this.dataset.slotId;
-          console.log('Dragging slot with team:', teamId);
+          // console.log('Dragging slot with team:', teamId);
           
           this.style.opacity = '0.5';
           this.style.backgroundColor = '#ffebee';
@@ -318,7 +319,7 @@ function updateSlotUI(slotId, slotData) {
         }
       })
       .then(data => {
-        console.log('Team removed from slot successfully');
+        // console.log('Team removed from slot successfully');
         
         // Update slot to show "Empty"
         const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
@@ -337,7 +338,7 @@ function updateSlotUI(slotId, slotData) {
         }
         
         // Always reload the teams panel to ensure the team appears
-        console.log('Reloading teams panel to ensure team appears');
+        // console.log('Reloading teams panel to ensure team appears');
         const teamsPanel = document.querySelector('#teams .panel_contents');
         if (teamsPanel) {
           fetch(window.location.pathname, {
@@ -351,7 +352,7 @@ function updateSlotUI(slotId, slotData) {
             if (newTeamsPanel) {
               teamsPanel.innerHTML = newTeamsPanel.innerHTML;
               makeEntriesDraggable();
-              console.log('Teams panel reloaded successfully');
+              // console.log('Teams panel reloaded successfully');
             } else {
               console.error('Could not find teams panel in response');
             }
@@ -362,7 +363,7 @@ function updateSlotUI(slotId, slotData) {
             const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
             if (teamElement) {
               teamElement.style.display = '';
-              console.log('Fallback: Team shown in list');
+              // console.log('Fallback: Team shown in list');
               makeEntriesDraggable();
             }
           });
@@ -381,7 +382,7 @@ function updateSlotUI(slotId, slotData) {
     
     // Make slots droppable
     const slots = document.querySelectorAll('.slot-item');
-    console.log('Found ' + slots.length + ' slots');
+    // console.log('Found ' + slots.length + ' slots');
     
     slots.forEach(slot => {
       slot.addEventListener('dragover', function(e) {
@@ -411,13 +412,13 @@ function updateSlotUI(slotId, slotData) {
         
         // Check if this is a slot-to-slot swap (drag a slot onto another slot)
         if (sourceType === 'slot' && sourceSlotId && !teamId) {
-          console.log('Swapping slot', sourceSlotId, 'with slot', destSlotId);
+          // console.log('Swapping slot', sourceSlotId, 'with slot', destSlotId);
           handleSlotSwap(sourceSlotId, destSlotId);
           return;
         }
         
         // Otherwise, this is a team-to-slot assignment
-        console.log('Dropping team', teamId, 'on slot', destSlotId);
+        // console.log('Dropping team', teamId, 'on slot', destSlotId);
         
         if (!teamId || !destSlotId) {
           console.error('Missing team or slot ID');
@@ -426,7 +427,7 @@ function updateSlotUI(slotId, slotData) {
         
         // Check if slot is already occupied
         const oldTeamId = destSlotElement.getAttribute('data-team-id');
-        console.log('Slot currently has team:', oldTeamId);
+        // console.log('Slot currently has team:', oldTeamId);
         
         // Get the team element from the list
         const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
@@ -450,7 +451,7 @@ function updateSlotUI(slotId, slotData) {
           })
         })
         .then(response => {
-          console.log('Response status:', response.status);
+          // console.log('Response status:', response.status);
           if (response.ok) {
             return response.json();
           } else {
@@ -459,16 +460,16 @@ function updateSlotUI(slotId, slotData) {
           }
         })
         .then(data => {
-          console.log('Success! Data:', data);
+          // console.log('Success! Data:', data);
           
           if (destSlotElement && data.slot && data.slot.team && data.slot.team.entries) {
             updateSlotUI(destSlotId, data.slot);
-            console.log('Slot updated from team drop');
+            // console.log('Slot updated from team drop');
             
             // Hide the new team from the list
             if (teamElement) {
               teamElement.style.display = 'none';
-              console.log('New team hidden from list');
+              // console.log('New team hidden from list');
             }
             
             // If there was an old team in the slot, show it back in the list
@@ -476,7 +477,7 @@ function updateSlotUI(slotId, slotData) {
               const oldTeamElement = document.querySelector(`.team-item[data-team-id="${oldTeamId}"]`);
               if (oldTeamElement) {
                 oldTeamElement.style.display = '';
-                console.log('Old team re-shown in list');
+                // console.log('Old team re-shown in list');
                 makeEntriesDraggable(); // Re-enable drag on the re-shown team
               }
             }
@@ -531,7 +532,7 @@ function updateSlotUI(slotId, slotData) {
           return;
         }
         
-        console.log('Removing team', teamId, 'from slot', slotId);
+        // console.log('Removing team', teamId, 'from slot', slotId);
         
         const token = document.querySelector('meta[name="csrf-token"]');
         if (!token) {
@@ -561,7 +562,7 @@ function updateSlotUI(slotId, slotData) {
           }
         })
         .then(data => {
-          console.log('Team removed from slot successfully, teamId:', teamId);
+          // console.log('Team removed from slot successfully, teamId:', teamId);
           
           // Update slot to show "Empty"
           const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
@@ -580,7 +581,7 @@ function updateSlotUI(slotId, slotData) {
           }
           
           // Always reload the teams panel to ensure the team appears
-          console.log('Reloading teams panel to ensure team appears');
+          // console.log('Reloading teams panel to ensure team appears');
           const teamsPanel = document.querySelector('#teams .panel_contents');
           if (teamsPanel) {
             fetch(window.location.pathname, {
@@ -594,7 +595,7 @@ function updateSlotUI(slotId, slotData) {
               if (newTeamsPanel) {
                 teamsPanel.innerHTML = newTeamsPanel.innerHTML;
                 makeEntriesDraggable();
-                console.log('Teams panel reloaded successfully');
+                // console.log('Teams panel reloaded successfully');
               } else {
                 console.error('Could not find teams panel in response');
               }
@@ -605,7 +606,7 @@ function updateSlotUI(slotId, slotData) {
               const teamElement = document.querySelector(`.team-item[data-team-id="${teamId}"]`);
               if (teamElement) {
                 teamElement.style.display = '';
-                console.log('Fallback: Team shown in list');
+                // console.log('Fallback: Team shown in list');
                 makeEntriesDraggable();
               }
             });
