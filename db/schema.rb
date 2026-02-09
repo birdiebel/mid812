@@ -222,7 +222,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_161309) do
     t.date "dob", default: "1970-01-01", null: false
     t.string "firstname", null: false
     t.integer "lang", default: 0
-    t.string "lastname", null: falsehttps://www.livgolf.com/leaderboard
+    t.string "lastname", null: false
     t.integer "sexe", default: 0
     t.datetime "updated_at", null: false
     t.bigint "user_id"
