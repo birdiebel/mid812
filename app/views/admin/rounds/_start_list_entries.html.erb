@@ -2,7 +2,7 @@
   <div class="panel" style="width: 500px;">
     <h3>Teams (Status: Enter)</h3>
     <div class="panel_contents" style="overflow-y: auto; height: 400px;">
-      <% teams = round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots) %>
+      <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
       <% available_teams = teams.reject { |team| team.slots.any? } %>
       <% resultcats = round.event.resultcats.sort_by(&:name) %>
       <% if resultcats.any? %>
