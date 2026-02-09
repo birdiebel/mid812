@@ -322,12 +322,15 @@ tbody td {
     display: block;
 }
 
-.entry-item, .slot-item {
+.entry-item, .slot-item, .team-item {
     margin-bottom: 8px;
     padding: 6px 8px;
     min-height: 40px;
     border-radius: 4px;
     border: 1px solid #ddd;
+}
+.team-item {
+    background-color: #e6f7e6;
 }
 .entry-item {
     background-color: lightyellow;

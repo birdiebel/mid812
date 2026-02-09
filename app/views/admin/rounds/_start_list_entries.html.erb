@@ -1,15 +1,17 @@
 <div id="teams">
-  <div class="panel" style="width: 500px;">
-    <h3>Teams (Status: Enter)</h3>
+  <div class="panel" style="width: 500px; background-color: #f9f9f9; border: 1px solid #ccc; border-radius: 4px;">
+    <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
+    <% available_teams_total = teams.reject { |team| team.slots.any? } %>
+    <h3 data-team-total>Teams (Status: Enter) & Available: <%= available_teams_total.count %></h3>
     <div class="panel_contents" style="overflow-y: auto; height: 400px;">
-      <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
+      <%# <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
       <% available_teams = teams.reject { |team| team.slots.any? } %>
-      <% resultcats = round.event.resultcats.sort_by(&:name) %>
+      <% resultcats = round.event.resultcats.sort_by(&:priority) %>
       <% if resultcats.any? %>
         <% resultcats.each do |resultcat| %>
           <% cat_teams = available_teams.select { |team| team.resultcat_id == resultcat.id } %>
           <div class="resultcat-group" data-resultcat-id="<%= resultcat.id %>">
-            <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= resultcat.name %></h4>
+            <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= resultcat.name %> | <%= cat_teams.count { |item| item.status == 'enter' } %></h4>
             <% cat_teams.each do |team| %>
               <div class="team-item" data-team-id="<%= team.id %>" data-resultcat-id="<%= team.resultcat_id %>" style="<%= team.slots.any? ? 'display: none;' : '' %>">
                 <strong><%= team.team_name %></strong>
