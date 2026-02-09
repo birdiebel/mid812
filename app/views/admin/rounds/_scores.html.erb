@@ -11,6 +11,7 @@
             Refresh
           </button>
         </div>
+        <div><%= round.start_list_caution %></div>
         <table class="index_table" id="scores-table">
           <thead>
             <tr>
@@ -105,7 +106,7 @@ $(document).ready(function() {
     sessionStorage.removeItem('showScores');
     
     // Hide all sections
-    $('#config-times, #start-list, #scores-round, #status, #round-details').hide();
+    $('#config-times, #start-list, #status, #round-details').hide();
     
     // Show only scores section
     $('#scores-round').show();

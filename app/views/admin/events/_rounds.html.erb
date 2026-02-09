@@ -14,6 +14,7 @@
               <th></th>
               <th></th>
               <th>HCP %</th>
+              <th>Slots Occupied</th>
               <th></th>
               <th></th>
             </tr>
@@ -25,7 +26,7 @@
                 <td><%= round.date %></td>
                 <td><span class="status_tag"><%= round.status %></span></td>
                 <td><%= round.hcp_pc %></td>
-                <td><%= button_to "Edit", edit_admin_round_path(round), method: :get, class: "btt btt-edit" %></td>
+                <td><%= round.slots_taked %></td>
                 <td><%= button_to "Delete", admin_round_path(round), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %></td>
               </tr>
             <% end %>

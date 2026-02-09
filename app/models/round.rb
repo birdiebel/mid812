@@ -7,5 +7,19 @@ class Round < ApplicationRecord
 
   validates :hcp_pc, inclusion: { in: 0..100, message: "must be between 0 and 100" }
   validates :status, presence: true
-  validates :num, presence: true, numericality: { only_integer: true, greater_than: 0 } 
+  validates :num, presence: true, numericality: { only_integer: true, greater_than: 0 }
+
+  def slots_taked
+    config_teetimes.joins(flights: :slots).where.not(slots: { team_id: nil }).count
+  end
+
+  def start_list_caution
+    if slots_taked < event.entries_valid
+      "<span class='is_red'>Start list may be incomplete (#{slots_taked} slots occupied for #{event.entries_valid} valid entries)</span>
+      <br>
+      <span class='is_red'>Review start list</span>".html_safe
+    else
+      false
+    end
+  end
 end

@@ -19,6 +19,11 @@ class Event < ApplicationRecord
   after_save :sync_playercats_ids
   after_save :sync_resultcats_ids
 
+
+  def entries_valid
+    entries.where(status: :enter).count
+  end
+
   def at_least_one_resultcat
     if resultcats.empty? && (!@resultcats_ids_to_sync || @resultcats_ids_to_sync.empty?)
       errors.add(:base, "Event must have at least one result category")
@@ -77,7 +82,7 @@ class Event < ApplicationRecord
     @resultcats_ids_to_sync = nil
   end
 
-  
+
 
   # Set default values
   before_create :set_default_values
@@ -149,7 +154,7 @@ class Event < ApplicationRecord
 
   def seed_register_player
     Player.all.each do |player|
-      next if self.entries.exists?(player_id: player.id)  
+      next if self.entries.exists?(player_id: player.id)
       entry = Entry.new
       entry.player = player
       entry.event = self
