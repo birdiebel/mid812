@@ -15,6 +15,30 @@
   document.addEventListener('DOMContentLoaded', function() {
     console.log('Starting drag & drop initialization...');
     
+    function refreshTeamList() {
+      const teamsPanel = document.querySelector('#teams .panel_contents');
+      if (teamsPanel) {
+        fetch(window.location.pathname, {
+          headers: { 'Accept': 'text/html' }
+        })
+        .then(response => response.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const newDoc = parser.parseFromString(html, 'text/html');
+          const newTeamsPanel = newDoc.querySelector('#teams .panel_contents');
+          if (newTeamsPanel) {
+            teamsPanel.innerHTML = newTeamsPanel.innerHTML;
+            makeEntriesDraggable();
+            console.log('Team list refreshed successfully');
+          } else {
+            console.error('Could not find teams panel in response');
+          }
+        })
+        .catch(error => {
+          console.error('Error refreshing team list:', error);
+        });
+      }
+    }
     // Function to make teams draggable
     function makeEntriesDraggable() {
       const entries = document.querySelectorAll('.team-item');
@@ -128,6 +152,9 @@
           
           // Re-initialize slot draggability
           makeSlotsDraggable();
+
+          // Refresh the team list to show the moved team in the correct place
+          refreshTeamList();
         })
         .catch(error => {
           console.error('Move error:', error);
@@ -457,6 +484,7 @@ function updateSlotUI(slotId, slotData) {
             // Re-initialize slot draggability
             makeSlotsDraggable();
             makeEntriesDraggable(); // Re-enable drag on remaining visible entries
+            refreshTeamList(); // Refresh the team list to ensure correct ordering
           } else {
             console.error('Missing slot or team data');
           }

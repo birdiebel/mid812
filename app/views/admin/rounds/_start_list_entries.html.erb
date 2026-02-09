@@ -2,11 +2,19 @@
   <div class="panel" style="width: 500px; background-color: #f9f9f9; border: 1px solid #ccc; border-radius: 4px;">
     <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
     <% available_teams_total = teams.reject { |team| team.slots.any? } %>
-    <h3 data-team-total>Teams (Status: Enter) & Available: <%= available_teams_total.count %></h3>
+    <h3 data-team-total>Teams (Status: Enter) : <%= available_teams_total.count %></h3>
     <div class="panel_contents" style="overflow-y: auto; height: 400px;">
       <%# <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
       <% available_teams = teams.reject { |team| team.slots.any? } %>
       <% resultcats = round.event.resultcats.sort_by(&:priority) %>
+      <% av_style = available_teams.any? ? "color: red" : "color: green" %>
+      <div style="<%= av_style %>">
+        <% if available_teams.any? %>
+          Still present: <%= available_teams.count %>
+        <% else %>
+          All entries are placed
+        <% end %>
+      </div>
       <% if resultcats.any? %>
         <% resultcats.each do |resultcat| %>
           <% cat_teams = available_teams.select { |team| team.resultcat_id == resultcat.id } %>
