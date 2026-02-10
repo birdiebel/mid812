@@ -42,9 +42,10 @@
             <% score = entry ? Score.find_or_create_by(round_id: round.id, entry_id: entry.id) { |s| s.slot = slot; s.status = :partial } : nil %>
             <% score.update_column(:slot_id, slot.id) if score && score.slot_id != slot.id %>
             <% tr_id = "team-score-#{score.id}" %>
+            <% scoring_class = "scoring-#{score.status}" if score %>
             
             <!-- Ligne TeamScore -->
-            <tr id="<%= tr_id %>" style="background-color: #e8f5e9; font-weight: bold; border-top: 2px solid #4caf50;">
+            <tr id="<%= tr_id %>" class="<%= scoring_class %>">
               <td><%= slot.flight.myTime %></td>
               <td><%= slot.flight.config_teetime.start_hole %></td>
               <td class="team-num"><%= slot.team.num %></td>
@@ -52,9 +53,11 @@
                 <strong><%= slot.team.name %></strong>
               </td>
               <td><%= slot.team.show_status %></td>
-              <td id="score-status-<%= score.id %>"><%= score.status %></td>
+              <td id="score-status-<%= score.id %>" class="scoring-tr <%= scoring_class %>">
+                <%= score.status %>
+              </td>
               <td>
-                <div class="<%= scoring_class %>">  
+                <div>  
                   <%= slot.team.resultcat&.scoring_short %>
                 </div>
               </td>

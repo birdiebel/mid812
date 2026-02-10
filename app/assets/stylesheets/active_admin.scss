@@ -392,3 +392,24 @@ tbody td {
     background-color: lightblue;
     color: black;
 }
+
+.scoring-tr {
+    background-color: #e8f5e9; 
+    font-weight: bold; 
+    border-top: 2px solid #4caf50;
+}
+
+.scoring-partial {
+    background-color: lightsteelblue;
+    color: black;
+}
+
+.scoring-completed {
+    background-color: lightgreen;
+    color: black;
+}
+
+.scoring-invalide {
+    background-color: pink;
+    color: black;
+}

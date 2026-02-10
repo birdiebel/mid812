@@ -5,7 +5,7 @@ class Score < ApplicationRecord
 
   accepts_nested_attributes_for :slot
 
-  enum :status, { partial: 0, completed: 1, invalide: 2 }
+  enum :status, { pending: 0, partial: 2, completed: 3, invalide: 4 }
 
   before_validation :assign_start_hole, if: -> { start_hole.blank? }
   before_save :calculate_recu_str
