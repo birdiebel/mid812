@@ -21,7 +21,7 @@ class Event < ApplicationRecord
 
 
   def entries_valid
-    entries.where(status: :enter).count
+    entries.where.not(status: :refused).count
   end
 
   def at_least_one_resultcat

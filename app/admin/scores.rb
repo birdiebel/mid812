@@ -1,11 +1,11 @@
 ActiveAdmin.register Score do
   permit_params :round_id, :slot_id, :entry_id, :status, :brut_str, :net_str, :stb_str, :hole_played, :start_hole,
-                slot_attributes: [ :id, team_attributes: [ :id, :status ]]
+                slot_attributes: [ :id, team_attributes: [ :id, :status ] ]
 
   menu label: "Scores", parent: "Config", priority: 13
 
   action_item "Back to Round", only: [ :edit ] do
-    link_to "Back to Round", admin_round_path(resource.round, anchor: "scores-round")
+    link_to "Back to Scoring", scoring_admin_round_path(resource.round, anchor: "team-score-#{resource.id}")
   end
 
   index do
@@ -42,12 +42,13 @@ ActiveAdmin.register Score do
     # end
 
     f.inputs "Result-Card" do
+      puts "Rendering result card partial for score form with round ID  : #{f.object.round_id}"
       render "admin/scores/result_card", f: f, score: f.object
     end
 
     f.actions do
       f.action :submit
-      f.cancel_link admin_round_path(f.object.round, anchor: "scores-round")
+      f.cancel_link scoring_admin_round_path(resource.round)
     end
   end
 
@@ -95,13 +96,12 @@ ActiveAdmin.register Score do
         ]
       )
     end
-    
+
     def update
-      
-      # all_params = params.to_h   
+      # all_params = params.to_h
       # puts "Received params: #{all_params.inspect}"
-     
-      puts "Updating team #{params[:team_id]} status to #{params[:team_status]}" 
+
+      puts "Updating team #{params[:team_id]} status to #{params[:team_status]}"
 
       @score = Score.find(params[:id])
 
@@ -113,7 +113,7 @@ ActiveAdmin.register Score do
       end
 
       if @score.update(permitted_params[:score])
-        redirect_to admin_round_path(@score.round, anchor: "scores-round"), notice: "Score updated successfully."
+        redirect_to scoring_admin_round_path(resource.round), notice: "Score updated successfully."
       else
         render :edit
       end
@@ -123,13 +123,12 @@ ActiveAdmin.register Score do
       # else
       #   render :edit
       # end
-
     end
 
     def create
       @score = Score.new(permitted_params[:score])
       if @score.save
-        redirect_to admin_round_path(@score.round, anchor: "scores-round"), notice: "Score created successfully."
+        redirect_to scoring_admin_round_path(resource.round), notice: "Score created successfully."
       else
         render :new
       end

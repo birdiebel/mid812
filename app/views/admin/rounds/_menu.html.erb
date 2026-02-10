@@ -5,9 +5,9 @@
   <a href="#start-list" class="menu-button menu-event-button" data-target="#start-list">
     Start List
   </a>
-  <a href="#scores-round" class="menu-button menu-event-button" data-target="#scores-round">
-    Scores
-  </a>
+
+  <%= link_to "Scoring", "/admin/rounds/#{round.id}/scoring", method: :get, class: "menu-button menu-event-button", style: "background-color: #43a047; color: white;" %>
+
   <a href="#round-details" class="menu-button menu-event-button" data-target="#round-details">
     Round Details
   </a>

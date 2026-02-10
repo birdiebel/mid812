@@ -10,13 +10,19 @@ ActiveAdmin.register Round do
     link_to "Close", admin_tour_event_path(resource.event.tour, resource.event, anchor: "rounds")
   end
 
+  # action_item "Scoring", only: [ :show ] do
+  #   link_to "Scoring", "/admin/rounds/#{resource.id}/scoring", method: :get
+  # end
+  member_action :scoring, method: :get do
+    @round = Round.find(params[:id])
+  end
+
   myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date} | #{round.status.upcase}" }
 
   show title: myTitle do
     render "admin/rounds/menu", round: round
     render "admin/rounds/config_times", round: round
     render "admin/rounds/start_list", round: round
-    render "admin/rounds/scores", round: round
     render "admin/rounds/status", round: round
     render "admin/rounds/round_details", round: round
   end
