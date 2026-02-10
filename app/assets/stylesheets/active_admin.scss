@@ -114,6 +114,12 @@ tbody td {
     gap: 5px;
 }
 
+.table-scoring {
+    overflow-y: auto !important;
+    height: 300px !important;
+    display: block !important;
+}
+
 .btt {
     -webkit-border-radius: 0 !important;
     -moz-border-radius: 0 !important;

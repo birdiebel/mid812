@@ -13,13 +13,14 @@
         <%= button_to "Close", "/admin/rounds/#{round.id}", method: :get, style: "padding: 8px 16px; font-size: 1em; cursor: pointer; background-color: darkred; color: white; border: none; border-radius: 4px;" %>
       </div>
       <div><%= round.start_list_caution %></div>
-      <table class="index_table" id="scores-table">
+      <table class="table-scoring" id="scores-table">
         <thead>
           <tr>
             <th></th>
             <th>@</th>
             <th>#</th>
             <th>Name</th>
+            <th></th>
             <th></th>
             <th></th>
             <th>Holes</th>
@@ -51,6 +52,7 @@
                 <strong><%= slot.team.name %></strong>
               </td>
               <td><%= slot.team.show_status %></td>
+              <td id="score-status-<%= score.id %>"><%= score.status %></td>
               <td>
                 <div class="<%= scoring_class %>">  
                   <%= slot.team.resultcat&.scoring_short %>
@@ -99,15 +101,12 @@ $(document).ready(function() {
     var searchInput = $('#search-team-num');
     var scoresRound = $('#scores-round');
     
-    if (searchInput.length > 0 ) {
-      searchInput.focus();
-      searchInput.val('');
+    if (!window.location.hash) {
+        if ("#scores-status" == "partial") {
+          $this.css("background-color", "yellow");
+        }
     }
-  
-  // Check if we should show scores section after refresh
-  if (sessionStorage.getItem('showScores') === 'true') {
-    sessionStorage.removeItem('showScores');
-    
+      
     // Hide all sections
     $('#config-times, #start-list, #status, #round-details').hide();
     
@@ -117,34 +116,32 @@ $(document).ready(function() {
     // Update menu buttons
     $('.menu-event-button').removeClass('is-active');
     $('a[href="#scores-round"]').addClass('is-active');
-  }
     
   // Refresh button handler
   $('#refresh-scores-btn').on('click', function() {
-    sessionStorage.setItem('showScores', 'true');
     location.reload();
   });
   
   // Watch for visibility changes on scores-round
-  var scoresRoundObserver = new MutationObserver(function(mutations) {
-    mutations.forEach(function(mutation) {
-      if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
-        if ($('#scores-round').is(':visible')) {
-          setTimeout(function() {
-            init_search_team();
-          }, 100);
-        }
-      }
-    });
-  });
+  // var scoresRoundObserver = new MutationObserver(function(mutations) {
+  //   mutations.forEach(function(mutation) {
+  //     if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+  //       if ($('#scores-round').is(':visible')) {
+  //         setTimeout(function() {
+  //           init_search_team();
+  //         }, 100);
+  //       }
+  //     }
+  //   });
+  // });
   
-  var scoresRound = document.getElementById('scores-round');
-  if (scoresRound) {
-    scoresRoundObserver.observe(scoresRound, {
-      attributes: true,
-      attributeFilter: ['style', 'class']
-    });
-  }
+  // var scoresRound = document.getElementById('scores-round');
+  // if (scoresRound) {
+  //   scoresRoundObserver.observe(scoresRound, {
+  //     attributes: true,
+  //     attributeFilter: ['style', 'class']
+  //   });
+  // }
   
   // Also listen to turbo events
   // $(document).on('turbo:load', function() {

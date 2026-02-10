@@ -48,7 +48,7 @@ ActiveAdmin.register Score do
 
     f.actions do
       f.action :submit
-      f.cancel_link scoring_admin_round_path(resource.round)
+      f.cancel_link scoring_admin_round_path(resource.round, anchor: "team-score-#{resource.id}")
     end
   end
 
@@ -113,7 +113,7 @@ ActiveAdmin.register Score do
       end
 
       if @score.update(permitted_params[:score])
-        redirect_to scoring_admin_round_path(resource.round), notice: "Score updated successfully."
+        redirect_to scoring_admin_round_path(resource.round, anchor: "team-score-#{@score.id}"), notice: "Score updated successfully."
       else
         render :edit
       end
@@ -128,7 +128,7 @@ ActiveAdmin.register Score do
     def create
       @score = Score.new(permitted_params[:score])
       if @score.save
-        redirect_to scoring_admin_round_path(resource.round), notice: "Score created successfully."
+        redirect_to scoring_admin_round_path(resource.round, anchor: "team-score-#{@score.id}"), notice: "Score created successfully."
       else
         render :new
       end
