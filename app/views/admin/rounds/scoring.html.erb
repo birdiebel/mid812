@@ -39,7 +39,7 @@
             <% scoring_class = "scoring-#{slot.team.resultcat&.scoring_short.downcase}" %>
             <% scoring_mode = slot.team.resultcat&.scoring_short.downcase %>
             <% entry = slot.team.entries.first %>
-            <% score = entry ? Score.find_or_create_by(round_id: round.id, entry_id: entry.id) { |s| s.slot = slot; s.status = :partial } : nil %>
+            <% score = entry ? Score.find_or_create_by(round_id: round.id, entry_id: entry.id) { |s| s.slot = slot; s.status = :pending } : nil %>
             <% score.update_column(:slot_id, slot.id) if score && score.slot_id != slot.id %>
             <% tr_id = "team-score-#{score.id}" %>
             <% scoring_class = "scoring-#{score.status}" if score %>

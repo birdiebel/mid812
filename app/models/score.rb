@@ -161,8 +161,10 @@ class Score < ApplicationRecord
     else
       if played >= nb_hole
         self.status = :completed
-      else
+      elsif played > 0
         self.status = :partial
+      else
+        self.status = :pending
       end
     end
   end
