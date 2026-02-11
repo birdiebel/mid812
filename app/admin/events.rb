@@ -43,6 +43,7 @@ ActiveAdmin.register Event do
     render "admin/events/player_categories", event: event
     render "admin/events/event_details", event: event
     render "admin/events/event_status", event: event
+    render "admin/events/ldb", event: event
   end
 
   form do |f|

@@ -1,0 +1,44 @@
+<div id="ldb" style="display:none;">
+  <div class="panel">
+    <h3>Rounds</h3>
+    <div class="panel_contents">
+      <table class="leaderboard-table">
+        <thead>
+          <tr>
+            <th>Position</th>
+            <th>Équipe</th>
+            <% event.rounds.order(:num).each do |round| %>
+              <th>R<%= round.num %>
+              </th>
+              <% end %>
+                <th>Total Brut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% event.teams_brut_totals_with_rounds.each do |row| %>
+            <tr>
+              <td>
+                <%= row[:position] %>
+              </td>
+              <td>
+                <%= row[:team].name %>
+              </td>
+              <% event.rounds.order(:num).each do |round| %>
+                <td>
+                  <% score=row[:par_round][round.id] %>
+                    <% if score.nil? || score==0 %>
+                      <%= row[:team].start_time_for_round(round.id) %>
+                        <% else %>
+                          <%= score %>
+                            <% end %>
+                </td>
+                <% end %>
+                  <td>
+                    <%= row[:brut_total] %>
+                  </td>
+            </tr>
+            <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
