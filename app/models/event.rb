@@ -22,12 +22,33 @@ class Event < ApplicationRecord
   # Retourne les équipes de l'event avec la somme des brut_total, le détail par round et la position (dense ranking)
   # Seules les équipes avec status = 'enter' sont prises en compte
   # Résultat : array de hashes [{ team: <Team>, brut_total: <somme>, par_round: { round_id => brut_total, ... }, position: <int> }, ...]
-  def teams_brut_totals_with_rounds
-    leaderboard = teams.where(status: :enter).includes(team_scores: :round).map do |team|
-      par_round = team.team_scores.group_by(&:round_id).transform_values { |scores| scores.sum(&:brut_total) }
-      total = par_round.values.sum
-      { team: team, brut_total: total, par_round: par_round }
-    end.sort_by { |h| -h[:brut_total] }
+  def teams_brut_totals_with_rounds(resultcat_id = nil)
+    leaderboard = teams.where(status: :enter, resultcat_id: resultcat_id)
+            .where.not(team_scores: { hole_played: 0 })
+            .includes(team_scores: :round, resultcat: {}).map do |team|
+      # Group scores by round
+      scores_by_round = team.team_scores.group_by(&:round_id)
+      brut_by_round = scores_by_round.transform_values { |scores| scores.sum(&:brut_total) }
+      net_by_round = scores_by_round.transform_values { |scores| scores.sum(&:net_total) }
+      stb_by_round = scores_by_round.transform_values { |scores| scores.sum(&:stb_total) }
+
+      brut_total = brut_by_round.values.sum
+      net_total = net_by_round.values.sum
+      stb_total = stb_by_round.values.sum
+
+      resultcat_priority = team.resultcat.priority
+      {
+        team: team,
+        resultcat_id: team.resultcat_id,
+        resultcat_priority: resultcat_priority,
+        brut_total: brut_total,
+        net_total: net_total,
+        stb_total: stb_total,
+        brut_by_round: brut_by_round,
+        net_by_round: net_by_round,
+        stb_by_round: stb_by_round
+      }
+    end.sort_by { |h| [ -h[:resultcat_priority], -h[:brut_total] ] }
 
     position = 1
     previous_total = nil
@@ -43,35 +64,7 @@ class Event < ApplicationRecord
 
   # Retourne score, détail par round et position pour un team donné (seulement si status = 'enter')
   def team_brut_total_with_position(team)
-    leaderboard = teams_brut_totals_with_rounds
-    leaderboard.find { |r| r[:team].id == team.id }
-  end
-
-  # Retourne les équipes de l'event avec la somme des brut_total, le détail par round et la position (dense ranking)
-  # Seules les équipes avec status = 'enter' sont prises en compte
-  # Résultat : array de hashes [{ team: <Team>, brut_total: <somme>, par_round: { round_id => brut_total, ... }, position: <int> }, ...]
-  def teams_brut_totals_with_rounds
-    leaderboard = teams.where(status: :enter).includes(team_scores: :round).map do |team|
-      par_round = team.team_scores.group_by(&:round_id).transform_values { |scores| scores.sum(&:brut_total) }
-      total = par_round.values.sum
-      { team: team, brut_total: total, par_round: par_round }
-    end.sort_by { |h| -h[:brut_total] }
-
-    position = 1
-    previous_total = nil
-    leaderboard.each_with_index do |row, idx|
-      if previous_total != row[:brut_total]
-        position = idx + 1
-      end
-      row[:position] = position
-      previous_total = row[:brut_total]
-    end
-    leaderboard
-  end
-
-  # Retourne score, détail par round et position pour un team donné (seulement si status = 'enter')
-  def team_brut_total_with_position(team)
-    leaderboard = teams_brut_totals_with_rounds
+    leaderboard = teams_brut_totals_with_rounds(team.resultcat_id)
     leaderboard.find { |r| r[:team].id == team.id }
   end
 
