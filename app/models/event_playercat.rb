@@ -3,4 +3,8 @@ class EventPlayercat < ApplicationRecord
 
   belongs_to :event
   belongs_to :playercat
+
+  def version_name
+    "#{name} ( #{version} )"
+  end
 end
