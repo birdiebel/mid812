@@ -8,10 +8,15 @@ class Playercat < ApplicationRecord
       "name", "teebox", "updated_at", "version", "sexe", "priority", "actif", "format" ]
   end
 
-
   enum :sexe, [ :Men, :Ladies ]
   enum :teebox, [ "Black", "White", "Yellow", "Blue", "Red" ]
   enum :format, [ :single, :team ]
+
+  default_scope { order(name: :asc, version: :desc) }
+
+  def version_name
+    "#{name} ( #{version} )"
+  end
 
   def teebox_index
     self.teebox.index

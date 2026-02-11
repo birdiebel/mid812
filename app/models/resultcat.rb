@@ -13,6 +13,12 @@ class Resultcat < ApplicationRecord
   enum :sexe, [ :Men, :Ladies, :All ]
   enum :scoring, [ :stroke_play, :stableford ]
 
+  default_scope { order(name: :asc, version: :desc) }
+
+  def version_name
+    "#{name} ( #{version} )"
+  end
+
   def scoring_short
     case scoring
     when "stroke_play"
