@@ -1,0 +1,100 @@
+.scorecard-title {
+    font-weight: bold;
+    border-bottom: 1px solid black;
+    border-top: 1px solid black;
+    font-size: medium;
+    padding: 5px;
+}
+
+.scorecard-label {
+    font-weight: bold;
+}
+
+.scorecard-zone {
+    text-align: center;
+}
+
+.score-input {
+    text-align: center;
+    width: 100%;
+    font-weight: bold;
+    font-size: 10px !important;
+}
+
+.div-against-par {
+    padding: 4px;
+    text-align: center;
+}
+.top-brut, .top-net, .top-stb {
+    font-weight: bold;
+    background-color: #b71c1c;
+    color: white;
+    padding: 4px 8px;
+}   
+.top-brut {
+    background-color: #1b5e20;
+}
+.top-net {
+    background-color: #0d47a1;
+}
+.top-stb {
+    background-color: #f57f17;
+}
+
+#scores-round {
+    .index_table tbody td {
+        vertical-align: middle;
+    }
+}
+
+.scoring-sp, .scoring-stb, .scoring-net {
+    border-radius: 3px;
+    display: inline-block;
+    font-weight: bold;
+    padding: 4px 8px;
+    margin: 2px;
+}   
+.scoring-sp {
+    background-color: lightgreen;
+    color: black;
+}
+.scoring-stb {
+    background-color: lightyellow;
+    color: black;
+}   
+.scoring-net {
+    background-color: lightblue;
+    color: black;
+}
+
+.scoring-tr {
+    background-color: #e8f5e9; 
+    font-weight: bold; 
+    border-top: 2px solid #4caf50;
+}
+
+.scoring-partial {
+    background-color: rgb(231, 233, 147);
+    color: black;
+}
+
+.scoring-completed {
+    background-color: rgb(195, 250, 195);
+    color: black;
+}
+
+.scoring-invalide {
+    background-color: rgb(255, 226, 231);
+    color: black;
+}
+
+.table-card {
+    padding: 10px;
+    background-color: white;
+}
+
+.table-scoring {
+    overflow-y: auto !important;
+    height: 300px !important;
+    display: block !important;
+}

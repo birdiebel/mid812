@@ -1,0 +1,41 @@
+.btt {
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0px !important;
+    font-family: Arial;
+    padding: 5px;
+    text-decoration: none !important;
+    font-weight: normal !important;
+}
+.submit-button {
+    -webkit-border-radius: 0 !important;
+    -moz-border-radius: 0 !important;
+    border-radius: 0px !important;
+    font-family: Arial;
+    padding: 5px;
+    text-decoration: none;
+    background-color: #007bff !important;
+    color: white !important;
+    font-weight: bold;
+}
+
+.btt-add {
+    color: #ffffff !important;
+    background: darkblue !important;
+}
+
+.btt-edit {
+    color: #ffffff !important;
+    background: darkgreen !important;
+}
+
+.btt-cancel {
+    color: #ffffff !important;
+    background: darkred !important;
+}
+
+.table-btn-action {
+    display: flex;
+    flex-direction: row;
+    gap: 5px;
+}
