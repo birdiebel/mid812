@@ -47,6 +47,34 @@ class Event < ApplicationRecord
     leaderboard.find { |r| r[:team].id == team.id }
   end
 
+  # Retourne les équipes de l'event avec la somme des brut_total, le détail par round et la position (dense ranking)
+  # Seules les équipes avec status = 'enter' sont prises en compte
+  # Résultat : array de hashes [{ team: <Team>, brut_total: <somme>, par_round: { round_id => brut_total, ... }, position: <int> }, ...]
+  def teams_brut_totals_with_rounds
+    leaderboard = teams.where(status: :enter).includes(team_scores: :round).map do |team|
+      par_round = team.team_scores.group_by(&:round_id).transform_values { |scores| scores.sum(&:brut_total) }
+      total = par_round.values.sum
+      { team: team, brut_total: total, par_round: par_round }
+    end.sort_by { |h| -h[:brut_total] }
+
+    position = 1
+    previous_total = nil
+    leaderboard.each_with_index do |row, idx|
+      if previous_total != row[:brut_total]
+        position = idx + 1
+      end
+      row[:position] = position
+      previous_total = row[:brut_total]
+    end
+    leaderboard
+  end
+
+  # Retourne score, détail par round et position pour un team donné (seulement si status = 'enter')
+  def team_brut_total_with_position(team)
+    leaderboard = teams_brut_totals_with_rounds
+    leaderboard.find { |r| r[:team].id == team.id }
+  end
+
   def entries_valid
     entries.where.not(status: :refused).count
   end
