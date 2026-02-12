@@ -1,35 +1,25 @@
 <div id="teams">
   <div class="panel" style="width: 500px; background-color: #f9f9f9; border: 1px solid #ccc; border-radius: 4px;">
-    <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
-    <% available_teams_total = teams.reject { |team| team.slots.any? } %>
-    <h3 data-team-total>Teams (Status: Enter) : <%= available_teams_total.count %></h3>
+
+    <% teams = @start_list_teams %>
+    <% team_ids_in_round_slots = @team_ids_in_round_slots %>
+
+    <% available_teams = teams.reject { |team| team_ids_in_round_slots.include?(team.id) } %>
+
+    <h3 data-team-total>Teams (Status: Enter) : <%= available_teams.count %></h3>
     <div class="panel_contents" style="overflow-y: auto; height: 400px;">
-      <%# <% teams ||= round.event.teams.where(status: :enter).includes(:resultcat, :entries, :slots).sort_by { |team| team.total_hcp } %>
-      <% available_teams = teams.reject { |team| team.slots.any? } %>
+
+      <%# teams are prepared in app/admin/rounds.rb (prepare_start_list_data) %>
+
       <% resultcats = round.event.resultcats.sort_by(&:priority) %>
-      <% av_style = available_teams.any? ? "color: red" : "color: green" %>
-      <div style="<%= av_style %>">
-        <% if available_teams.any? %>
-          Still present: <%= available_teams.count %>
-        <% else %>
-          All entries are placed
-        <% end %>
-      </div>
+      <%= render "admin/rounds/status_info", available_teams: available_teams %>
       <% if resultcats.any? %>
         <% resultcats.each do |resultcat| %>
           <% cat_teams = available_teams.select { |team| team.resultcat_id == resultcat.id } %>
           <div class="resultcat-group" data-resultcat-id="<%= resultcat.id %>">
             <h4 style="background-color: yellow; padding: 5px; font-weight: bold;"><%= resultcat.name %> | <%= cat_teams.count { |item| item.status == 'enter' } %></h4>
             <% cat_teams.each do |team| %>
-              <div class="team-item" data-team-id="<%= team.id %>" data-resultcat-id="<%= team.resultcat_id %>" style="<%= team.slots.any? ? 'display: none;' : '' %>">
-                <strong><%= team.team_name %></strong>
-                <br>
-                <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-                  <div>HCP: <%= team.total_hcp %></div> 
-                  <div>|</div> 
-                  <div><%= team.entries.first.playercat.icon_teebox.html_safe %></div>
-                </div>
-              </div>
+              <%= render "admin/rounds/team_item", team: team %>
             <% end %>
           </div>
         <% end %>

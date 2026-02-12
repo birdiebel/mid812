@@ -1,5 +1,5 @@
 <div style="margin-bottom: 15px;">
-  <input type="text" id="search-teams" placeholder="Rechercher par nom de team..." class="search-entries" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+  <input type="text" id="search-teams" placeholder="Rechercher par nom de team..." class="search-entries" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;" autocomplete="off">
 </div>
 
 <% grouped_teams = event.teams.order(status: :asc, created_at: :desc).group_by(&:status) %>
@@ -19,13 +19,13 @@
             <td><%= team.total_age %></td>
             <td><%= team.updated_at %></td>
             <td><%= team.total_hcp.round(1) %></td>
-            <td colspan="4" >
+            <td colspan="4">
                 <div class="table-btn-action">
                     <div style="margin-top: 3px; margin-right: 5px;">
                         <% if (event.team? || event.bigteam?) && team.entries.size < event.max_players %>
                             <%= link_to "Add partner", admin_tour_event_path(event.tour, event, team_id: team.id, player_lastname: params[:player_lastname]), method: :get, class: "btt btt-add" %>
                         <% else %>
-                            <span class="is_red is_bold">COMPLETED</span>    
+                            <span class="is_red is_bold">COMPLETED</span>
                         <% end %>
                     </div>
                     <div>
@@ -45,8 +45,8 @@
             <td><%= entry.player.age %></td>
             <td><%= entry.player.my_licence %></td>
             <td><%= entry.hcp %></td>
-            <% if !entry.playercat.nil?  %>
-                <td><%= entry.playercat.icon_teebox.html_safe %></td>
+            <% if !entry.playercat.nil? %>
+              <td><%= sanitize(entry.playercat.icon_teebox, tags: %w[i span], attributes: %w[class style]) %></td>
             <% else %>
                 <td class="is_red is_bold"><span>N/A</span></td>
             <% end %>
@@ -72,18 +72,18 @@
 document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('search-teams');
   if (!searchInput) return;
-  
+
   searchInput.addEventListener('keyup', function() {
     const searchTerm = this.value.toLowerCase();
     const table = document.querySelector('.entries-table-teams');
-    
+
     // Get all teams
     const teamHeaders = table.querySelectorAll('.team-header-row');
     const entryRows = table.querySelectorAll('.entry-row');
-    
+
     // Track which teams match the search - only on team name
     const visibleTeams = new Set();
-    
+
     // Check all team headers - only search on team name
     teamHeaders.forEach(header => {
       const teamName = header.getAttribute('data-name').toLowerCase();
@@ -91,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function() {
         visibleTeams.add(header.getAttribute('data-team-id'));
       }
     });
-    
+
     // Show all entry rows for visible teams, hide others
     entryRows.forEach(row => {
       const teamId = row.getAttribute('data-team-id');
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         row.style.display = 'none';
       }
     });
-    
+
     // Show/hide team headers
     teamHeaders.forEach(header => {
       const teamId = header.getAttribute('data-team-id');

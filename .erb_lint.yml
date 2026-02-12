@@ -1,0 +1,16 @@
+---
+glob: "**/*.html{+*,}.erb"
+exclude:
+  - "vendor/**/*"
+linters:
+  Rubocop:
+    enabled: false
+  ErbSafety:
+    enabled: true
+    exclude:
+      - "app/views/admin/rounds/_start_list_entries.html.erb"
+      - "app/views/admin/rounds/_team_item.html.erb"
+      - "app/views/admin/rounds/_start_list_flights.html.erb"
+      - "app/views/admin/rounds/_slot_item.html.erb"
+  SpaceAroundErbTag:
+    enabled: true

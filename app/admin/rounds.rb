@@ -56,6 +56,8 @@ ActiveAdmin.register Round do
   end
 
   controller do
+    before_action :prepare_start_list_data, only: :show
+
     def create
       @round = Round.new(permitted_params[:round])
       if @round.save
@@ -79,6 +81,15 @@ ActiveAdmin.register Round do
       event = @round.event
       @round.destroy
       redirect_to admin_tour_event_path(event.tour, event), notice: "Round deleted successfully."
+    end
+
+    private
+
+    def prepare_start_list_data
+      return unless resource&.event
+
+      @start_list_teams = resource.event.teams.where(status: :enter).includes(:resultcat, :entries).to_a.sort_by(&:total_hcp)
+      @team_ids_in_round_slots = resource.slots.where.not(team_id: nil).distinct.pluck(:team_id)
     end
   end
 end

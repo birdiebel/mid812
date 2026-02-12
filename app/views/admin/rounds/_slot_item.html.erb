@@ -1,0 +1,26 @@
+<% if slot.team %>
+  <div class="slot-item slot-item--occupied"
+       data-slot-id="<%= slot.id %>"
+       data-team-id="<%= slot.team.id %>"
+       data-team-name="<%= slot.team.team_name %>"
+       data-hcp="<%= slot.team.total_hcp %>">
+    <strong><%= slot.team.team_name %></strong>
+    <br>
+    <% slot.team.entries.each do |entry| %>
+      <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+        <div><strong>PHCP: <%= entry.playing_hcp %></strong></div>
+        <div>|</div>
+        <% if entry.playercat && entry.playercat.icon_teebox.present? %>
+          <div><%= entry.playercat.icon_teebox.html_safe %></div>
+        <% else %>
+          <div style="color: red;">NO ICON</div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% else %>
+  <div class="slot-item slot-item--empty" data-slot-id="<%= slot.id %>">
+    <strong></strong>
+    <br>
+  </div>
+<% end %>

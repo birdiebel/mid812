@@ -3,10 +3,10 @@
   <div class="panel_contents">
     <% round = @round %>
     <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? }.sort_by { |s| [s.flight.flight_time, s.team.num] } %>
-    
+
     <% if slots.any? %>
       <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
-        <input type="text" id="search-team-num" placeholder="Search team #..." style="padding: 8px; width: 200px; font-size: 1em;">
+        <input type="text" id="search-team-num" placeholder="Search team #..." style="padding: 8px; width: 200px; font-size: 1em;" autocomplete="off">
         <button id="refresh-scores-btn" style="padding: 8px 16px; font-size: 1em; cursor: pointer; background-color: #1e88e5; color: white; border: none; border-radius: 4px;">
           Refresh
         </button>
@@ -43,7 +43,7 @@
             <% score.update_column(:slot_id, slot.id) if score && score.slot_id != slot.id %>
             <% tr_id = "team-score-#{score.id}" %>
             <% scoring_class = "scoring-#{score.status}" if score %>
-            
+
             <!-- Ligne TeamScore -->
             <tr id="<%= tr_id %>" class="<%= scoring_class %>">
               <td><%= slot.flight.myTime %></td>
@@ -57,13 +57,13 @@
                 <%= score.status %>
               </td>
               <td>
-                <div>  
+                <div>
                   <%= slot.team.resultcat&.scoring_short %>
                 </div>
               </td>
               <td><%= team_score.hole_played_show %></td>
               <% scoring_mode == "sp" ? ts_score = team_score.stroke_play_score : ts_score = "x" %>
-              <td> 
+              <td>
                 <div class="div-against-par" style="<%= team_score.style_for_stroke_play(ts_score) %>"><strong><%= ts_score %></strong></div>
               <td><%= scoring_mode == "sp" ? team_score.brut_total : "x" %></td>
               <td><%= scoring_mode == "sp" ? team_score.net_total : "x" %></td>
@@ -74,15 +74,15 @@
               <td>
                 <% if scoring_mode == "sp" && slot.team.status != "disqualified" %>
                   <%= form_with model: slot.team, url: admin_team_path(slot.team), method: :patch, local: true, style: "display: inline-flex; gap: 5px; align-items: center;" do |f| %>
-                    <%= hidden_field_tag :round_id, round.id %>                    
+                    <%= hidden_field_tag :round_id, round.id %>
                     <%= f.select :status, Team.statuses.keys.reject { |s| s == "refused" }.map { |s| [s.humanize, s] }, { selected: slot.team.status }, { style: "padding: 4px; font-size: 0.9em;" } %>
                     <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>
                   <% end %>
                 <% elsif scoring_mode != "sp" %>
                     <%= form_with model: slot.team, url: admin_team_path(slot.team), method: :patch, local: true, style: "display: inline-flex; gap: 5px; align-items: center;" do |f| %>
-                      <%= hidden_field_tag :round_id, round.id %>                    
+                      <%= hidden_field_tag :round_id, round.id %>
                       <%= f.select :status, Team.statuses.keys.reject { |s| s == "refused" }.map { |s| [s.humanize, s] }, { selected: slot.team.status }, { style: "padding: 4px; font-size: 0.9em;" } %>
-                      <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>                    
+                      <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>
                     <% end %>
                 <% end %>
               </td>
@@ -97,34 +97,33 @@
 </div>
 <script>
 
-
 $(document).ready(function() {
-  
+
   // Focus on search input when scores section is visible
     var searchInput = $('#search-team-num');
     var scoresRound = $('#scores-round');
-    
+
     if (!window.location.hash) {
         if ("#scores-status" == "partial") {
           $this.css("background-color", "yellow");
         }
     }
-      
+
     // Hide all sections
     $('#config-times, #start-list, #status, #round-details').hide();
-    
+
     // Show only scores section
     $('#scores-round').show();
-    
+
     // Update menu buttons
     $('.menu-event-button').removeClass('is-active');
     $('a[href="#scores-round"]').addClass('is-active');
-    
+
   // Refresh button handler
   $('#refresh-scores-btn').on('click', function() {
     location.reload();
   });
-  
+
   // Watch for visibility changes on scores-round
   // var scoresRoundObserver = new MutationObserver(function(mutations) {
   //   mutations.forEach(function(mutation) {
@@ -137,7 +136,7 @@ $(document).ready(function() {
   //     }
   //   });
   // });
-  
+
   // var scoresRound = document.getElementById('scores-round');
   // if (scoresRound) {
   //   scoresRoundObserver.observe(scoresRound, {
@@ -145,21 +144,21 @@ $(document).ready(function() {
   //     attributeFilter: ['style', 'class']
   //   });
   // }
-  
+
   // Also listen to turbo events
   // $(document).on('turbo:load', function() {
   //   init_search_team();
   // });
-  
+
   $(document).on('keyup', '#search-team-num', function() {
     var searchValue = $(this).val().trim();
     var rows = $('#scores-table tbody tr');
-    
+
     if (searchValue === '') {
       rows.show();
       return;
     }
-    
+
     rows.each(function() {
       var teamNum = $(this).find('.team-num').text().trim();
       if (teamNum === searchValue) {
@@ -169,13 +168,13 @@ $(document).ready(function() {
       }
     });
   });
-  
+
   $(document).on('keypress', '#search-team-num', function(e) {
     if (e.which == 13) { // Enter key
       e.preventDefault();
       var searchValue = $(this).val().trim();
       var visibleRows = $('#scores-table tbody tr:visible');
-      
+
       if (visibleRows.length === 1) {
         var editButton = visibleRows.find('a.btt-add').first();
         if (editButton.length) {

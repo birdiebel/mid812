@@ -47,7 +47,7 @@ ActiveAdmin.register Event do
   end
 
   form do |f|
-    render partial: "admin/events/form", handlers: [ :arb ], locals: { f: f }
+    render partial: "admin/events/form", handlers: [ :arb ], locals: { f: }
     f.actions do
       f.action :submit
       f.cancel_link(url_for(:back))

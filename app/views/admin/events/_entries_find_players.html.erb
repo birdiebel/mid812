@@ -5,13 +5,13 @@
         <form action="<%= admin_tour_event_path(event.tour, event) %>" method="get">
           <div style="display: flex; gap: 10px; align-items: center;">
             <label>Find by name or licence number :</label>
-            <input type="text" name="player_lastname" value="<%= params[:player_lastname] %>">
+            <input type="text" name="player_lastname" value="<%= params[:player_lastname] %>" autocomplete="off">
             <% if params[:team_id].present? %>
               <input type="hidden" name="team_id" value="<%= params[:team_id] %>">
               <span style="color: darkgreen; font-weight: bold;">Team selected: <%= Team.find(params[:team_id]).name rescue 'N/A' %></span>
             <% end %>
             <button type="submit">Find</button>
-            <button type="button" onclick="window.location='<%= admin_tour_event_path(event.tour, event) %>'">Clear</button>
+            <a href="<%= admin_tour_event_path(event.tour, event) %>" class="button">Clear</a>
           </div>
         </form>
       </div>

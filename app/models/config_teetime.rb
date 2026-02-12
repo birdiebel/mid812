@@ -3,6 +3,7 @@ class ConfigTeetime < ApplicationRecord
   belongs_to :course
   belongs_to :formula, optional: true
   has_many :flights, dependent: :destroy
+  has_many :slots, through: :flights
 
   def self.ransackable_attributes(auth_object = nil)
     [ "course_id", "created_at", "formula_id", "hcp_pc", "id", "id_value", "nb_slots", "nb_teams", "round_id", "start_hole", "start_time", "step", "updated_at" ]
@@ -23,17 +24,17 @@ class ConfigTeetime < ApplicationRecord
   after_save :create_or_update_flights
 
   after_initialize :set_default_values
-  
+
   def set_default_values
     return unless new_record?
-    
+
     if round&.event
       case round.event.format
-      when 'single'
+      when "single"
         self.nb_slots ||= 3
-      when 'team'
+      when "team"
         self.nb_slots ||= 2
-      when 'bigteam'
+      when "bigteam"
         self.nb_slots ||= 2
       end
     end

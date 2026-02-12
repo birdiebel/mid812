@@ -1,9 +1,9 @@
 <% if slot.team %>
                     <% slot.team.entries.each do |p| %>
                       <div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-                        <div><strong>PHCP: <%= p.playing_hcp %></strong></div> 
-                        <div>|</div> 
-                        <div><%= p.playercat.icon_teebox.html_safe %></div>
+                        <div><strong>PHCP: <%= p.playing_hcp %></strong></div>
+                        <div>|</div>
+                        <div><%= sanitize(p.playercat.icon_teebox, tags: %w[i span], attributes: %w[class style]) %></div>
                       </div>
                     <% end %>
                   <% end %>

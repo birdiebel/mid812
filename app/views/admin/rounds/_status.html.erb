@@ -5,7 +5,7 @@
       <%= form_for [:admin, round.event, round], html: { class: 'formtastic round' } do |f| %>
         <fieldset class="inputs">
           <legend><span>Change Round Status</span></legend>
-          
+
           <ol>
             <li class="radio input optional" id="round_status_input">
               <fieldset class="choices">
@@ -24,7 +24,7 @@
             </li>
           </ol>
         </fieldset>
-        
+
         <fieldset class="actions">
           <ol>
             <li class="action input_action">
@@ -33,7 +33,7 @@
           </ol>
         </fieldset>
       <% end %>
-      
+
       <p style="margin-top: 15px;"><strong>Total Entries:</strong> <%= round.event.entries.count %></p>
     </div>
   </div>

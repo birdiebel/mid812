@@ -1,5 +1,5 @@
 <div style="margin-bottom: 15px;">
-  <input type="text" id="search-single" placeholder="Rechercher par nom ou licence..." class="search-entries" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;">
+  <input type="text" id="search-single" placeholder="Rechercher par nom ou licence..." class="search-entries" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;" autocomplete="off">
 </div>
 
 <% teams = event.teams.includes(entries: [:player, :playercat]).order("entries.playercat_id ASC, entries.created_at DESC") %>
@@ -20,8 +20,8 @@
             <td><%= entry.player.age %></td>
             <td><%= entry.player.my_licence %></td>
             <td><%= entry.hcp %></td>
-            <% if !entry.playercat.nil?  %>
-                <td><%= entry.playercat.icon_teebox.html_safe %></td>
+            <% if !entry.playercat.nil? %>
+              <td><%= sanitize(entry.playercat.icon_teebox, tags: %w[i span], attributes: %w[class style]) %></td>
             <% else %>
                 <td class="is_red is_bold"><span>N/A</span></td>
             <% end %>
@@ -52,15 +52,15 @@
 document.addEventListener('DOMContentLoaded', function() {
   const searchInput = document.getElementById('search-single');
   if (!searchInput) return;
-  
+
   searchInput.addEventListener('keyup', function() {
     const searchTerm = this.value.toLowerCase();
     const rows = document.querySelectorAll('.entries-table-single .entry-row');
-    
+
     rows.forEach(row => {
       const name = row.getAttribute('data-name').toLowerCase();
       const licence = row.getAttribute('data-licence').toLowerCase();
-      
+
       if (name.includes(searchTerm) || licence.includes(searchTerm)) {
         row.style.display = '';
       } else {

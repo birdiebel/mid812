@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ERB Lint (partial courant)",
+      "type": "shell",
+      "command": "bundle",
+      "args": [
+        "exec",
+        "erb_lint",
+        "app/views/admin/rounds/_start_list_entries.html.erb"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "ERB Lint (tout)",
+      "type": "shell",
+      "command": "bundle",
+      "args": [
+        "exec",
+        "erb_lint"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "RuboCop (fichiers modifiés)",
+      "type": "shell",
+      "command": "bundle",
+      "args": [
+        "exec",
+        "rubocop",
+        "app/admin/rounds.rb",
+        "app/models/round.rb",
+        "app/models/config_teetime.rb"
+      ],
+      "group": "test",
+      "problemMatcher": []
+    }
+  ]
+}

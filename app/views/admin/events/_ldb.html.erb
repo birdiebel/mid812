@@ -26,33 +26,33 @@
                     <td><%= row[:team_hole_played] %></td>
                     <% event.rounds.order(:num).each do |round| %>
                     <td>
-                      <% score=row[:brut_by_round][round.id] %> 
-                      <% if score.nil? || score==0 %> 
-                        <%= row[:team].start_time_for_round(round.id) %> 
-                      <% else %> 
+                      <% score=row[:brut_by_round][round.id] %>
+                      <% if score.nil? || score==0 %>
+                        <%= row[:team].start_time_for_round(round.id) %>
+                      <% else %>
                         <%= score %>
                       <% end %>
                     </td>
                     <% end %>
 
-                    <% if row[:brut_total] > 0  %>
+                    <% if row[:brut_total] > 0 %>
                       <td class="top-brut"><%= row[:brut_total] %></td>
                     <% else %>
-                      <td></td>  
-                    <% end %> 
+                      <td></td>
+                    <% end %>
 
                     <% if row[:net_total]> 0 %>
                       <td class="top-net">
                         <%= row[:net_total] %>
                       </td>
                     <% else %>
-                      <td></td>   
+                      <td></td>
                     <% end %>
 
-                    <% if row[:net_total] > 0 %>  
+                    <% if row[:net_total] > 0 %>
                       <td class="top-stb"><%= row[:stb_total] %></td>
                     <% else %>
-                      <td></td>   
+                      <td></td>
                     <% end %>
 
                   </tr>

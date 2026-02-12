@@ -1,0 +1,9 @@
+<% if available_teams.any? %>
+  <div style="color: red" class="status-info">
+    Still present: <%= available_teams.count %>
+  </div>
+<% else %>
+  <div style="color: green" class="status-info">
+    All entries are placed
+  </div>
+<% end %>
