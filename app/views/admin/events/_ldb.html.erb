@@ -5,7 +5,6 @@
       <table class="leaderboard-table">
         <thead>
           <tr>
-            <th></th>
             <th>Pos</th>
             <th>Équipe</th>
             <% event.rounds.order(:num).each do |round| %>
@@ -18,12 +17,9 @@
         </thead>
         <tbody>
           <% event.resultcats.order(priority: :asc).each do |r| %>
-            <h4><%= r.name %></h4>
+            <tr><td colspan="99" bgcolor="lightyellow" font-weight="bold"><%= r.name %></td></tr>
             <% event.teams_brut_totals_with_rounds(r.id).each do |row| %>
             <tr>
-              <td>
-                <%= row[:resultcat_priority] %> : <%= r.name %>
-              </td>
               <td><%= row[:position] %></td>
               <td style="text-align: left;"><%= row[:team].name %></td>
               <% event.rounds.order(:num).each do |round| %>
