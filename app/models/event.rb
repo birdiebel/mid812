@@ -23,9 +23,12 @@ class Event < ApplicationRecord
   # Seules les équipes avec status = 'enter' sont prises en compte
   # Résultat : array de hashes [{ team: <Team>, brut_total: <somme>, par_round: { round_id => brut_total, ... }, position: <int> }, ...]
   def teams_brut_totals_with_rounds(resultcat_id = nil)
-    leaderboard = teams.where(status: :enter, resultcat_id: resultcat_id)
-            .where.not(team_scores: { hole_played: 0 })
-            .includes(team_scores: :round, resultcat: {}).map do |team|
+        leaderboard = teams.joins(:resultcat)
+          .where(status: :enter, resultcat_id: resultcat_id)
+          .where.not(team_scores: { hole_played: 0 })
+          .includes(team_scores: :round, resultcat: {})
+            .order("resultcats.priority ASC")
+          .map do |team|
       # Group scores by round
       scores_by_round = team.team_scores.group_by(&:round_id)
       brut_by_round = scores_by_round.transform_values { |scores| scores.sum(&:brut_total) }
@@ -36,7 +39,7 @@ class Event < ApplicationRecord
       net_total = net_by_round.values.sum
       stb_total = stb_by_round.values.sum
 
-      resultcat_priority = team.resultcat.priority
+        resultcat_priority = team.resultcat&.priority.nil? ? 9999 : team.resultcat.priority
       {
         team: team,
         resultcat_id: team.resultcat_id,
@@ -48,7 +51,7 @@ class Event < ApplicationRecord
         net_by_round: net_by_round,
         stb_by_round: stb_by_round
       }
-    end.sort_by { |h| [ -h[:resultcat_priority], -h[:brut_total] ] }
+    end.sort_by { |h| [ h[:brut_total] ] }
 
     position = 1
     previous_total = nil

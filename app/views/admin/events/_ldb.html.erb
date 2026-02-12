@@ -17,7 +17,8 @@
           </tr>
         </thead>
         <tbody>
-          <% event.resultcats.each do |r| %>
+          <% event.resultcats.order(priority: :asc).each do |r| %>
+            <h4><%= r.name %></h4>
             <% event.teams_brut_totals_with_rounds(r.id).each do |row| %>
             <tr>
               <td>
