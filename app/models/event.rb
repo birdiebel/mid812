@@ -23,12 +23,33 @@ class Event < ApplicationRecord
   # Seules les équipes avec status = 'enter' sont prises en compte
   # Résultat : array de hashes [{ team: <Team>, brut_total: <somme>, par_round: { round_id => brut_total, ... }, position: <int> }, ...]
   def teams_brut_totals_with_rounds(resultcat_id = nil)
-        leaderboard = teams.joins(:resultcat)
-          .where(status: :enter, resultcat_id: resultcat_id)
-          .where.not(team_scores: { hole_played: 0 })
-          .includes(team_scores: :round, resultcat: {})
-            .order("resultcats.priority ASC")
-          .map do |team|
+    teams_scope = teams.joins(:resultcat)
+      .where(status: :enter, resultcat_id: resultcat_id)
+      .where.not(team_scores: { hole_played: 0 })
+      .includes(team_scores: :round, resultcat: {})
+      .order("resultcats.priority ASC")
+
+
+    # On prépare le classement selon le scoring du premier team (ou par défaut)
+    first_team = teams_scope.first
+
+    resultcat_scoring = first_team&.resultcat&.scoring
+    this_order = case resultcat_scoring
+    when "stroke_play"
+        ->(h) { [ h[:brut_total] ] }
+    when "stableford"
+        ->(h) { [ -h[:stb_total] ] }
+    else
+        ->(h) { [ h[:brut_total] ] }
+    end
+
+    running_rounds = self.rounds.where(status: "running").first
+
+    if running_rounds.nil?
+      return []
+    end
+
+    leaderboard = teams_scope.map do |team|
       # Group scores by round
       scores_by_round = team.team_scores.group_by(&:round_id)
       brut_by_round = scores_by_round.transform_values { |scores| scores.sum(&:brut_total) }
@@ -39,19 +60,20 @@ class Event < ApplicationRecord
       net_total = net_by_round.values.sum
       stb_total = stb_by_round.values.sum
 
-        resultcat_priority = team.resultcat&.priority.nil? ? 9999 : team.resultcat.priority
+      team_hole_played = team.round_hole_played(running_rounds.id)
+
       {
         team: team,
         resultcat_id: team.resultcat_id,
-        resultcat_priority: resultcat_priority,
         brut_total: brut_total,
         net_total: net_total,
         stb_total: stb_total,
         brut_by_round: brut_by_round,
         net_by_round: net_by_round,
-        stb_by_round: stb_by_round
+        stb_by_round: stb_by_round,
+        team_hole_played: team_hole_played
       }
-    end.sort_by { |h| [ h[:brut_total] ] }
+    end.sort_by(&this_order)
 
     position = 1
     previous_total = nil

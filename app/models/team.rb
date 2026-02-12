@@ -24,6 +24,14 @@ class Team < ApplicationRecord
   before_update :sync_entries_status
   after_save :update_resultcat, if: -> { !@skip_resultcat_update }
 
+  def running_round
+    event.rounds.where(status: "running").first
+  end
+
+  def round_hole_played(round_id)
+    self.team_scores.find_by(round: round_id)&.hole_played || 0
+  end
+
   # Retourne l'heure de départ du team pour un round donné au format hh:mm
   def start_time_for_round(round_id)
     slot = slots.find { |s| s.flight&.config_teetime&.round_id == round_id }

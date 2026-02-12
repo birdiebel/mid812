@@ -6,55 +6,57 @@
         <thead>
           <tr>
             <th>Pos</th>
-            <th>Équipe</th>
+            <th>Team</th>
+            <th>Hole</th>
             <% event.rounds.order(:num).each do |round| %>
               <th style="text-align: center;">R<%= round.num %></th>
             <% end %>
-            <th>Total Brut</th>
-            <th>Total Net</th>
-            <th>Total Stb</th>
+            <th>Brut</th>
+            <th>Net</th>
+            <th>Stb</th>
           </tr>
         </thead>
         <tbody>
           <% event.resultcats.order(priority: :asc).each do |r| %>
-            <tr><td colspan="99" bgcolor="lightyellow" font-weight="bold"><%= r.name %></td></tr>
-            <% event.teams_brut_totals_with_rounds(r.id).each do |row| %>
-            <tr>
-              <td><%= row[:position] %></td>
-              <td style="text-align: left;"><%= row[:team].name %></td>
-              <% event.rounds.order(:num).each do |round| %>
-              <td>
-                <% score=row[:brut_by_round][round.id] %> 
-                <% if score.nil? || score==0 %> 
-                  <%= row[:team].start_time_for_round(round.id) %> 
-                <% else %> 
-                  <%= score %> 
-                <% end %>
-              </td>
+            <tr><td colspan="99" bgcolor="yellow" font-weight="bold"><%= r.name %></td></tr>
+            <% event.teams_brut_totals_with_rounds(r.id)&.each do |row| %>
+                  <tr>
+                    <td><%= row[:position] %></td>
+                    <td style="text-align: left;"><%= row[:team].name %></td>
+                    <td><%= row[:team_hole_played] %></td>
+                    <% event.rounds.order(:num).each do |round| %>
+                    <td>
+                      <% score=row[:brut_by_round][round.id] %> 
+                      <% if score.nil? || score==0 %> 
+                        <%= row[:team].start_time_for_round(round.id) %> 
+                      <% else %> 
+                        <%= score %>
+                      <% end %>
+                    </td>
+                    <% end %>
+
+                    <% if row[:brut_total] > 0  %>
+                      <td class="top-brut"><%= row[:brut_total] %></td>
+                    <% else %>
+                      <td></td>  
+                    <% end %> 
+
+                    <% if row[:net_total]> 0 %>
+                      <td class="top-net">
+                        <%= row[:net_total] %>
+                      </td>
+                    <% else %>
+                      <td></td>   
+                    <% end %>
+
+                    <% if row[:net_total] > 0 %>  
+                      <td class="top-stb"><%= row[:stb_total] %></td>
+                    <% else %>
+                      <td></td>   
+                    <% end %>
+
+                  </tr>
               <% end %>
-
-              <% if row[:brut_total] > 0  %>
-                <td><%= row[:brut_total] %></td>
-              <% else %>
-                <td></td>  
-              <% end %> 
-
-              <% if row[:net_total]> 0 %>
-                <td>
-                  <%= row[:net_total] %>
-                </td>
-              <% else %>
-                <td></td>   
-              <% end %>
-
-              <% if row[:net_total] > 0 %>  
-                <td><%= row[:stb_total] %></td>
-              <% else %>
-                <td></td>   
-              <% end %>
-
-            </tr>
-            <% end %>
           <% end %>
         </tbody>
       </table>
