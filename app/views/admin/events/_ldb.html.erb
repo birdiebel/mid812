@@ -62,11 +62,21 @@
                     <% else %>
                       <td>
                         <% if row[:diff_par].nil? %>
-                          N.A.
+                          <div class="div-against-par" style="font-weight: bold;">
+                            N.A.
+                          </div>
                         <% elsif row[:diff_par].positive? %>
-                          +<%= row[:diff_par] %>
+                          <div class="div-against-par" style="font-weight: bold; color: red;">
+                            +<%= row[:diff_par] %>
+                          </div>
+                        <% elsif row[:diff_par].negative? %>
+                          <div class="div-against-par" style="font-weight: bold; color: green;">
+                            <%= row[:diff_par] %>
+                          </div>
                         <% else %>
-                          <%= row[:diff_par] %>
+                          <div class="div-against-par" style="font-weight: bold;">
+                            PAR
+                          </div>
                         <% end %>
                       </td>
                     <% end %>

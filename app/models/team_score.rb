@@ -94,31 +94,31 @@ class TeamScore < ApplicationRecord
 
   private
 
-  def copy_from_single_score
-    # Cherche le score qui a des données (brut_str present)
-    score = nil
-    team.entries.each do |e|
-      score = e.scores.where(round: round).find { |s| s.brut_str.present? }
-      break if score.present?
+    def copy_from_single_score
+      # Cherche le score qui a des données (brut_str present)
+      score = nil
+      team.entries.each do |e|
+        score = e.scores.where(round: round).find { |s| s.brut_str.present? }
+        break if score.present?
+      end
+
+      # Si aucun score avec données, prend le premier score de la première entry
+      score ||= team.entries.first&.scores&.order(:id)&.first
+      return unless score
+
+      self.hole_played = score.hole_played || 0
+      self.status = team.status
+      self.brut_total = score.brut("total").to_i
+      self.net_total = score.net("total").to_i
+      self.stb_total = score.stb("total").to_i
+      par_and_diff = par_and_diff_for_score(score)
+      self.par_total = par_and_diff[:par_total]
+      self.diff_par = par_and_diff[:diff_par]
+
+      # stroke_play_score retourne une string, il faut la convertir
+      sp_score = score.stroke_play_score
+      self.stroke_play_score = parse_stroke_play_score(sp_score)
     end
-
-    # Si aucun score avec données, prend le premier score de la première entry
-    score ||= team.entries.first&.scores&.order(:id)&.first
-    return unless score
-
-    self.hole_played = score.hole_played || 0
-    self.status = team.status
-    self.brut_total = score.brut("total").to_i
-    self.net_total = score.net("total").to_i
-    self.stb_total = score.stb("total").to_i
-    par_and_diff = par_and_diff_for_score(score)
-    self.par_total = par_and_diff[:par_total]
-    self.diff_par = par_and_diff[:diff_par]
-
-    # stroke_play_score retourne une string, il faut la convertir
-    sp_score = score.stroke_play_score
-    self.stroke_play_score = parse_stroke_play_score(sp_score)
-  end
 
   def calculate_best_ball
     scores = team.entries.map { |e| e.scores.find_by(round: round) }.compact

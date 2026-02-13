@@ -66,7 +66,16 @@
               <td><%= team_score.hole_played_show %></td>
               <% scoring_mode == "sp" ? ts_score = team_score.stroke_play_score : ts_score = "x" %>
               <td>
-                <div class="div-against-par" style="<%= team_score.style_for_stroke_play(ts_score) %>"><strong><%= ts_score %></strong></div>
+                <% if ts_score.nil? || ts_score == "N.A." %>
+                  <div class="div-against-par"><strong><%= ts_score %></strong></div>
+                <% elsif ts_score.to_i.zero? %>
+                  <div class="div-against-par" style="color: green;"><strong><%= ts_score %></strong></div>
+                <% elsif ts_score.to_i.negative? %>
+                  <div class="div-against-par" style="color: red;"><strong><%= ts_score %></strong></div>
+                <% else %>
+                  <div class="div-against-par" style="color: blue;"><strong><%= ts_score %></strong></div>
+                <% end %>
+              </td>
               <td><%= scoring_mode == "sp" ? team_score.par_total : "x" %></td>
               <td>
                 <% if scoring_mode == "sp" %>

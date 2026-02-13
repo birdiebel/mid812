@@ -50,11 +50,21 @@ class Event < ApplicationRecord
     this_order =
       case resultcat_scoring
       when "stroke_play"
-        ->(h) { [ h[:brut_total] ] }
+        ->(h) { [ h[:diff_par].nil? ? Float::INFINITY : h[:diff_par] ] }
       when "stableford"
         ->(h) { [ -h[:stb_total] ] }
       else
         ->(h) { [ h[:brut_total] ] }
+      end
+
+    ranking_value =
+      case resultcat_scoring
+      when "stroke_play"
+        ->(h) { h[:diff_par].nil? ? Float::INFINITY : h[:diff_par] }
+      when "stableford"
+        ->(h) { -h[:stb_total] }
+      else
+        ->(h) { h[:brut_total] }
       end
 
     running_rounds = self.rounds.where(status: "running").first
@@ -124,9 +134,10 @@ class Event < ApplicationRecord
     position = 1
     previous_total = nil
     leaderboard.each_with_index do |row, idx|
-      position = idx + 1 if previous_total != row[:brut_total]
+      current_value = ranking_value.call(row)
+      position = idx + 1 if previous_total != current_value
       row[:position] = position
-      previous_total = row[:brut_total]
+      previous_total = current_value
     end
     leaderboard
   end
