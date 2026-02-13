@@ -11,6 +11,10 @@ class Tee < ApplicationRecord
 
   enum :teebox, [ "Black", "White", "Yellow", "Blue", "Red" ]
 
+  def par
+    sum_str("par_str")
+  end
+
   def sum_dist
     dist_str.split(",").map!(&:to_i).sum
   end

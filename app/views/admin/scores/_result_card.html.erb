@@ -20,6 +20,22 @@
 <% net = (net + Array.new(nb_hole, "")).first(nb_hole) %>
 <% stb = (stb + Array.new(nb_hole, "")).first(nb_hole) %>
 
+<% par_total = tee.par %>
+<% brut_values_for_diff = score.brut_str.present? ? score.brut_str.split(",").map { |value| value.present? ? value.to_i : nil } : [] %>
+<% diff_not_calculable = brut_values_for_diff.compact.any?(&:zero?) %>
+<% played_indexes_for_diff = brut_values_for_diff.each_with_index.select { |value, _| value && value > 0 }.map { |_, index| index } %>
+<% brut_total_initial = played_indexes_for_diff.sum { |index| brut_values_for_diff[index] || 0 } %>
+<% par_array_for_diff = tee&.str_to_array("par_str") || [] %>
+<% par_total_played = played_indexes_for_diff.sum { |index| par_array_for_diff[index] || 0 } %>
+<% diff_par_initial_value = brut_total_initial - par_total_played %>
+<% diff_par_initial = if diff_not_calculable || par_total_played.zero?
+                                                "N.A."
+                                            elsif diff_par_initial_value.positive?
+                                                "+#{diff_par_initial_value}"
+                                            else
+                                                diff_par_initial_value.to_s
+                                            end %>
+
 <div class="panel">
   <h3 style="display: flex; justify-content: space-between; align-items: center;">
     <span style="display: flex; gap: 10px; align-items: center;">
@@ -33,12 +49,15 @@
           Result-Card
         <% end %>
       </span>
-      
-    <span style="display: flex; gap: 5px;">
-      <span class="brut_total scoring-sp" player="<%= player %>"></span>
-      <span class="net_total scoring-net" player="<%= player %>"></span>
-      <span class="stb_total scoring-stb" player="<%= player %>"></span>
-    </span>
+        </span>
+
+        <span style="display: flex; gap: 5px;">
+            <span class="brut_total scoring-sp" player="<%= player %>"></span>
+            <span class="net_total scoring-net" player="<%= player %>"></span>
+            <span class="stb_total scoring-stb" player="<%= player %>"></span>
+            <span class="par_total" player="<%= player %>">Par : <%= par_total_played %></span>
+            <span class="diff_par" player="<%= player %>">Diff : <%= diff_par_initial %></span>
+        </span>
   </h3>
     <div style="padding: 5px;">
     <% if tee %>
@@ -111,15 +130,7 @@
         <td class="scorecard-label">Brut</td>
         <% nb_hole.times do |i| %>
             <td class="scorecard-zone">
-            <input
-                class="score-input brut"
-                style="width: 100%"
-                type="text"
-                name="brut_inputs[<%= i %>]"
-                value="<%= brut[i] %>"
-                player="<%= player %>"
-                hole="<%= i %>"
-            />
+            <%= text_field_tag "brut_inputs[#{i}]", brut[i], class: "score-input brut", style: "width: 100%", autocomplete: "off", player: player, hole: i %>
             </td>
             <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone scorecard-label brut_front" player="<%= player %>"></td>
@@ -163,5 +174,5 @@
     <%= f.input :brut_str, as: :hidden, input_html: { class: "initial_brut", player: player } %>
     <%= f.input :net_str, as: :hidden, input_html: { class: "initial_net", player: player } %>
     <%= f.input :stb_str, as: :hidden, input_html: { class: "initial_stb", player: player } %>
-    </div>
+    <%= f.input :par_total, as: :hidden, input_html: { class: "par_total_value", value: par_total, player: player } %>
 </div>

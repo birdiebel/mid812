@@ -8,7 +8,7 @@ class TeamScore < ApplicationRecord
   validates :team_id, uniqueness: { scope: :round_id }
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "brut_total", "created_at", "hole_played", "id", "net_total",
+    [ "brut_total", "created_at", "diff_par", "hole_played", "id", "net_total", "par_total",
       "round_id", "status", "stb_total", "stroke_play_score", "team_id", "updated_at" ]
   end
 
@@ -111,6 +111,9 @@ class TeamScore < ApplicationRecord
     self.brut_total = score.brut("total").to_i
     self.net_total = score.net("total").to_i
     self.stb_total = score.stb("total").to_i
+    par_and_diff = par_and_diff_for_score(score)
+    self.par_total = par_and_diff[:par_total]
+    self.diff_par = par_and_diff[:diff_par]
 
     # stroke_play_score retourne une string, il faut la convertir
     sp_score = score.stroke_play_score
@@ -141,5 +144,35 @@ class TeamScore < ApplicationRecord
     # Calcul du stroke play score
     sp_scores = scores.map { |s| parse_stroke_play_score(s.stroke_play_score) }.compact
     self.stroke_play_score = sp_scores.min || 0
+
+    best_score = scores.min_by { |s| s.brut("total") || 0 }
+    par_and_diff = par_and_diff_for_score(best_score)
+    self.par_total = par_and_diff[:par_total]
+    self.diff_par = par_and_diff[:diff_par]
+  end
+
+  def par_and_diff_for_score(score)
+    return { par_total: 0, diff_par: 0 } unless score&.brut_str.present?
+
+    brut_values = score.brut_str.split(",").map { |value| value.blank? || value.strip == "" ? nil : value.to_i }
+
+    # If any played score is 0, diff_par is not calculable.
+    return { par_total: 0, diff_par: 0 } if brut_values.compact.any?(&:zero?)
+
+    played_holes = brut_values.each_with_index.select { |value, _| value && value > 0 }.map { |_, index| index }
+    return { par_total: 0, diff_par: 0 } if played_holes.empty?
+
+    course = score.slot&.flight&.config_teetime&.course
+    return { par_total: 0, diff_par: 0 } unless course
+
+    teebox = score.entry&.playercat&.teebox
+    tee = course.tees.find_by(teebox: teebox)
+    return { par_total: 0, diff_par: 0 } unless tee
+
+    par_array = tee.str_to_array("par_str")
+    par_total = played_holes.sum { |index| par_array[index] || 0 }
+    brut_total_played = played_holes.sum { |index| brut_values[index] || 0 }
+
+    { par_total: par_total, diff_par: brut_total_played - par_total }
   end
 end

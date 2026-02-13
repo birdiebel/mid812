@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_05_161309) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_13_000000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -286,8 +286,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_05_161309) do
   create_table "team_scores", force: :cascade do |t|
     t.integer "brut_total", default: 0
     t.datetime "created_at", null: false
+    t.integer "diff_par", default: 0, null: false
     t.integer "hole_played", default: 0
     t.integer "net_total", default: 0
+    t.integer "par_total", default: 0, null: false
     t.bigint "round_id", null: false
     t.integer "status", default: 0
     t.integer "stb_total", default: 0

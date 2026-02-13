@@ -16,6 +16,10 @@ class Slot < ApplicationRecord
   before_update :before_update_callback
   # after_commit :sync_playing_hcps, on: [ :create, :update ]
 
+  def tee
+    flight&.config_teetime&.course&.tees&.find_by(teebox: team.entries.first.playercat.teebox) if team && team.entries.exists?
+  end
+
   def before_update_callback
     puts "Before updating Slot #{id}: team_id=#{team_id}, flight_id=#{flight_id}, num=#{num}, playing_hcp=#{playing_hcp}"
     puts "  team_id changed: #{team_id_changed?}, was: #{team_id_was}, now: #{team_id}"

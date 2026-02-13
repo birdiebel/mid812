@@ -25,6 +25,8 @@
             <th></th>
             <th>Holes</th>
             <th>+-</th>
+            <th>Par</th>
+            <th>Diff</th>
             <th>Brut</th>
             <th>Net</th>
             <th>Stb</th>
@@ -65,6 +67,20 @@
               <% scoring_mode == "sp" ? ts_score = team_score.stroke_play_score : ts_score = "x" %>
               <td>
                 <div class="div-against-par" style="<%= team_score.style_for_stroke_play(ts_score) %>"><strong><%= ts_score %></strong></div>
+              <td><%= scoring_mode == "sp" ? team_score.par_total : "x" %></td>
+              <td>
+                <% if scoring_mode == "sp" %>
+                  <% if team_score.par_total.to_i.zero? %>
+                    N.A.
+                  <% elsif team_score.diff_par.to_i.positive? %>
+                    +<%= team_score.diff_par %>
+                  <% else %>
+                    <%= team_score.diff_par %>
+                  <% end %>
+                <% else %>
+                  x
+                <% end %>
+              </td>
               <td><%= scoring_mode == "sp" ? team_score.brut_total : "x" %></td>
               <td><%= scoring_mode == "sp" ? team_score.net_total : "x" %></td>
               <td><%= team_score.stb_total %></td>

@@ -5,6 +5,9 @@ class Round < ApplicationRecord
   has_many :slots, through: :flights
   has_many :scores, dependent: :destroy
 
+  # Jp
+  has_one :course, through: :config_teetimes
+
   enum :status, [ :pending, :running, :terminated, :suspended, :canceled ]
 
   validates :hcp_pc, inclusion: { in: 0..100, message: "must be between 0 and 100" }

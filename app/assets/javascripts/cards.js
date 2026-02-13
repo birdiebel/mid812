@@ -268,6 +268,52 @@ function show_totaux(player) {
     show_totaux_brut('brut', player);
     show_totaux_zone('net', player);
     show_totaux_zone('stb', player);
+    show_diff_par(player);
+}
+
+function show_diff_par(player) {
+    var hasZeroScore = false;
+    var playedHoleCount = 0;
+    var brutPlayedTotal = 0;
+    var parPlayedTotal = 0;
+
+    $(select_all_input(player)).each(function () {
+        var rawValue = $(this).val();
+        if (rawValue === "" || rawValue === null || rawValue === undefined) {
+            return;
+        }
+
+        var numericValue = parseInt(rawValue, 10);
+        if (isNaN(numericValue)) {
+            return;
+        }
+
+        if (numericValue === 0) {
+            hasZeroScore = true;
+            return;
+        }
+
+        if (numericValue > 0) {
+            var holeIndex = parseInt($(this).attr("hole"), 10);
+            playedHoleCount += 1;
+            brutPlayedTotal += numericValue;
+            parPlayedTotal += select_par_value(player, holeIndex) || 0;
+        }
+    });
+
+    var parTarget = $(".par_total[player='" + player + "']").first();
+    if (parTarget.length > 0) {
+        parTarget.text("Par : " + (playedHoleCount > 0 ? parPlayedTotal : ""));
+    }
+
+    if (hasZeroScore || playedHoleCount === 0) {
+        set_total_if_present("diff_par", player, "N.A.");
+        return;
+    }
+
+    var diff = brutPlayedTotal - parPlayedTotal;
+    var diffDisplay = diff > 0 ? "+" + diff : diff;
+    set_total_if_present("diff_par", player, diffDisplay);
 }
 
 function show_totaux_brut(zone, player) {
