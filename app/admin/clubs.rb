@@ -38,7 +38,7 @@ ActiveAdmin.register Club do
     #   end
     # end
     f.actions do
-       f.action :submit
+      f.action :submit
        f.cancel_link(url_for(:back))
     end
   end

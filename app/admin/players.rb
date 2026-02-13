@@ -56,19 +56,19 @@ ActiveAdmin.register Player do
     end
 
     f.inputs "User" do
-        f.has_many :user, heading: false, allow_destroy: false, new_record: !resource.user do |u|
-          u.input :email
-          u.input :role
-          if u.object.new_record?
-            u.input :password
-            u.input :password_confirmation
-          end
-          u.input :actif
+      f.has_many :user, heading: false, allow_destroy: false, new_record: !resource.user do |u|
+        u.input :email
+        u.input :role
+        if u.object.new_record?
+          u.input :password
+          u.input :password_confirmation
         end
+        u.input :actif
+      end
     end
 
     f.actions do
-       f.action :submit
+      f.action :submit
        f.cancel_link(url_for(:back))
     end
   end
@@ -76,7 +76,7 @@ ActiveAdmin.register Player do
   show do
     default_main_content
     div do
-        button_to "Add licence", new_admin_player_licence_path(player_id: resource.id), method: :get
+      button_to "Add licence", new_admin_player_licence_path(player_id: resource.id), method: :get
     end
 
     panel "Licences" do

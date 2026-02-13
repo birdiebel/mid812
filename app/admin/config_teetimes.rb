@@ -42,7 +42,7 @@ ActiveAdmin.register ConfigTeetime do
         event_format = round.event.format
         f.input :formula, as: :select, collection: Formula.where(format: event_format).map { |formula| [ formula.name, formula.id ] }, include_blank: "Select a formula"
         default_nb_teams = round.event.entries.where(status: :enter).count
-        default_nb_slots = event_format == 'single' ? 3 : 2
+        default_nb_slots = event_format == "single" ? 3 : 2
       else
         f.input :round, as: :select, collection: Round.all.map { |r| [ "#{r.event.name} - Round #{r.num}", r.id ] }, include_blank: false
         f.input :course, as: :select, collection: Course.all.map { |c| [ "#{c.club.name} - #{c.name}", c.id ] }, include_blank: false

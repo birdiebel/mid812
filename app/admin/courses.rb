@@ -16,7 +16,7 @@ ActiveAdmin.register Course do
       f.input :nb_hole
     end
     f.actions do
-       f.action :submit
+      f.action :submit
        f.cancel_link(url_for(:back))
     end
   end
