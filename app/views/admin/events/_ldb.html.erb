@@ -25,13 +25,14 @@
               <tr><td colspan="99" bgcolor="yellow" font-weight="bold"><%= r.name %></td></tr>
             <% end %>
             <% event_teams&.each do |row| %>
+              <% stableford_scoring = row[:team].resultcat&.scoring == "stableford" %>
                   <tr>
                     <td><%= row[:position] %></td>
                     <td style="text-align: left;"><%= row[:team].name %></td>
                     <td><%= row[:team_hole_played] %></td>
                     <% event.rounds.order(:num).each do |round| %>
                     <td>
-                      <% score=row[:brut_by_round][round.id] %>
+                      <% score = stableford_scoring ? row[:stb_by_round][round.id] : row[:brut_by_round][round.id] %>
                       <% if score.nil? || score==0 %>
                         <%= row[:team].start_time_for_round(round.id) %>
                       <% else %>
@@ -40,29 +41,39 @@
                     </td>
                     <% end %>
 
-                    <% if row[:brut_total] > 0 %>
+                    <% if stableford_scoring %>
+                      <td></td>
+                    <% elsif row[:brut_total] > 0 %>
                       <td class="top-brut"><%= row[:brut_total] %></td>
                     <% else %>
                       <td></td>
                     <% end %>
 
-                    <% if row[:par_total] > 0 %>
+                    <% if stableford_scoring %>
+                      <td></td>
+                    <% elsif row[:par_total] > 0 %>
                       <td><%= row[:par_total] %></td>
                     <% else %>
                       <td></td>
                     <% end %>
 
-                    <td>
-                      <% if row[:diff_par].nil? %>
-                        N.A.
-                      <% elsif row[:diff_par].positive? %>
-                        +<%= row[:diff_par] %>
-                      <% else %>
-                        <%= row[:diff_par] %>
-                      <% end %>
-                    </td>
+                    <% if stableford_scoring %>
+                      <td></td>
+                    <% else %>
+                      <td>
+                        <% if row[:diff_par].nil? %>
+                          N.A.
+                        <% elsif row[:diff_par].positive? %>
+                          +<%= row[:diff_par] %>
+                        <% else %>
+                          <%= row[:diff_par] %>
+                        <% end %>
+                      </td>
+                    <% end %>
 
-                    <% if row[:net_total]> 0 %>
+                    <% if stableford_scoring %>
+                      <td></td>
+                    <% elsif row[:net_total]> 0 %>
                       <td class="top-net">
                         <%= row[:net_total] %>
                       </td>
