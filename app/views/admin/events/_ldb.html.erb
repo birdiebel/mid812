@@ -18,8 +18,11 @@
         </thead>
         <tbody>
           <% event.resultcats.order(priority: :asc).each do |r| %>
-            <tr><td colspan="99" bgcolor="yellow" font-weight="bold"><%= r.name %></td></tr>
-            <% event.teams_brut_totals_with_rounds(r.id)&.each do |row| %>
+            <% event_teams = event.teams_brut_totals_with_rounds(r.id) %>
+            <% if event_teams.present? %>
+              <tr><td colspan="99" bgcolor="yellow" font-weight="bold"><%= r.name %></td></tr>
+            <% end %>
+            <% event_teams&.each do |row| %>
                   <tr>
                     <td><%= row[:position] %></td>
                     <td style="text-align: left;"><%= row[:team].name %></td>
