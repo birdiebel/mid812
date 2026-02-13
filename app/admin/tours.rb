@@ -44,7 +44,7 @@ ActiveAdmin.register Tour do
       f.input :year
     end
     f.actions do
-       f.action :submit
+      f.action :submit
        f.cancel_link(url_for(:back))
     end
   end

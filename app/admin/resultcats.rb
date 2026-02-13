@@ -74,7 +74,7 @@ ActiveAdmin.register Resultcat do
       f.input :actif
     end
     f.actions do
-       f.action :submit
+      f.action :submit
        f.cancel_link(url_for(:back))
     end
   end

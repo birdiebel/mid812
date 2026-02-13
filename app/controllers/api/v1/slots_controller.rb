@@ -38,9 +38,9 @@ module Api
 
       private
 
-      def slot_params
-        params.require(:slot).permit(:team_id)
-      end
+        def slot_params
+          params.require(:slot).permit(:team_id)
+        end
     end
   end
 end

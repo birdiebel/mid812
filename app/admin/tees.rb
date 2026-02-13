@@ -25,7 +25,7 @@ ActiveAdmin.register Tee do
 
   form do |f|
     panel "Scorecard" do
-        render "admin/tees/score_inputs", { tee: tee }
+      render "admin/tees/score_inputs", { tee: tee }
     end
   end
 

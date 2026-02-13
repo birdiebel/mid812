@@ -95,10 +95,10 @@ class Entry < ApplicationRecord
         if playercat.agecats.exists?
           if playercat.agecats.where("age_low <= ? AND age_high >= ?", age, age).exists?
             if playercat.hcp_min <= hcp && playercat.hcp_max >= hcp
-                if player.sexe == playercat.sexe
-                  self.update_column(:playercat_id, playercat.id)
-                  return playercat
-                end
+              if player.sexe == playercat.sexe
+                self.update_column(:playercat_id, playercat.id)
+                return playercat
+              end
             end
           end
         end

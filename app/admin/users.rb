@@ -32,7 +32,7 @@ ActiveAdmin.register User do
     end
 
     f.inputs "Player", for: [ :player, f.object.player || Player.new ], new_record: false do |p|
-        p.input :firstname
+      p.input :firstname
         p.input :lastname
         p.input :dob
         p.input :sexe
@@ -58,13 +58,13 @@ ActiveAdmin.register User do
     end
     if user.player
       panel "Player" do
-          attributes_table_for(user.player) do
-            row :firstname
-            row :lastname
-            row :dob
-            row :sexe
-            row :lang
-          end
+        attributes_table_for(user.player) do
+          row :firstname
+          row :lastname
+          row :dob
+          row :sexe
+          row :lang
+        end
       end
     else
       h3 style: "color: red" do
