@@ -30,7 +30,7 @@ Rails.application.configure do
   config.cache_classes = false
   config.action_controller.perform_caching = false
   config.reload_classes_only_on_change = true
-  config.watchable_dirs[File.join(config.root, "app/admin")] = ["rb"]
+  config.watchable_dirs[File.join(config.root, "app/admin")] = [ "rb" ]
 
   # Change to :null_store to avoid any caching.
   config.cache_store = :memory_store

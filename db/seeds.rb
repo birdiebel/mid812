@@ -1,39 +1,39 @@
 
 # Genere
 def go_players(nbCount, sexe)
-    # Boucle
-    (1..nbCount).each do |i|
-        # User
-        user = User.new
-        user.email = Faker::Internet.email
-        user.password = "123456"
-        user.actif = true
-        user.save
-        puts "User #{user.id}"
+  # Boucle
+  (1..nbCount).each do |i|
+    # User
+    user = User.new
+      user.email = Faker::Internet.email
+      user.password = "123456"
+      user.actif = true
+      user.save
+      puts "User #{user.id}"
 
-        # Player
-        player = Player.new
-        player.user = user
-        player.firstname = Faker::Name.male_first_name
-        player.lastname = Faker::Name.last_name
-        player.sexe = sexe
-        player.dob = Faker::Date.between(from: '1955-09-23', to: '2010-09-25')
-        player.save
-        puts "PLayer #{i}"
+      # Player
+      player = Player.new
+      player.user = user
+      player.firstname = Faker::Name.male_first_name
+      player.lastname = Faker::Name.last_name
+      player.sexe = sexe
+      player.dob = Faker::Date.between(from: '1955-09-23', to: '2010-09-25')
+      player.save
+      puts "PLayer #{i}"
 
-        # Licence
-        licence = Licence.new
-        licence.player = player
-        licence.num = Faker::Number.between(from: 100000, to: 999999).to_s
-        licence.hcp = Faker::Number.between(from: -2.1, to: 36.4)
-        licence.club = Faker::Sports::Basketball.team
-        licence.save
-        puts "Licence #{i}"
-    end
+      # Licence
+      licence = Licence.new
+      licence.player = player
+      licence.num = Faker::Number.between(from: 100000, to: 999999).to_s
+      licence.hcp = Faker::Number.between(from: -2.1, to: 36.4)
+      licence.club = Faker::Sports::Basketball.team
+      licence.save
+      puts "Licence #{i}"
+  end
 end
 
 def go_agecat(name, short, age_low, age_high, color, year)
-    agecat = Agecat.new
+  agecat = Agecat.new
     agecat.name = name
     agecat.short = short
     agecat.age_low = age_low
@@ -45,8 +45,8 @@ def go_agecat(name, short, age_low, age_high, color, year)
 end
 
 def seed_tours(name)
-    # Reset datas
-    Tour.delete_all
+  # Reset datas
+  Tour.delete_all
     Event.delete_all
 
     # Boucles
@@ -69,9 +69,9 @@ end
 
 # Users, players and licence
 def seed_players(men, ladies)
-    # Reset datas
-    # Entry.delete.all
-    User.delete_all
+  # Reset datas
+  # Entry.delete.all
+  User.delete_all
     Player.delete_all
 
     # Boucles
@@ -80,8 +80,8 @@ def seed_players(men, ladies)
 end
 
 def seed_agecats
-    # Reset datas
-    Agecat.delete_all
+  # Reset datas
+  Agecat.delete_all
 
     # Boucles
     # go_agecat("All", "A", 0, 99, "black", 2026)
@@ -92,7 +92,7 @@ def seed_agecats
 end
 
 def go_playercat(name, sexe, hcp_min, hcp_max, version, teebox, priority, format)
-    playercat = Playercat.new
+  playercat = Playercat.new
     playercat.name = name
     playercat.sexe = sexe
     playercat.hcp_min = hcp_min
@@ -107,8 +107,8 @@ def go_playercat(name, sexe, hcp_min, hcp_max, version, teebox, priority, format
 end
 
 def seed_playercats
-    # Reset datas
-    Playercat.delete_all
+  # Reset datas
+  Playercat.delete_all
 
     # Boucles
     # Federal Men
@@ -171,8 +171,8 @@ def seed_playercats
 end
 
 def seed_admin_user
-    # Reset datas
-    User.where(role: "admin").destroy_all
+  # Reset datas
+  User.where(role: "admin").destroy_all
 
     # Admin User
     user = User.new
@@ -185,8 +185,8 @@ def seed_admin_user
 end
 
 def seed_club_course(club_name, course_name)
-    # Club
-    club = Club.new
+  # Club
+  club = Club.new
     club.name = club_name
     club.save
     puts "Club #{club.name}"

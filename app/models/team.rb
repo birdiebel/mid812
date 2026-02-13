@@ -140,9 +140,9 @@ class Team < ApplicationRecord
 
   private
 
-  def assign_num
-    return if num.present?
-    max_num = Team.where(event_id: event_id).maximum(:num) || 0
-    self.num = max_num + 1
-  end
+    def assign_num
+      return if num.present?
+      max_num = Team.where(event_id: event_id).maximum(:num) || 0
+      self.num = max_num + 1
+    end
 end

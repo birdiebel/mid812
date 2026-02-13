@@ -71,25 +71,25 @@ class Score < ApplicationRecord
 
   private
 
-  def calculate_total(score_str, var)
-    return 0 unless score_str.present?
+    def calculate_total(score_str, var)
+      return 0 unless score_str.present?
 
-    values = score_str.split(",").map do |v|
-      next 0 if v.blank? || v.strip == "" || v == "x"
-      v.to_i
-    end
+      values = score_str.split(",").map do |v|
+        next 0 if v.blank? || v.strip == "" || v == "x"
+        v.to_i
+      end
 
-    case var.to_s
-    when "front"
-      values.first(9).sum
-    when "back"
-      values.slice(9, 9).sum
-    when "total"
-      values.sum
-    else
-      0
+      case var.to_s
+      when "front"
+        values.first(9).sum
+      when "back"
+        values.slice(9, 9).sum
+      when "total"
+        values.sum
+      else
+        0
+      end
     end
-  end
 
   def assign_start_hole
     return if slot.nil?

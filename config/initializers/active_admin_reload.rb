@@ -5,4 +5,4 @@ Rails.application.config.to_prepare do
     ActiveAdmin.application.unload!
     Rails.application.reload_routes!
   end
-end   
+end
