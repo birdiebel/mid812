@@ -85,11 +85,11 @@ ActiveAdmin.register Round do
 
     private
 
-    def prepare_start_list_data
-      return unless resource&.event
+      def prepare_start_list_data
+        return unless resource&.event
 
-      @start_list_teams = resource.event.teams.where(status: :enter).includes(:resultcat, :entries).to_a.sort_by(&:total_hcp)
-      @team_ids_in_round_slots = resource.slots.where.not(team_id: nil).distinct.pluck(:team_id)
-    end
+        @start_list_teams = resource.event.teams.where(status: :enter).includes(:resultcat, :entries).to_a.sort_by(&:total_hcp)
+        @team_ids_in_round_slots = resource.slots.where.not(team_id: nil).distinct.pluck(:team_id)
+      end
   end
 end

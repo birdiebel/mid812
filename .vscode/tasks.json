@@ -19,7 +19,8 @@
       "command": "bundle",
       "args": [
         "exec",
-        "erb_lint"
+        "erb_lint",
+        "--lint-all"
       ],
       "group": "test",
       "problemMatcher": []

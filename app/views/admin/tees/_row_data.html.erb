@@ -8,9 +8,9 @@
 
     <!-- ROW LABEL -->
     <td class="scorecard-label <%= tee.teebox.downcase %>"><%= label %></td>
-    
+
     <!-- HOLE 1-9 -->
-    <% datas.slice(0,9).each do |data|  %>
+    <% datas.slice(0,9).each do |data| %>
         <td class='scorecard-zone <%= tee.teebox.downcase %>'><%= data %></td>
     <% end %>
 
@@ -23,10 +23,10 @@
 
     <!-- HOLE 10-18 -->
     <% if datas.count == 18 %>
-        <% datas.slice(9,9).each do |data|  %>
+        <% datas.slice(9,9).each do |data| %>
             <td class='scorecard-zone <%= tee.teebox.downcase %>'><%= data %></td>
         <% end %>
-    <% end %>    
+    <% end %>
 
     <!-- TOTAL 10-18 AND 1-18 -->
     <% if mode == 'total' %>

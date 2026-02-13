@@ -10,23 +10,23 @@
     <td class="scorecard-label <%= tee.teebox.downcase %>"><%= label %></td>
 
     <% if datas.count == 18 %>
-    
+
         <!-- HOLE 1-9 -->
-        <% datas.slice(0,9).each_with_index do |data,index|  %>
+        <% datas.slice(0,9).each_with_index do |data,index| %>
             <td class='scorecard-zone <%= tee.teebox.downcase %>'>
             <% if mode == 'hole_num' %>
                 <%= data %>
             <% else %>
-                <input class="score-input" style="width: 100%" 
-                    id="<%= zone %>[<%= index %>]" 
-                    name="<%= zone %>[<%= index %>]" 
-                    type="text" 
+                <input class="score-input" style="width: 100%"
+                    id="<%= zone %>[<%= index %>]"
+                    name="<%= zone %>[<%= index %>]"
+                    type="text"
+                    autocomplete="off"
                     zone="<%= zone %>"
-                    value=<%= data %> 
-                    hole="<%= index+1 %>" 
-                    limit=<%= limit %>
-                />
-            <% end %>    
+                    value="<%= data %>"
+                    hole="<%= index + 1 %>"
+                    limit="<%= limit %>">
+            <% end %>
             </td>
         <% end %>
 
@@ -38,21 +38,21 @@
         <% end %>
 
         <!-- HOLE 10-18 -->
-        <% datas.slice(9,9).each_with_index do |data,index|  %>
+        <% datas.slice(9,9).each_with_index do |data,index| %>
             <td class='scorecard-zone <%= tee.teebox.downcase %>'>
             <% if mode == 'hole_num' %>
                 <%= data %>
             <% else %>
                 <input class="score-input" style="width: 100%"
-                    id="<%= zone %>[<%= index+9 %>]" 
-                    name="<%= zone %>[<%= index+9 %>]" 
-                    type="text" 
+                    id="<%= zone %>[<%= index+9 %>]"
+                    name="<%= zone %>[<%= index+9 %>]"
+                    type="text"
+                    autocomplete="off"
                     zone="<%= zone %>"
-                    value=<%= data %> 
-                    hole="<%= index+10 %>" 
-                    limit=<%= limit %>
-                />
-            <% end %>    
+                    value="<%= data %>"
+                    hole="<%= index + 10 %>"
+                    limit="<%= limit %>">
+            <% end %>
             </td>
         <% end %>
 
@@ -61,32 +61,32 @@
             <td id='<%= zone %>-back' class='scorecard-zone <%= tee.teebox.downcase %>'></td>
         <% else %>
             <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
-        <% end %>        
+        <% end %>
 
         <!-- TOTAL CARD -->
         <% if mode == 'total' %>
             <td id='<%= zone %>-total' class='scorecard-zone <%= tee.teebox.downcase %>'></td>
         <% else %>
             <td class='scorecard-zone <%= tee.teebox.downcase %>'></td>
-        <% end %> 
+        <% end %>
 
     <% else %>
-    
-        <% datas.slice(0,datas.count).each_with_index do |data,index|  %>
+
+        <% datas.slice(0,datas.count).each_with_index do |data,index| %>
             <td class='scorecard-zone <%= tee.teebox.downcase %>'>
             <% if mode == 'hole_num' %>
                 <%= data %>
             <% else %>
-                <input class="score-input" style="width: 100%" 
-                    id="<%= zone %>[<%= index %>]" 
-                    name="<%= zone %>[<%= index %>]" 
-                    type="text" 
+                <input class="score-input" style="width: 100%"
+                    id="<%= zone %>[<%= index %>]"
+                    name="<%= zone %>[<%= index %>]"
+                    type="text"
+                    autocomplete="off"
                     zone="<%= zone %>"
-                    value=<%= data %> 
-                    hole="<%= index+1 %>" 
-                    limit=<%= limit %>
-                />
-            <% end %>    
+                    value="<%= data %>"
+                    hole="<%= index + 1 %>"
+                    limit="<%= limit %>">
+            <% end %>
             </td>
         <% end %>
 
@@ -99,4 +99,4 @@
 
     <% end %>
 
-<% end %>    
+<% end %>

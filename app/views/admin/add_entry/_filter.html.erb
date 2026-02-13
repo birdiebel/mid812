@@ -1,5 +1,5 @@
-<%= form_tag request.path, method: :get, class: "filter_form" do %> 
-  <%= text_field_tag :q_lastname_cont, params[:q]&.dig(:lastname_cont), placeholder:"Name" %> 
-  <%= submit_tag "Filter" %> 
-  <%= link_to "Clear", request.path, class:"clear_filters_btn" %> 
+<%= form_tag request.path, method: :get, class: "filter_form" do %>
+  <%= text_field_tag :q_lastname_cont, params[:q]&.dig(:lastname_cont), placeholder: "Name", autocomplete: "off" %>
+  <%= submit_tag "Filter" %>
+  <%= link_to "Clear", request.path, class:"clear_filters_btn" %>
 <% end %>

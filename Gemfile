@@ -83,4 +83,5 @@ end
 
 group :development do
   gem "ruby-lsp", require: false
+  gem "syntax_tree", require: false
 end

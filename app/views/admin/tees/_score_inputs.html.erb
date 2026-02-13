@@ -1,35 +1,35 @@
-<h3>Scorecard for <%= tee.course.name %> (<%= tee.course.version%>)</h3>
+<h3>Scorecard for <%= tee.course.name %> (<%= tee.course.version %>)</h3>
 
 <table class="table-card <%= tee.teebox.downcase %>">
 
     <% if !tee.par_str.empty? %>
-        
+
         <!-- TITLE -->
         <tr>
             <td colspan="99" class="scorecard-title <%= tee.teebox.downcase %>"><%= tee.teebox %> tees</td>
-        </tr>    
+        </tr>
 
         <!-- HOLE NUM -->
         <tr>
-            <%= render partial: 'row_data_inputs', 
+            <%= render partial: 'row_data_inputs',
                 locals: {tee: tee, zone: "par_str", label: "", mode: "hole_num"} %>
         </tr>
 
         <!-- PAR -->
         <tr>
-            <%= render partial: 'row_data_inputs', 
+            <%= render partial: 'row_data_inputs',
                 locals: {tee: tee, zone: "par_str", label: "Par", mode: "total", limit: 1} %>
         </tr>
 
         <!-- STROKE -->
         <tr>
-            <%= render partial: 'row_data_inputs', 
+            <%= render partial: 'row_data_inputs',
                 locals: {tee: tee, zone: "stroke_str", label: "Stroke", mode: "no-total", limit: 1} %>
         </tr>
 
         <!-- DIST -->
         <tr>
-            <%= render partial: 'row_data_inputs', 
+            <%= render partial: 'row_data_inputs',
                 locals: {tee: tee, zone: "dist_str", label: "Dist", mode: "total", limit: 99} %>
         </tr>
 
@@ -38,24 +38,24 @@
         <tr>
             <td class='scorecard-label <%= tee.teebox.downcase %>'>Slope</td>
             <td colspan=2>
-                <input class="" style="width: 100%" 
-                    id="tee_slope" 
-                    name="tee[slope]" 
-                    type="number" 
-                    value=<%= tee.slope %>
-            />            
+                <input class="" style="width: 100%"
+                    id="tee_slope"
+                    name="tee[slope]"
+                    type="number"
+                    autocomplete="off"
+                    value="<%= tee.slope %>">
             </td>
         </tr>
 
         <tr>
             <td class='scorecard-label <%= tee.teebox.downcase %>'>Rating</td>
             <td colspan=2>
-                <input class="" style="width: 100%" 
-                    id="tee_rating" 
-                    name="tee[rating]" 
-                    type="number" 
-                    value=<%= tee.rating %>
-            />            
+                <input class="" style="width: 100%"
+                    id="tee_rating"
+                    name="tee[rating]"
+                    type="number"
+                    autocomplete="off"
+                    value="<%= tee.rating %>">
             </td>
         </tr>
 
@@ -66,22 +66,22 @@
         <!-- Db Fields -->
             <tr>
                 <td colspan=2>PAR STR</td>
-                <td colspan=99> 
-                    <input id="tee_par_str" name="tee[par_str]" type="text">
+                <td colspan=99>
+                    <input id="tee_par_str" name="tee[par_str]" type="text" autocomplete="off">
                 </td>
             </tr>
             <tr>
                 <td colspan=2>DIST STR</td>
                 <td colspan=99>
-                    <input id="tee_dist_str" name="tee[dist_str]" type="text">
+                    <input id="tee_dist_str" name="tee[dist_str]" type="text" autocomplete="off">
                 </td>
             </tr>
             <tr>
                 <td colspan=2>STROKE STR</td>
                 <td colspan=99>
-                    <input id="tee_stroke_str" name="tee[stroke_str]" type="text">
+                    <input id="tee_stroke_str" name="tee[stroke_str]" type="text" autocomplete="off">
                 </td>
-            </tr>            
+            </tr>
         </table>
     </div>
 
@@ -94,7 +94,7 @@
             </li>
         </ol>
     </fieldset>
-    
+
 <%# end %>
 
 </table>
