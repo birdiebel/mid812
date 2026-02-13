@@ -12,6 +12,8 @@
               <th style="text-align: center;">R<%= round.num %></th>
             <% end %>
             <th>Brut</th>
+            <th>Par</th>
+            <th>Diff</th>
             <th>Net</th>
             <th>Stb</th>
           </tr>
@@ -43,6 +45,22 @@
                     <% else %>
                       <td></td>
                     <% end %>
+
+                    <% if row[:par_total] > 0 %>
+                      <td><%= row[:par_total] %></td>
+                    <% else %>
+                      <td></td>
+                    <% end %>
+
+                    <td>
+                      <% if row[:diff_par].nil? %>
+                        N.A.
+                      <% elsif row[:diff_par].positive? %>
+                        +<%= row[:diff_par] %>
+                      <% else %>
+                        <%= row[:diff_par] %>
+                      <% end %>
+                    </td>
 
                     <% if row[:net_total]> 0 %>
                       <td class="top-net">

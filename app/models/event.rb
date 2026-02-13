@@ -19,9 +19,11 @@ class Event < ApplicationRecord
   after_save :sync_playercats_ids
   after_save :sync_resultcats_ids
 
-  # Retourne les équipes de l'event avec la somme des brut_total, le détail par round et la position (dense ranking)
+  # Retourne les équipes de l'event avec la somme des scores team_scores,
+  # le détail par round et la position (dense ranking)
   # Seules les équipes avec status = 'enter' sont prises en compte
-  # Résultat : array de hashes [{ team: <Team>, brut_total: <somme>, par_round: { round_id => brut_total, ... }, position: <int> }, ...]
+  # Résultat : array de hashes
+  # [{ team: <Team>, brut_total: <somme>, par_total: <somme>, diff_par: <somme ou nil>, ... }, ...]
   def teams_brut_totals_with_rounds(resultcat_id = nil)
     teams_scope = teams.joins(:resultcat)
       .where(status: :enter, resultcat_id: resultcat_id)
@@ -55,10 +57,27 @@ class Event < ApplicationRecord
       brut_by_round = scores_by_round.transform_values { |scores| scores.sum(&:brut_total) }
       net_by_round = scores_by_round.transform_values { |scores| scores.sum(&:net_total) }
       stb_by_round = scores_by_round.transform_values { |scores| scores.sum(&:stb_total) }
+      par_by_round = {}
+      diff_by_round = {}
+
+      scores_by_round.each do |round_id, scores|
+        stored_par_total = scores.sum(&:par_total).to_i
+
+        if stored_par_total.positive?
+          par_by_round[round_id] = stored_par_total
+          diff_by_round[round_id] = scores.sum(&:diff_par)
+        else
+          fallback = team_round_par_and_diff(team, round_id)
+          par_by_round[round_id] = fallback[:par_total]
+          diff_by_round[round_id] = fallback[:diff_par]
+        end
+      end
 
       brut_total = brut_by_round.values.sum
       net_total = net_by_round.values.sum
       stb_total = stb_by_round.values.sum
+      par_total = par_by_round.values.sum
+      diff_par = diff_by_round.values.any?(&:nil?) ? nil : diff_by_round.values.sum
 
       team_hole_played = team.round_hole_played(running_rounds.id)
 
@@ -68,9 +87,13 @@ class Event < ApplicationRecord
         brut_total: brut_total,
         net_total: net_total,
         stb_total: stb_total,
+        par_total: par_total,
+        diff_par: diff_par,
         brut_by_round: brut_by_round,
         net_by_round: net_by_round,
         stb_by_round: stb_by_round,
+        par_by_round: par_by_round,
+        diff_by_round: diff_by_round,
         team_hole_played: team_hole_played
       }
     end.sort_by(&this_order)
@@ -85,6 +108,40 @@ class Event < ApplicationRecord
       previous_total = row[:brut_total]
     end
     leaderboard
+  end
+
+  def team_round_par_and_diff(team, round_id)
+    scores = team.entries.includes(:playercat, :scores).flat_map do |entry|
+      entry.scores.select { |score| score.round_id == round_id && score.brut_str.present? }
+    end
+
+    return { par_total: 0, diff_par: nil } if scores.empty?
+
+    # If any card contains a 0 score, diff/par is considered non-calculable.
+    return { par_total: 0, diff_par: nil } if scores.any? do |score|
+      score.brut_str.to_s.split(",").any? { |value| value.present? && value.to_i.zero? }
+    end
+
+    par_total = 0
+    brut_total = 0
+
+    scores.each do |score|
+      brut_values = score.brut_str.to_s.split(",").map { |value| value.present? ? value.to_i : nil }
+      played_holes = brut_values.each_with_index.select { |value, _| value && value > 0 }.map { |_, index| index }
+      next if played_holes.empty?
+
+      course = score.slot&.flight&.config_teetime&.course
+      tee = course&.tees&.find_by(teebox: score.entry&.playercat&.teebox)
+      next unless tee
+
+      par_array = tee.str_to_array("par_str")
+      par_total += played_holes.sum { |index| par_array[index] || 0 }
+      brut_total += played_holes.sum { |index| brut_values[index] || 0 }
+    end
+
+    return { par_total: 0, diff_par: nil } if par_total.zero?
+
+    { par_total: par_total, diff_par: brut_total - par_total }
   end
 
   # Retourne score, détail par round et position pour un team donné (seulement si status = 'enter')
