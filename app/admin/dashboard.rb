@@ -11,15 +11,10 @@ ActiveAdmin.register_page "Dashboard" do
     #   end
     # end
 
-
     columns do
       column do
-        panel "Recent Events mec" do
-          ul do
-            Event.all.each do |event|
-              li link_to(event.name, admin_tour_event_path(event.tour, event))
-            end
-          end
+        panel "Running Events" do
+          render "admin/dashboard/running_events"
         end
       end
 

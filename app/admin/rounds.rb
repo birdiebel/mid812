@@ -25,6 +25,8 @@ ActiveAdmin.register Round do
     render "admin/rounds/start_list", round: round
     render "admin/rounds/status", round: round
     render "admin/rounds/round_details", round: round
+    page_call = params[:page] || "config_times"
+    div id: "round_menu_page_call", data: { page_call: page_call }
   end
 
 

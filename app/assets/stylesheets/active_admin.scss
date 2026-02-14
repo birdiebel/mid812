@@ -15,6 +15,12 @@
 // For example, to change the default status-tag color:
 //
 
+.flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px 0 !important;
+}
 
 .status_tag { background: lightblue; color: black; padding: 4px 8px; }
 

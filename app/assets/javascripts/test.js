@@ -1,22 +1,45 @@
-$(document).ready(function () {
+function initMenuButtons() {
   const $buttons = $(".menu-event-button")
   if ($buttons.length === 0) return
 
-  CallMenu = $buttons.parent().attr("name")
+  const callMenu = $buttons.parent().attr("name")
+  let sections = []
 
-  if (CallMenu == "event-menu") {
+  if (callMenu == "event-menu") {
     sections = ["#event-entries", "#rounds", "#ldb", "#courses", "#player-categories", "#event-status", "#event-details"]
   }
-  if (CallMenu == "round-menu") {
+  if (callMenu == "round-menu") {
     sections = [ "#config-times", "#start-list", "#scores-round", "#status", "#round-details"]
+  }
+
+  if (sections.length === 0) return
+
+  function normalizeMenuTarget(rawTarget) {
+    if (!rawTarget) return null
+
+    const aliases = {
+      config_times: "config-times",
+      config_teetime: "config-times",
+      start_list: "start-list",
+      round_details: "round-details",
+      scores_round: "scores-round",
+      event_entries: "event-entries",
+      player_categories: "player-categories",
+      event_status: "event-status",
+      event_details: "event-details"
+    }
+
+    let target = String(rawTarget).trim().replace(/^#/, "")
+    target = aliases[target] || target.replace(/_/g, "-")
+    return `#${target}`
   }
 
   function showSection(target) {
     sections.forEach((selector) => {
       if (selector === target) {
-        $(selector).css('display', 'block')
+        $(selector).removeAttr("hidden").css("display", "block")
       } else {
-        $(selector).css('display', 'none')
+        $(selector).attr("hidden", true).css("display", "none")
       }
     })
   }
@@ -26,7 +49,7 @@ $(document).ready(function () {
     $buttons.filter(`[data-target="${target}"]`).addClass("is-active")
   }
 
-  $buttons.on("click", function (event) {
+  $buttons.off("click.menu").on("click.menu", function (event) {
     event.preventDefault()
     const target = $(this).data("target")
     if (!target) return
@@ -37,6 +60,15 @@ $(document).ready(function () {
 
   // Check if there's a hash in the URL, otherwise use the first section
   let initial = sections[0]
+
+  const pageCall =
+    $("#round_menu_page_call").data("page_call") ||
+    $("#event_menu_page_call").data("page_call")
+  const pageCallTarget = normalizeMenuTarget(pageCall)
+
+  if (pageCallTarget && sections.includes(pageCallTarget)) {
+    initial = pageCallTarget
+  }
   
   if (window.location.hash && sections.includes(window.location.hash)) {
     initial = window.location.hash
@@ -44,7 +76,10 @@ $(document).ready(function () {
   
   showSection(initial)
   setActive(initial)
-})
+}
+
+$(document).ready(initMenuButtons)
+$(document).on("turbo:load", initMenuButtons)
 
 // Filter playercats checkboxes by event format
 $(document).ready(function() {

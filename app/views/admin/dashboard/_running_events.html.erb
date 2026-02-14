@@ -1,0 +1,30 @@
+<% Event.where(status: "running").each do |event| %>
+  <!-- Event -->
+  <div class="flex-between" style="background-color: yellow;">
+    <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @ 
+      <%= event.date_event&.strftime("%A %d-%b-%Y") %> |
+      <%= event.tour.name %>
+    </h4>
+    <div>
+      <%= link_to "Open", admin_tour_event_path(event.tour, event), class: "btt btt-edit" %>
+    </div>
+  </div>
+
+  <!-- Rounds -->
+  <div style="margin-left: 20px; background-color: lightblue; padding-top: 0px;">
+    <% event.rounds.order(:num).each do |round| %>
+      <div class="flex-between" style="background-color: lightgreen;">
+        <h5 style="margin: 5px; padding: 5px;">Round <%= round.num %> - <%= round.status %></h5>
+        <div>
+          <% if round.status=="pending" %>
+            <%= link_to "Start List" ,admin_round_path(round, page: "start_list"), class: "btt btt-start-list" %>
+          <% end %>
+          <% if round.status == "running" %>
+            <%= link_to "Scoring" , scoring_admin_round_path(round), class: "btt btt-scoring" %>
+          <% end %>
+          <%= link_to "Open", admin_round_path(round), class: "btt btt-edit" %>
+        </div>
+      </div>        
+    <% end %>
+  </div>
+<% end %>
