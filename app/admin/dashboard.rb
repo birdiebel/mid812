@@ -16,6 +16,12 @@ ActiveAdmin.register_page "Dashboard" do
         panel "Running Events" do
           render "admin/dashboard/running_events"
         end
+        panel "On Line Events" do
+          render "admin/dashboard/online_events"
+        end
+        panel "Futures Events" do
+          render "admin/dashboard/created_events"
+        end
       end
 
       column do

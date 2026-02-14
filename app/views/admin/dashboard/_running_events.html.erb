@@ -1,21 +1,32 @@
 <% Event.where(status: "running").each do |event| %>
   <!-- Event -->
-  <div class="flex-between" style="background-color: yellow;">
+  <div class="flex-between" style="background-color: yellow; border-bottom: 1px solid black;">
     <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @ 
       <%= event.date_event&.strftime("%A %d-%b-%Y") %> |
       <%= event.tour.name %>
     </h4>
     <div>
-      <%= link_to "Open", admin_tour_event_path(event.tour, event), class: "btt btt-edit" %>
+      <% if event.status == "running" %>
+        <%= link_to "Open", admin_tour_event_path(event.tour, event, page: "ldb"), class: "btt btt-open" %>
+      <% end %>
+      <% if event.status=="registration" %>
+        <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "event-entries" ), class: "btt btt-open" %>
+      <% end %>
+      <% if event.status == "created" || event.status == "pending" %>
+        <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "rounds" ), class: "btt btt-open" %>
+      <% end %>
     </div>
   </div>
 
   <!-- Rounds -->
-  <div style="margin-left: 20px; background-color: lightblue; padding-top: 0px;">
+  <div style="margin-left: 20px; ">
     <% event.rounds.order(:num).each do |round| %>
-      <div class="flex-between" style="background-color: lightgreen;">
-        <h5 style="margin: 5px; padding: 5px;">Round <%= round.num %> - <%= round.status %></h5>
+      <div class="flex-between" style="border-bottom: 1px solid black;">
+        <h5 style="margin: 5px; padding: 5px;">Round <%= round.num %> - <%= round.status.upcase %></h5>
         <div>
+          <% if round.status=="created" %>
+            <%= link_to "Config teetimes" ,admin_round_path(round, page: "config_teetimes" ), class: "btt btt-config-teetimes" %>
+          <% end %>
           <% if round.status=="pending" %>
             <%= link_to "Start List" ,admin_round_path(round, page: "start_list"), class: "btt btt-start-list" %>
           <% end %>

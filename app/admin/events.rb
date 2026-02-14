@@ -44,6 +44,8 @@ ActiveAdmin.register Event do
     render "admin/events/event_details", event: event
     render "admin/events/event_status", event: event
     render "admin/events/ldb", event: event
+    page_call = params[:page] || "entries"
+    div id: "round_menu_page_call", data: { page_call: page_call }
   end
 
   form do |f|
