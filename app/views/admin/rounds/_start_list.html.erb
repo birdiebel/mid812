@@ -1,11 +1,11 @@
 <div id="start-list" class="round-menu-section" data-turbo-cache="false" hidden>
   <div class="panel" style="text-align: center;">
     <h3>Start List</h3>
-    <div class="flex-container" style="gap: 20px; justify-content: center; align-items: flex-start;">
-      <div>
+    <div class="flex-container" style="gap: 20px; justify-content: center; align-items: stretch; height: 70vh;">
+      <div style="height: 100%;">
         <%= render partial: "admin/rounds/start_list_flights", locals: { round: @round }, cache: false %>
       </div>
-      <div>
+      <div style="height: 100%;">
         <%= render partial: "admin/rounds/start_list_entries", locals: { round: @round } %>
       </div>
     </div>

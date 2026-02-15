@@ -1,7 +1,7 @@
-<div id="flights" style="width: 500px;">
-  <div class="panel">
+<div id="flights" style="width: 500px; height: 100%;">
+  <div class="panel" style="height: 100%; display: flex; flex-direction: column;">
     <h3>Flights</h3>
-    <div class="panel_contents" style="overflow-y: auto; height: 400px;">
+    <div class="panel_contents" style="overflow-y: auto; flex: 1; min-height: 0;">
       <% round.config_teetimes.each do |config| %>
         <div class="config-section">
           <h4 style="background-color: green; color: white; padding: 5px; font-weight: bold;"><%= config.course.name %> - Hole <%= config.start_hole %></h4>
