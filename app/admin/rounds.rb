@@ -17,6 +17,19 @@ ActiveAdmin.register Round do
     @round = Round.find(params[:id])
   end
 
+  member_action :pdf_start_list, method: :get do
+    @round = Round.find(params[:id])
+    respond_to do |format|
+      format.html
+      format.pdf do
+        render pdf: "start_list_pdf",   # Excluding ".pdf" extension.
+               template: "admin/rounds/pdf_start_list",
+               formats: [ :html ],
+               layout: "pdf" # Optional, use 'pdf' to render app/views/layouts/pdf.html.erb
+      end
+    end
+  end
+
   myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date} | #{round.status.upcase}" }
 
   show title: myTitle do

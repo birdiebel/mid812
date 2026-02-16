@@ -4,5 +4,6 @@ Rails.application.config.dartsass.builds = {
   "buttons.scss"       => "buttons.css",
   "colors.scss"        => "colors.css",
   "scorecards.scss"    => "scorecards.css",
-  "start_lists.scss"   => "start_lists.css"
+  "start_lists.scss"   => "start_lists.css",
+  "pdf.scss"           => "pdf.css"
 }

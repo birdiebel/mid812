@@ -1,0 +1,58 @@
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+h1 {
+  color: #2563eb;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.pdf-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  width: auto;
+  table-layout: auto;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+th {
+  background-color: #2563eb;
+  color: white;
+  padding: 12px;
+  text-align: left;
+  font-weight: bold;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  white-space: nowrap !important;
+  width: fit-content !important;
+  text-align: center;
+}
+
+tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+tr:hover {
+  background-color: #f3f4f6;
+}
+
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.summary {
+  margin-bottom: 20px;
+  padding: 10px;
+  background-color: #eff6ff;
+  border-left: 4px solid #2563eb;
+}

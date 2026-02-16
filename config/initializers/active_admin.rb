@@ -229,6 +229,7 @@ ActiveAdmin.setup do |config|
     config.register_stylesheet "colors.css"
     config.register_stylesheet "scorecards.css"
     config.register_stylesheet "start_lists.css"
+    config.register_stylesheet "pdf.css"
   #
   # You can provide an options hash for more control, which is passed along to stylesheet_link_tag():
   #   config.register_stylesheet 'my_print_stylesheet.css', media: :print

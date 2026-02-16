@@ -62,7 +62,10 @@ class Team < ApplicationRecord
   end
 
   def team_name
-    entries.map { |e| e.player.full_name }.join(" / ")
+    entries.map {
+      |e|
+      "<b>#{e.player.full_name}</b> (#{e.hcp}) | #{e.licence.club}".html_safe
+    }.join(" / ").html_safe
   end
 
   def update_resultcat

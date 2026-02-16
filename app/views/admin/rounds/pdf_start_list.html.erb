@@ -1,0 +1,66 @@
+<% round = @round %>
+<% event = round.event %>
+<div style="text-align: center; margin-bottom: 20px;">
+  <p style="font-weight: bold;">
+    <%= event.name %> - Round <%= round.num %> - <%= round.date&.strftime("%A %d-%b-%Y") %> : Start List 
+  </p>
+</div>
+<div>
+  <table class="pdf-table">
+    <thead>
+      <tr>
+        <th>Hole</th>
+        <th></th>
+        <th>Team</th>
+        <th>P.Hcp</th>
+        <th>Tee</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% prev_time = nil %>
+      <% prev_hole = nil %>
+      <% round.slots.each do |slot| %>
+        <!-- changement de start_hole -->
+          <% if prev_hole != slot.flight.config_teetime.start_hole %>
+            <tr>
+              <td colspan="5" style="text-align: left; background-color: lightgray;">
+                Start from Hole <%= slot.flight.config_teetime.start_hole %> |
+                Course: <%= slot.flight.config_teetime.course.name %>
+              </td>
+          </tr>
+          <% end %>  
+          <!-- infos row -->
+          <tr>
+            <!--  Start_hole & Time -->
+            <% if prev_time != slot.flight.myTime %>
+              <td><%= slot.flight.config_teetime.start_hole %></td>
+              <td><%= slot.flight.myTime %></td>
+            <% else %>
+              <td>&nbsp;</td>
+              <td>&nbsp;</td>
+            <% end %>
+            <!-- Team -->
+            <% if slot.team %>
+              <td style="text-align: left;"><%= slot.team.team_name %></td>
+            <% else %>
+              <td>&nbsp;</td><td>&nbsp;</td>
+            <% end %>
+            <!-- P.Hcp -->
+            <% if slot.team %>
+              <td><%= slot.team.entries.first.playing_hcp %></td>
+            <% else %>
+              <td>&nbsp;</td>
+            <% end %>
+            <!-- Tee -->
+             <% if slot.team %>
+              <td><%= slot.team.entries.first.playercat.teebox %></td>
+            <% else %>
+              <td>&nbsp;</td>
+            <% end %>
+            <% prev_time = slot.flight.myTime %>
+            <% prev_hole = slot.flight.config_teetime.start_hole %>
+          </tr>
+      <% end %>
+    </tbody>
+  </table>  
+</div>

@@ -1,6 +1,9 @@
 <div id="start-list" class="round-menu-section" data-turbo-cache="false" hidden>
   <div class="panel" style="text-align: center;">
     <h3>Start List</h3>
+    <div>
+      <%= link_to "PDF Start List", pdf_start_list_admin_round_path(@round, format: :pdf), class: "button" %>
+    </div>
     <div class="flex-container" style="gap: 20px; justify-content: center; align-items: stretch; height: 70vh;">
       <div style="height: 100%;">
         <%= render partial: "admin/rounds/start_list_flights", locals: { round: @round }, cache: false %>
