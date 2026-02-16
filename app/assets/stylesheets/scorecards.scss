@@ -53,6 +53,7 @@
     font-weight: bold;
     padding: 4px 8px;
     margin: 2px;
+    border-bottom: 1px solid black !important;
 }   
 .scoring-sp {
     background-color: lightgreen;
@@ -74,7 +75,7 @@
 }
 
 .scoring-partial {
-    background-color: rgb(231, 233, 147);
+    background-color: rgb(253, 249, 210);
     color: black;
 }
 
@@ -94,7 +95,9 @@
 }
 
 .table-scoring {
-    overflow-y: visible !important;
-    height: auto !important;
-    display: table !important;
+    display: inline-table !important;
+    border-collapse: separate!important;
+    tr {
+        border-bottom: 1px solid black !important;
+    }
 }

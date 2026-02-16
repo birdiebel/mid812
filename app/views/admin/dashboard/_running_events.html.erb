@@ -1,6 +1,6 @@
 <% Event.where(status: "running").each do |event| %>
   <!-- Event -->
-  <div class="flex-between" style="background-color: yellow; border-bottom: 1px solid black;">
+  <div class="flex-between" style="background-color: lightyellow; border-bottom: 1px solid lightgrey;">
     <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @ 
       <%= event.date_event&.strftime("%A %d-%b-%Y") %> |
       <%= event.tour.name %>
@@ -21,7 +21,7 @@
   <!-- Rounds -->
   <div style="margin-left: 20px; ">
     <% event.rounds.order(:num).each do |round| %>
-      <div class="flex-between" style="border-bottom: 1px solid black;">
+      <div class="flex-between" style="border-bottom: 1px solid lightgrey;">
         <h5 style="margin: 5px; padding: 5px;">Round <%= round.num %> - <%= round.status.upcase %></h5>
         <div>
           <% if round.status=="created" %>

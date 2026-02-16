@@ -47,7 +47,7 @@
             <% scoring_class = "scoring-#{score.status}" if score %>
 
             <!-- Ligne TeamScore -->
-            <tr id="<%= tr_id %>" class="<%= scoring_class %>">
+            <tr id="<%= tr_id %>" class="<%= scoring_class %>"> 
               <td><%= slot.flight.myTime %></td>
               <td><%= slot.flight.config_teetime.start_hole %></td>
               <td class="team-num"><%= slot.team.num %></td>
