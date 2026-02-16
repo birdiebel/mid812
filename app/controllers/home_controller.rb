@@ -7,8 +7,9 @@ class HomeController < ApplicationController
       format.html
       format.pdf do
         render pdf: "test_pdf",   # Excluding ".pdf" extension.
-               template: "home/test_pdf.html.erb",
-               layout: "pdf.html" # Optional, use 'pdf.html' for a custom layout
+               template: "home/test_pdf",
+               formats: [ :html ],
+               layout: "pdf" # Optional, use 'pdf' to render app/views/layouts/pdf.html.erb
       end
     end
   end
