@@ -76,6 +76,8 @@ gem "jquery-rails"
 gem "faker"
 gem "amoeba"
 gem "rails-i18n"
+gem "wicked_pdf"
+gem "wkhtmltopdf-binary"
 
 group :development do
   gem "rails_live_reload"

@@ -2,6 +2,17 @@ class HomeController < ApplicationController
   def index
   end
 
+  def test_pdf
+    respond_to do |format|
+      format.html
+      format.pdf do
+        render pdf: "test_pdf",   # Excluding ".pdf" extension.
+               template: "home/test_pdf.html.erb",
+               layout: "pdf.html" # Optional, use 'pdf.html' for a custom layout
+      end
+    end
+  end
+
   def loadadmin
     if user_signed_in? && current_user.role == "admin"
       redirect_to(admin_dashboard_path)

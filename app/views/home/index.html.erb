@@ -6,7 +6,9 @@
   </p>
 </div>
 <div class="text-2xl">
-  <% if user_signed_in? && current_user.role=="admin" %> <%= link_to "Admin" ,  admin_path %>
+  <% if user_signed_in? && current_user.role=="admin" %>
+    <%= link_to "Admin" ,  admin_path %>
+    <%= link_to "Test PDF" ,  home_test_pdf_path, target: "_blank" %>
   <% end %>
 </div>
 <div class="text-2xl">

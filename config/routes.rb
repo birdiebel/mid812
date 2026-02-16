@@ -12,6 +12,7 @@ Rails.application.routes.draw do
 
   ActiveAdmin.routes(self)
   get "home/index"
+  get "home/test_pdf", to: "home#test_pdf", defaults: { format: "pdf" }
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
