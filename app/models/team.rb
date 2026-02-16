@@ -61,10 +61,24 @@ class Team < ApplicationRecord
     entries.sum(:hcp)
   end
 
+  def team_nameXXX
+    entries.map {
+      |e|
+      "<div style='display: flex; justify-content: center; align-items: center; gap: 5px;'>
+          <b>#{e.player.full_name}</b> (#{e.hcp}) | #{e.licence.club} | #{e.playercat&.icon_teebox}
+      </div>"
+    }.join("<br/>").html_safe
+  end
+
   def team_name
     entries.map {
       |e|
-      "<b>#{e.player.full_name}</b> (#{e.hcp}) | #{e.licence.club}"
+      "
+          <div style='display: flex; justify-content: center; align-items: center; gap: 5px; margin-bottom: -15px;'>
+            <b>#{e.player.full_name}</b>
+            (#{e.hcp}) | #{e.licence.club} | #{e.playercat&.icon_teebox}
+          </div>
+      "
     }.join("<br/>").html_safe
   end
 

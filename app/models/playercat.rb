@@ -21,6 +21,7 @@ class Playercat < ApplicationRecord
   def teebox_index
     self.teebox.index
   end
+
   def icon_teebox
     tee_boxcolor = self.teebox.downcase
     "<div class='bloc-teebox "+tee_boxcolor+"'></div>".html_safe
@@ -28,6 +29,6 @@ class Playercat < ApplicationRecord
 
   def icon_teebox_span
     tee_boxcolor = self.teebox.downcase
-    "<span class='bloc-teebox "+tee_boxcolor+"'></span>".html_safe
+    "<span class='bloc-teebox-span "+tee_boxcolor+"'></span>".html_safe
   end
 end
