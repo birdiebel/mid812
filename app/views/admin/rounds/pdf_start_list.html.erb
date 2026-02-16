@@ -12,8 +12,10 @@
         <th>Hole</th>
         <th></th>
         <th>Team</th>
-        <th>P.Hcp</th>
         <th>Tee</th>
+        <th>P.Hcp</th>
+        <th>Cat</th>
+        <th>Scoring</th>
       </tr>
     </thead>
     <tbody>
@@ -23,7 +25,7 @@
         <!-- changement de start_hole -->
           <% if prev_hole != slot.flight.config_teetime.start_hole %>
             <tr>
-              <td colspan="5" style="text-align: left; background-color: lightgray;">
+              <td colspan="6" style="text-align: left; background-color: lightgray;">
                 Start from Hole <%= slot.flight.config_teetime.start_hole %> |
                 Course: <%= slot.flight.config_teetime.course.name %>
               </td>
@@ -41,22 +43,45 @@
             <% end %>
             <!-- Team -->
             <% if slot.team %>
-              <td style="text-align: left;"><%= slot.team.team_name %></td>
+              <td style="text-align: left;"><%= slot.team.team_name_pdf %></td>
             <% else %>
               <td>&nbsp;</td><td>&nbsp;</td>
             <% end %>
-            <!-- P.Hcp -->
-            <% if slot.team %>
-              <td><%= slot.team.entries.first.playing_hcp %></td>
-            <% else %>
-              <td>&nbsp;</td>
-            <% end %>
+          
             <!-- Tee -->
              <% if slot.team %>
-              <td><%= slot.team.entries.first.playercat.teebox %></td>
+              <td><%= slot.team.team_teebox_pdf %></td>
             <% else %>
               <td>&nbsp;</td>
             <% end %>
+
+            <!-- P.Hcp -->
+            <% if slot.team %>
+              <td>
+                <%= slot.team.entries.first.playing_hcp %>
+              </td>
+              <% else %>
+                <td>&nbsp;</td>
+            <% end %>
+
+            <!-- Cat -->
+            <% if slot.team %>
+              <td>
+                <%= slot.team.resultcat&.name %>
+              </td>
+            <% else %>
+              <td>&nbsp;</td>
+            <% end %>
+
+            <!-- Scoring -->
+            <% if slot.team %>
+              <td>
+                <%= slot.team.resultcat&.scoring_name %>
+              </td>
+            <% else %>
+              <td>&nbsp;</td>
+            <% end %>
+
             <% prev_time = slot.flight.myTime %>
             <% prev_hole = slot.flight.config_teetime.start_hole %>
           </tr>

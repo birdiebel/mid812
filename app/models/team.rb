@@ -64,8 +64,22 @@ class Team < ApplicationRecord
   def team_name
     entries.map {
       |e|
-      "<b>#{e.player.full_name}</b> (#{e.hcp}) | #{e.licence.club}".html_safe
+      "<b>#{e.player.full_name}</b> (#{e.hcp}) | #{e.licence.club}"
     }.join(" / ").html_safe
+  end
+
+  def team_name_pdf
+    entries.map {
+      |e|
+      "<b>#{e.player.full_name}</b> (#{e.hcp}) | #{e.licence.club}"
+    }.join("</br>").html_safe
+  end
+
+  def team_teebox_pdf
+    entries.map {
+      |e|
+      "#{e.playercat.teebox} "
+    }.join("</br>").html_safe
   end
 
   def update_resultcat

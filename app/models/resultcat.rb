@@ -30,4 +30,15 @@ class Resultcat < ApplicationRecord
       ""
     end
   end
+
+  def scoring_name
+    case scoring
+    when "stroke_play"
+      "Stroke Play"
+    when "stableford"
+      "Stableford"
+    else
+      ""
+    end
+  end
 end
