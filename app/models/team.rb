@@ -65,7 +65,7 @@ class Team < ApplicationRecord
     entries.map {
       |e|
       "<b>#{e.player.full_name}</b> (#{e.hcp}) | #{e.licence.club}"
-    }.join(" / ").html_safe
+    }.join("<br/>").html_safe
   end
 
   def team_name_pdf
