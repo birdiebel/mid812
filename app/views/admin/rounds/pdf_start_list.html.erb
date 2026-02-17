@@ -21,7 +21,7 @@
     <tbody>
       <% prev_time = nil %>
       <% prev_hole = nil %>
-      <% round.slots.each do |slot| %>
+      <% round.slots.joins(flight: :config_teetime).includes(flight: { config_teetime: :course }).order('flights.num ASC, config_teetimes.start_hole ASC, slots.num ASC').each do |slot| %>
         <!-- changement de start_hole -->
           <% if prev_hole != slot.flight.config_teetime.start_hole %>
             <tr>

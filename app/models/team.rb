@@ -61,6 +61,10 @@ class Team < ApplicationRecord
     entries.sum(:hcp)
   end
 
+  def team_name_short
+    entries.map { |e| e.player.full_name }.join(" & ")
+  end
+
   def team_nameXXX
     entries.map {
       |e|

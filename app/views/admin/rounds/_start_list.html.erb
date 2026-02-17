@@ -228,17 +228,15 @@ function updateSlotUI(slotId, slotData) {
     const iconTeebox = p.playercat?.icon_teebox || '';
 
     return `<div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-      <div><strong>PHCP: ${playingHcp}</strong></div>
-      <div>|</div>
-      <div>${iconTeebox}</div>
-    </div>`;
-  }).join('');
+            <div>HCP: ${team.total_hcp}</div>
+            </div>`;
+          }).join('');
 
   // Construire le HTML final du slot
   slotElement.innerHTML = `
     <strong>${teamName}</strong>
     <br>
-    ${entriesHtml}
+    ${team.total_hcp}
   `;
 
   // Mettre à jour les data attributes

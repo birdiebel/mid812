@@ -11,7 +11,7 @@
     <table class="index_table entries-table-teams">
     <tbody>
         <% teams.each do |team| %>
-        <% team_name = team.team_name %>
+        <% team_name = team.team_name_short %>
         <tr style="border-top: 2px solid black;" class="team-header-row" data-name="<%= team_name %>" data-team-id="<%= team.id %>">
             <td></td>
             <td style="background-color: lightgreen;"><strong><%= team_name.presence || team.name %></strong></td>

@@ -13,7 +13,10 @@ ActiveAdmin.register Slot do
   index do
     column "Num", :num
     column "Flight", :flight
-    column "Team", :team
+    column "Team ID", :team_id
+    column "Team" do |slot|
+      slot.team ? slot.team.team_name_short : "No team assigned"
+    end
     column "Playing HCP", :playing_hcp
     column "" do |slot|
       button_to "Edit", edit_admin_slot_path(slot), method: :get, class: "btt btt-edit"
@@ -26,7 +29,7 @@ ActiveAdmin.register Slot do
       li do
         label "Team"
         div do
-          text_node f.object.team ? f.object.team.name : "No team assigned"
+          text_node f.object.team ? f.object.team.team_name_short : "No team assigned"
         end
       end
       f.input :num, as: :number

@@ -35,6 +35,8 @@ class Entry < ApplicationRecord
       status: team_status
     )
     update(team: team)
+    team_name = team.entries.map { |e| e.player.full_name }.join(" & ")
+    team.update_column(:name, team_name)
   end
 
   def add_licence_to_entry
