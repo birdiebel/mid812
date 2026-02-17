@@ -2,7 +2,7 @@
   <h3><%= @round.event.name %> : round <%= @round.num %> on <%= @round.date %></h3>
   <div class="panel_contents">
     <% round = @round %>
-    <% slots = round.config_teetimes.flat_map { |ct| ct.flights.flat_map(&:slots) }.select { |s| s.team.present? }.sort_by { |s| [s.flight.flight_time, s.team.num] } %>
+    <% slots = @slots || round.scoring_slots %>
 
     <% if slots.any? %>
       <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
@@ -37,23 +37,14 @@
         <tbody>
           <% slots.each do |slot| %>
             <% team=slot.team %>
-            <% team_score = TeamScore.find_or_create_by(team: slot.team, round: round) %>
-            <% team_score.recalculate! if team_score.persisted? && team_score.brut_total.nil? %>
+            <% team_score = @team_scores_by_team_id[team.id] %>
             <% scoring_class = "scoring-#{slot.team.resultcat&.scoring_short.downcase}" %>
             <% scoring_mode = slot.team.resultcat&.scoring_short.downcase %>
 
-            <!-- Create or find score table for each entry of the team -->
-            <% team.entries.each do |entry| %>
-              <% score_entry = Score.find_or_create_by(round: round, entry: entry) do |s| %>
-                <% s.slot = slot %>
-                <% s.status = :pending %>
-              <% end %>
-              <% score_entry.update_column(:slot_id, slot.id) if score_entry.slot_id != slot.id %>
-            <% end %>
-
             <!-- Get first entry's score -->
-            <% score = team.entries.first.scores.find_by(round: round) %>
-            <%= puts "Score for team #{team.id} (#{team.team_name_short}): #{score.id}" %>
+            <% first_entry_id = team.entries.first&.id %>
+            <% score = @scores_by_entry_id[first_entry_id] %>
+            <% next unless score %>
 
             <% tr_id = "team-score-#{score.id}" %>
             <% scoring_class = "scoring-#{team_score.status}" if team_score %>

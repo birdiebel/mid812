@@ -27,4 +27,28 @@ class Round < ApplicationRecord
       "<span class='is_green'>Start list looks complete (#{slots_taked} slots occupied for #{event.entries_valid} valid entries)</span>".html_safe
     end
   end
+
+  def scoring_slots
+    config_teetimes
+      .includes(flights: { slots: { team: [ :entries, :resultcat ] } })
+      .flat_map { |config_teetime| config_teetime.flights.flat_map(&:slots) }
+      .select { |slot| slot.team.present? }
+      .sort_by { |slot| [ slot.flight.flight_time, slot.team.num ] }
+  end
+
+  def ensure_scores_for_scoring!
+    scoring_slots.each do |slot|
+      slot.team.entries.each do |entry|
+        score = scores.find_or_initialize_by(entry_id: entry.id)
+
+        if score.new_record?
+          score.slot = slot
+          score.status ||= :pending
+          score.save!
+        elsif score.slot_id != slot.id
+          score.update_columns(slot_id: slot.id, updated_at: Time.current)
+        end
+      end
+    end
+  end
 end

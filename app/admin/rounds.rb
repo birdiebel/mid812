@@ -15,6 +15,21 @@ ActiveAdmin.register Round do
   # end
   member_action :scoring, method: :get do
     @round = Round.find(params[:id])
+    @round.ensure_scores_for_scoring!
+    @slots = @round.scoring_slots
+
+    team_ids = @slots.map(&:team_id).compact.uniq
+    team_ids.each do |team_id|
+      TeamScore.find_or_create_by(team_id: team_id, round: @round)
+    end
+
+    @team_scores_by_team_id = TeamScore.where(round: @round, team_id: team_ids).index_by(&:team_id)
+    @team_scores_by_team_id.each_value do |team_score|
+      team_score.recalculate! if team_score.brut_total.nil?
+    end
+
+    first_entry_ids = @slots.map { |slot| slot.team.entries.first&.id }.compact
+    @scores_by_entry_id = Score.where(round: @round, entry_id: first_entry_ids).index_by(&:entry_id)
   end
 
   member_action :start_list, method: :get do
