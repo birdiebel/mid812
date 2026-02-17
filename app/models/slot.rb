@@ -118,7 +118,7 @@ class Slot < ApplicationRecord
     end
   end
 
-  def playing_hcp_single(entry)
+  def playing_hcp_single(entry, round_result: true)
     return nil unless entry
     # Teams
     # team = entry.team
@@ -143,7 +143,8 @@ class Slot < ApplicationRecord
     hcp_pd = hcp_pc.to_f / 100.0
     if rating && slope
       # Compute playing_hcp
-      hcp = (((hcp * slope) / 113.0 + (rating - par)) * hcp_pd).round
+      hcp = (((hcp * slope) / 113.0 + (rating - par)) * hcp_pd)
+      hcp = hcp.round if round_result
     end
     # return hcp with adjustment hcp_pc
     hcp
@@ -160,32 +161,14 @@ class Slot < ApplicationRecord
 
   def playing_hcp_greensome(team)
     return nil unless team
-    # Get total HCP
-    total_hcp = team.total_hcp
-    return nil unless total_hcp
 
-    # Get teebox from first entry (assuming same teebox for team)
-    first_entry = team.entries.first
-    teebox_name = first_entry&.playercat&.teebox
-    return total_hcp unless teebox_name
+    individual_playing_hcps = team.entries.first(2).map do |entry|
+      playing_hcp_single(entry, round_result: false)
+    end.compact
+    return nil unless individual_playing_hcps.size == 2
 
-    # Course
-    course = self.flight&.config_teetime&.course
-    tee = course&.tees&.find_by(teebox: teebox_name)
-    return total_hcp unless tee
-
-    # rating and slope du teebox
-    rating = tee.rating
-    slope = tee.slope
-    par = tee.sum_str("par_str")
-    if rating && slope
-      # Compute playing_hcp based on total team hcp
-      playing_hcp = ((total_hcp * slope) / 113.0 + (rating - par)).round
-    else
-      playing_hcp = total_hcp
-    end
-
-    playing_hcp
+    low_hcp, high_hcp = individual_playing_hcps.sort
+    ((low_hcp * 0.6) + (high_hcp * 0.4)).round
   end
 
   def normalize_formula_key(formula_name)
