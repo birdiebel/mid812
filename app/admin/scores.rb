@@ -58,7 +58,7 @@ ActiveAdmin.register Score do
       row :round
       row :slot
       row :entry do |score|
-        score.entry.player.full_name
+        score.entry&.player&.full_name || "N/A"
       end
       row :status
       row :hole_played

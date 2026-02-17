@@ -1,11 +1,11 @@
 class Score < ApplicationRecord
   belongs_to :round
-  belongs_to :slot
-  belongs_to :entry
+  belongs_to :slot, optional: true
+  belongs_to :entry, optional: true
 
   accepts_nested_attributes_for :slot
 
-  enum :status, { pending: 0, partial: 2, completed: 3, invalide: 4 }
+  enum :status, { pending: 0, partial: 1, completed: 2, invalide: 3 }
 
   before_validation :assign_start_hole, if: -> { start_hole.blank? }
   before_save :calculate_recu_str

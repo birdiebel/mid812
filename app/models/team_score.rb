@@ -2,8 +2,9 @@ class TeamScore < ApplicationRecord
   belongs_to :team
   belongs_to :round
 
-  enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
-  # enum :status, { partial: 0, complete: 1, validated: 2, dnf: 3, dns: 4, dsq: 5 }
+  # enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
+  enum :status, { pending: 0, partial: 1, completed: 2, invalide: 3 }
+
 
   validates :team_id, uniqueness: { scope: :round_id }
 
@@ -40,7 +41,7 @@ class TeamScore < ApplicationRecord
     scoring_mode = self.team&.resultcat&.scoring
     return unless formula
 
-    # new_status = :enter # Valeur par défaut
+    # new_status = :pending # Valeur par défaut
 
     if score_status.present? && scoring_mode == "stroke_play" && score_status == "invalide"
       self.team.status = :disqualified
@@ -53,8 +54,7 @@ class TeamScore < ApplicationRecord
     puts "Setting team #{team_id} status to #{self.team.status} due to score status #{score_status}"
 
     # Update le status du team si fourni
-    self.status = self.team.status
-
+    self.status = score_status if score_status.present?
     case formula.nb_cards
     when 1
       # Single/Foursome/Greensome: copie du score unique
@@ -107,7 +107,7 @@ class TeamScore < ApplicationRecord
       return unless score
 
       self.hole_played = score.hole_played || 0
-      self.status = team.status
+      self.status = score.status || :pending
       self.brut_total = score.brut("total").to_i
       self.net_total = score.net("total").to_i
       self.stb_total = score.stb("total").to_i

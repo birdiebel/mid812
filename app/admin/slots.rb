@@ -11,6 +11,7 @@ ActiveAdmin.register Slot do
   config.sort_order = "flight_id_asc"
 
   index do
+    column "Idx", :id
     column "Num", :num
     column "Flight", :flight
     column "Team ID", :team_id
@@ -44,12 +45,15 @@ ActiveAdmin.register Slot do
   controller do
     def update
       @slot = Slot.find(params[:id])
+      puts "Received update for Slot #{@slot.id}: #{permitted_params[:slot].inspect}"
       if @slot.update(permitted_params[:slot])
+        puts "Successfully updated Slot #{@slot.id}"
         respond_to do |format|
           format.html { redirect_to admin_slot_path(@slot), notice: "Slot was successfully updated." }
           format.json { render json: { success: true } }
         end
       else
+        puts "Failed to update Slot #{@slot.id}: #{@slot.errors.full_messages.join(', ')}"
         respond_to do |format|
           format.html { render :edit }
           format.json { render json: { success: false, errors: @slot.errors }, status: :unprocessable_entity }

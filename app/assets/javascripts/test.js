@@ -9,7 +9,7 @@ function initMenuButtons() {
     sections = ["#event-entries", "#rounds", "#ldb", "#courses", "#player-categories", "#event-status", "#event-details"]
   }
   if (callMenu == "round-menu") {
-    sections = [ "#config-times", "#start-list", "#scores-round", "#status", "#round-details"]
+    sections = [ "#config-times", "#scores-round", "#status", "#round-details"]
   }
 
   if (sections.length === 0) return
@@ -20,7 +20,6 @@ function initMenuButtons() {
     const aliases = {
       config_times: "config-times",
       config_teetime: "config-times",
-      start_list: "start-list",
       round_details: "round-details",
       scores_round: "scores-round",
       event_entries: "event-entries",
@@ -50,9 +49,10 @@ function initMenuButtons() {
   }
 
   $buttons.off("click.menu").on("click.menu", function (event) {
-    event.preventDefault()
     const target = $(this).data("target")
     if (!target) return
+
+    event.preventDefault()
 
     showSection(target)
     setActive(target)

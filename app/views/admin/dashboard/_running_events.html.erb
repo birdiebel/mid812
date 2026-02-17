@@ -1,7 +1,7 @@
 <% Event.where(status: "running").each do |event| %>
   <!-- Event -->
   <div class="flex-between" style="background-color: lightyellow; border-bottom: 1px solid lightgrey;">
-    <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @ 
+    <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @
       <%= event.date_event&.strftime("%A %d-%b-%Y") %> |
       <%= event.tour.name %>
     </h4>
@@ -28,14 +28,14 @@
             <%= link_to "Config teetimes" ,admin_round_path(round, page: "config_teetimes" ), class: "btt btt-config-teetimes" %>
           <% end %>
           <% if round.status=="pending" %>
-            <%= link_to "Start List" ,admin_round_path(round, page: "start_list"), class: "btt btt-start-list" %>
+            <%= link_to "Start List" , start_list_admin_round_path(round), class: "btt btt-start-list" %>
           <% end %>
           <% if round.status == "running" %>
             <%= link_to "Scoring" , scoring_admin_round_path(round), class: "btt btt-scoring" %>
           <% end %>
           <%= link_to "Open", admin_round_path(round), class: "btt btt-edit" %>
         </div>
-      </div>        
+      </div>
     <% end %>
   </div>
 <% end %>

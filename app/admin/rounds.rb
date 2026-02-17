@@ -17,6 +17,10 @@ ActiveAdmin.register Round do
     @round = Round.find(params[:id])
   end
 
+  member_action :start_list, method: :get do
+    @round = Round.find(params[:id])
+  end
+
   member_action :pdf_start_list, method: :get do
     @round = Round.find(params[:id])
     respond_to do |format|
@@ -35,7 +39,6 @@ ActiveAdmin.register Round do
   show title: myTitle do
     render "admin/rounds/menu", round: round
     render "admin/rounds/config_times", round: round
-    render "admin/rounds/start_list", round: round
     render "admin/rounds/status", round: round
     render "admin/rounds/round_details", round: round
     page_call = params[:page] || "config_times"
@@ -71,7 +74,7 @@ ActiveAdmin.register Round do
   end
 
   controller do
-    before_action :prepare_start_list_data, only: :show
+    before_action :prepare_start_list_data, only: [ :show, :start_list ]
 
     def create
       @round = Round.new(permitted_params[:round])

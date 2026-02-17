@@ -20,7 +20,7 @@
 <% net = (net + Array.new(nb_hole, "")).first(nb_hole) %>
 <% stb = (stb + Array.new(nb_hole, "")).first(nb_hole) %>
 
-<% par_total = tee.par %>
+<% par_total = tee&.par.to_i %>
 <% brut_values_for_diff = score.brut_str.present? ? score.brut_str.split(",").map { |value| value.present? ? value.to_i : nil } : [] %>
 <% diff_not_calculable = brut_values_for_diff.compact.any?(&:zero?) %>
 <% played_indexes_for_diff = brut_values_for_diff.each_with_index.select { |value, _| value && value > 0 }.map { |_, index| index } %>

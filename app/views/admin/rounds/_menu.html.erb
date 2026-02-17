@@ -2,9 +2,7 @@
   <a href="#config-times" class="menu-button menu-event-button" data-target="#config-times">
     Config Times
   </a>
-  <a href="#start-list" class="menu-button menu-event-button" data-target="#start-list">
-    Start List
-  </a>
+  <%= link_to "Start List", start_list_admin_round_path(round), method: :get, class: "menu-button menu-event-button", style: "background-color: #43a047; color: white;" %>
 
   <%= link_to "Scoring", "/admin/rounds/#{round.id}/scoring", method: :get, class: "menu-button menu-event-button", style: "background-color: #43a047; color: white;" %>
 
@@ -21,4 +19,3 @@
     display: none;
   }
 </style>
-

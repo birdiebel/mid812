@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_13_000000) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_17_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -257,17 +257,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_13_000000) do
   create_table "scores", force: :cascade do |t|
     t.string "brut_str"
     t.datetime "created_at", null: false
-    t.bigint "entry_id", null: false
+    t.bigint "entry_id"
     t.integer "hole_played"
     t.string "net_str"
     t.string "recu_str"
     t.bigint "round_id", null: false
-    t.bigint "slot_id", null: false
+    t.bigint "slot_id"
     t.integer "start_hole"
     t.integer "status"
     t.string "stb_str"
     t.datetime "updated_at", null: false
     t.index ["entry_id"], name: "index_scores_on_entry_id"
+    t.index ["round_id", "entry_id"], name: "index_scores_on_round_id_and_entry_id_unique", unique: true, where: "(entry_id IS NOT NULL)"
     t.index ["round_id"], name: "index_scores_on_round_id"
     t.index ["slot_id"], name: "index_scores_on_slot_id"
   end

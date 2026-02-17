@@ -1,16 +1,14 @@
-<div id="start-list" class="round-menu-section" data-turbo-cache="false" hidden>
-  <div class="panel" style="text-align: center;">
-    <h3>Start List</h3>
-    <div>
-      <%= link_to "PDF Start List", pdf_start_list_admin_round_path(@round, format: :pdf), class: "button" %>
+<div class="panel" style="text-align: center;">
+  <h3>Start List</h3>
+  <div>
+    <%= link_to "PDF Start List", pdf_start_list_admin_round_path(@round, format: :pdf), class: "button" %>
+  </div>
+  <div class="flex-container" style="gap: 20px; justify-content: center; align-items: stretch; height: 70vh;">
+    <div style="height: 100%;">
+      <%= render partial: "admin/rounds/start_list_flights", locals: { round: @round }, cache: false %>
     </div>
-    <div class="flex-container" style="gap: 20px; justify-content: center; align-items: stretch; height: 70vh;">
-      <div style="height: 100%;">
-        <%= render partial: "admin/rounds/start_list_flights", locals: { round: @round }, cache: false %>
-      </div>
-      <div style="height: 100%;">
-        <%= render partial: "admin/rounds/start_list_entries", locals: { round: @round } %>
-      </div>
+    <div style="height: 100%;">
+      <%= render partial: "admin/rounds/start_list_entries", locals: { round: @round } %>
     </div>
   </div>
 </div>
@@ -215,29 +213,29 @@
     }
 
     // Dans votre fonction updateSlotUI()
-function updateSlotUI(slotId, slotData) {
-  const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
-  if (!slotElement || !slotData.team || !slotData.team.entries) return;
+   function updateSlotUI(slotId, slotData) {
+    const slotElement = document.querySelector(`[data-slot-id="${slotId}"]`);
+     if (!slotElement || !slotData.team || !slotData.team.entries) return;
 
-  const team = slotData.team;
-  const teamName = team.team_name || '';
+      const team = slotData.team;
+      const teamName = team.team_name || '';
 
-  // Générer le HTML pour chaque entry (joueur)
-  const entriesHtml = slotData.team.entries.map(p => {
-    const playingHcp = p.playing_hcp || 'x';
-    const iconTeebox = p.playercat?.icon_teebox || '';
+      // Générer le HTML pour chaque entry (joueur)
+      const entriesHtml = slotData.team.entries.map(p => {
+      const playingHcp = p.playing_hcp || 'x';
+      const iconTeebox = p.playercat?.icon_teebox || '';
 
-    return `<div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-            <div>HCP: ${team.total_hcp}</div>
-            </div>`;
-          }).join('');
+      return `<div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
+             <div>HCP: ${team.total_hcp}</div>
+             </div>`;
+            }).join('');
 
-  // Construire le HTML final du slot
-  slotElement.innerHTML = `
-    <strong>${teamName}</strong>
-    <br>
-    ${team.total_hcp}
-  `;
+      // Construire le HTML final du slot
+      slotElement.innerHTML = `
+        <strong>${teamName}</strong>
+        <br>
+      ${team.total_hcp}
+    `;
 
   // Mettre à jour les data attributes
   slotElement.setAttribute('data-team-id', team.id);
