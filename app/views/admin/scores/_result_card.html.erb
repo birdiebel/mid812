@@ -8,7 +8,7 @@
 
 <% par = tee&.str_to_array("par_str") || [] %>
 <% stroke = tee&.str_to_array("stroke_str") || [] %>
-<% recu = score.recu_str.present? ? score.recu_str.split(",").map(&:to_i) : [] %>
+<% recu = score.computed_recu_array.presence || (score.recu_str.present? ? score.recu_str.split(",").map(&:to_i) : []) %>
 <% brut = score.brut_str.present? ? score.brut_str.split(",") : [] %>
 <% net = score.net_str.present? ? score.net_str.split(",") : [] %>
 <% stb = score.stb_str.present? ? score.stb_str.split(",") : [] %>

@@ -48,9 +48,15 @@ class Slot < ApplicationRecord
           # Set slot playing_hcp to the best (lowest) of the team
           self.playing_hcp = computed_hcps.compact.min
 
-        when formula_key.include?("foursome") || formula_key.include?("greensome")
-          # Calculate playing_hcp based on team total_hcp, apply to both players
-          computed_hcp = playing_hcp_team(team)
+        when formula_key.include?("foursome")
+          computed_hcp = playing_hcp_foursome(team)
+          self.playing_hcp = computed_hcp
+          team.entries.each do |entry|
+            entry.update_column(:playing_hcp, computed_hcp)
+          end
+
+        when formula_key.include?("greensome")
+          computed_hcp = playing_hcp_greensome(team)
           self.playing_hcp = computed_hcp
           team.entries.each do |entry|
             entry.update_column(:playing_hcp, computed_hcp)
@@ -84,6 +90,7 @@ class Slot < ApplicationRecord
       computed_hcp = playing_hcp_single(entry)
       update_column(:playing_hcp, computed_hcp)
       entry.update_column(:playing_hcp, computed_hcp) if entry
+
     when formula_key.include?("4bbb") || formula_key.include?("fourball") || formula_key.include?("4ball")
       computed_hcps = team.entries.map do |entry|
         computed_hcp = playing_hcp_single(entry)
@@ -91,12 +98,21 @@ class Slot < ApplicationRecord
         computed_hcp
       end
       update_column(:playing_hcp, computed_hcps.compact.min)
-    when formula_key.include?("foursome") || formula_key.include?("greensome")
-      computed_hcp = playing_hcp_team(team)
+
+    when formula_key.include?("foursome")
+      computed_hcp = playing_hcp_foursome(team)
       update_column(:playing_hcp, computed_hcp)
       team.entries.each do |entry|
         entry.update_column(:playing_hcp, computed_hcp)
       end
+
+    when formula_key.include?("greensome")
+      computed_hcp = playing_hcp_greensome(team)
+      update_column(:playing_hcp, computed_hcp)
+      team.entries.each do |entry|
+      entry.update_column(:playing_hcp, computed_hcp)
+    end
+
     else
       update_column(:playing_hcp, nil)
     end
@@ -133,7 +149,16 @@ class Slot < ApplicationRecord
     hcp
   end
 
-  def playing_hcp_team(team)
+  def playing_hcp_foursome(team)
+    return nil unless team
+
+    individual_playing_hcps = team.entries.first(2).map { |entry| playing_hcp_single(entry) }.compact
+    return nil unless individual_playing_hcps.size == 2
+
+    ((individual_playing_hcps.sum) * 0.5).round
+  end
+
+  def playing_hcp_greensome(team)
     return nil unless team
     # Get total HCP
     total_hcp = team.total_hcp

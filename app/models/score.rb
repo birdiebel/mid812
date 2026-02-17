@@ -69,6 +69,25 @@ class Score < ApplicationRecord
     end
   end
 
+  def computed_recu_array
+    return [] unless entry && slot
+
+    hcp = effective_playing_hcp_for_recu
+    return [] unless hcp && hcp > 0
+
+    tee = course_tee_for_entry
+    return [] unless tee
+
+    stroke_indexes = tee.str_to_array("stroke_str")
+    return [] unless stroke_indexes.any?
+
+    stroke_indexes.map do |stroke_index|
+      full_strokes = hcp / 18
+      extra_stroke = (hcp % 18) >= stroke_index ? 1 : 0
+      full_strokes + extra_stroke
+    end
+  end
+
   private
 
     def calculate_total(score_str, var)
@@ -98,39 +117,33 @@ class Score < ApplicationRecord
   end
 
   def calculate_recu_str
-    return unless entry && slot
-
-    # Get playing_hcp from entry
-    hcp = entry.playing_hcp&.to_i
-    return unless hcp && hcp > 0
-
-    # Get the tee based on playercat teebox
-    playercat = entry.playercat
-    return unless playercat
-
-    course = slot.flight&.config_teetime&.course
-    return unless course
-
-    tee = course.tees.find_by(teebox: playercat.teebox)
-    return unless tee
-
-    # Get stroke index array from tee
-    stroke_indexes = tee.str_to_array("stroke_str")
-    return unless stroke_indexes.any?
-
-    # Calculate strokes received for each hole
-    recu_per_hole = stroke_indexes.map do |stroke_index|
-      # Full rounds of strokes
-      full_strokes = hcp / 18
-      # Extra strokes on hardest holes
-      extra_stroke = (hcp % 18) >= stroke_index ? 1 : 0
-      full_strokes + extra_stroke
-    end
+    recu_per_hole = computed_recu_array
+    return if recu_per_hole.empty?
 
     # Store as comma-separated string
     self.recu_str = recu_per_hole.join(",")
 
-    Rails.logger.debug "Score#calculate_recu_str: hcp=#{hcp}, recu_str=#{self.recu_str}"
+    Rails.logger.debug "Score#calculate_recu_str: hcp=#{effective_playing_hcp_for_recu}, recu_str=#{self.recu_str}"
+  end
+
+  def effective_playing_hcp_for_recu
+    formula_key = slot&.flight&.config_teetime&.formula&.name.to_s.downcase.gsub(/[^a-z0-9]/, "")
+
+    if formula_key.include?("foursome")
+      entry.team&.entries&.order(:id)&.first&.playing_hcp&.to_i
+    else
+      entry.playing_hcp&.to_i
+    end
+  end
+
+  def course_tee_for_entry
+    playercat = entry.playercat
+    return nil unless playercat
+
+    course = slot.flight&.config_teetime&.course
+    return nil unless course
+
+    course.tees.find_by(teebox: playercat.teebox)
   end
 
   def update_hole_played_and_status
