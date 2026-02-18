@@ -41,7 +41,7 @@
     <span style="display: flex; gap: 10px; align-items: center;">
       <span>
         <% if slot&.team %>
-          <%= slot.team.num %> - <%= slot.team.name %>
+          <%= slot.team.num %> - <%= slot.team.team_name_short %> ( <%= slot.playing_hcp.to_i %> )
           <% if score.round %>
             - Round <%= score.round.num %>
           <% end %>
@@ -49,15 +49,14 @@
           Result-Card
         <% end %>
       </span>
-        </span>
-
-        <span style="display: flex; gap: 5px;">
-            <span class="brut_total scoring-sp" player="<%= player %>"></span>
-            <span class="net_total scoring-net" player="<%= player %>"></span>
-            <span class="stb_total scoring-stb" player="<%= player %>"></span>
-            <span class="par_total" player="<%= player %>">Par : <%= par_total_played %></span>
-            <span class="diff_par" player="<%= player %>">Diff : <%= diff_par_initial %></span>
-        </span>
+    </span>
+    <span style="display: flex; gap: 5px;">
+        <span class="brut_total scoring-sp" player="<%= player %>"></span>
+        <span class="net_total scoring-net" player="<%= player %>"></span>
+        <span class="stb_total scoring-stb" player="<%= player %>"></span>
+        <span class="par_total" player="<%= player %>">Par : <%= par_total_played %></span>
+        <span class="diff_par" player="<%= player %>">Diff : <%= diff_par_initial %></span>
+    </span>
   </h3>
     <div style="padding: 5px;">
     <% if tee %>
@@ -175,4 +174,5 @@
     <%= f.input :net_str, as: :hidden, input_html: { class: "initial_net", player: player } %>
     <%= f.input :stb_str, as: :hidden, input_html: { class: "initial_stb", player: player } %>
     <%= f.input :par_total, as: :hidden, input_html: { class: "par_total_value", value: par_total, player: player } %>
+
 </div>
