@@ -10,6 +10,7 @@ class Score < ApplicationRecord
 
   before_validation :assign_start_hole, if: -> { start_hole.blank? }
   before_save :calculate_recu_str
+  before_save :calculate_net_and_stb_str
   before_save :update_hole_played_and_status
   after_save :update_team_score
 
@@ -89,6 +90,39 @@ class Score < ApplicationRecord
     end
   end
 
+  def computed_net_array
+    return [] unless slot && entry
+
+    nb_hole = course_hole_count
+    brut_values = normalized_brut_values(nb_hole)
+    recu_values = normalized_recu_values(nb_hole)
+
+    (0...nb_hole).map do |index|
+      brut_value = brut_values[index]
+      next "" if brut_value.blank?
+      next "x" if brut_value == "x" || brut_value.to_i.zero?
+
+      (brut_value.to_i - recu_values[index].to_i).to_s
+    end
+  end
+
+  def computed_stb_array
+    return [] unless slot && entry
+
+    nb_hole = course_hole_count
+    net_values = computed_net_array
+    par_values = course_tee_for_entry&.str_to_array("par_str") || []
+
+    (0...nb_hole).map do |index|
+      net_value = net_values[index].to_s
+      next "" if net_value.blank?
+      next "x" if net_value == "x"
+
+      stb_value = (par_values[index].to_i - net_value.to_i) + 2
+      stb_value.negative? ? "x" : stb_value.to_s
+    end
+  end
+
   private
 
     def calculate_total(score_str, var)
@@ -127,6 +161,17 @@ class Score < ApplicationRecord
     Rails.logger.debug "Score#calculate_recu_str: hcp=#{effective_playing_hcp_for_recu}, recu_str=#{self.recu_str}"
   end
 
+  def calculate_net_and_stb_str
+    return unless brut_str.present?
+
+    net_values = computed_net_array
+    stb_values = computed_stb_array
+    return if net_values.empty? && stb_values.empty?
+
+    self.net_str = net_values.join(",") if net_values.any?
+    self.stb_str = stb_values.join(",") if stb_values.any?
+  end
+
   def effective_playing_hcp_for_recu
     return playing_hcp.to_i if playing_hcp.present?
 
@@ -147,6 +192,26 @@ class Score < ApplicationRecord
     return nil unless course
 
     course.tees.find_by(teebox: playercat.teebox)
+  end
+
+  def course_hole_count
+    nb_hole = slot&.flight&.config_teetime&.course&.nb_hole.to_i
+    nb_hole.positive? ? nb_hole : 18
+  end
+
+  def normalized_brut_values(nb_hole)
+    values = (brut_str || "").split(",")
+    (0...nb_hole).map { |index| values[index].to_s.strip }
+  end
+
+  def normalized_recu_values(nb_hole)
+    values = if recu_str.present?
+      recu_str.split(",")
+    else
+      computed_recu_array.map(&:to_s)
+    end
+
+    (0...nb_hole).map { |index| values[index].to_i }
   end
 
   def update_hole_played_and_status

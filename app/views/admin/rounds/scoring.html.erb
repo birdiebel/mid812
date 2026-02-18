@@ -97,7 +97,12 @@
               <td><%= scoring_mode == "sp" ? team_score.net_total : "x" %></td>
               <td><%= team_score.stb_total %></td>
               <td>
-                <%= link_to "Scores", edit_admin_score_path(score), class: "btt btt-add" if score %>
+                <% formula_nb_cards = slot.flight&.config_teetime&.formula&.nb_cards.to_i %>
+                <% if formula_nb_cards > 1 && team_score %>
+                  <%= link_to "Scores", cards_admin_team_score_path(team_score), class: "btt btt-add" %>
+                <% elsif score %>
+                  <%= link_to "Scores", edit_admin_score_path(score), class: "btt btt-add" %>
+                <% end %>
               </td>
               <td>
                 <% if scoring_mode == "sp" && slot.team.status != "disqualified" %>

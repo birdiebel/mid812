@@ -1,0 +1,566 @@
+<div class="panel">
+  <h3 style="display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+    <span>
+      Team #<%= @team_score.team.num %> - <%= @team_score.team.team_name_short %> | Round <%= @team_score.round.num %>
+    </span>
+    <span style="display: flex; gap: 5px;">
+      <span class="scoring-sp" id="team-brut-total">Brut: <%= @team_score.brut_total.presence || "" %></span>
+      <span class="scoring-net" id="team-net-total">Net: <%= @team_score.net_total.presence || "" %></span>
+      <span class="scoring-stb" id="team-stb-total">Stb: <%= @team_score.stb_total.presence || "" %></span>
+    </span>
+  </h3>
+
+  <div class="panel_contents">
+    <% nb_hole = team_score_hole_count(@team_score) %>
+
+    <% if @scores.any? %>
+      <%= form_with url: update_cards_admin_team_score_path(@team_score), method: :patch, local: true do %>
+        <% shared_score = @scores.first %>
+        <% shared_entry = shared_score.entry %>
+        <% shared_slot = shared_score.slot %>
+        <% shared_course = shared_slot&.flight&.config_teetime&.course %>
+        <% shared_tee = shared_course&.tees&.find_by(teebox: shared_entry&.playercat&.teebox) %>
+        <% shared_nb_hole = shared_course&.nb_hole.to_i %>
+        <% shared_nb_hole = 18 if shared_nb_hole <= 0 %>
+        <% show_split_totals = shared_nb_hole == 18 %>
+        <% shared_par_values = (shared_tee&.str_to_array("par_str") || []).first(shared_nb_hole) %>
+        <% shared_par_values = (shared_par_values + Array.new(shared_nb_hole, 0)).first(shared_nb_hole) %>
+        <% team_brut_values = (@team_score.brut_str || "").split(",").first(shared_nb_hole) %>
+        <% team_net_values = (@team_score.net_str || "").split(",").first(shared_nb_hole) %>
+        <% team_stb_values = (@team_score.stb_str || "").split(",").first(shared_nb_hole) %>
+        <% team_brut_values = (team_brut_values + Array.new(shared_nb_hole, "")).first(shared_nb_hole) %>
+        <% team_net_values = (team_net_values + Array.new(shared_nb_hole, "")).first(shared_nb_hole) %>
+        <% team_stb_values = (team_stb_values + Array.new(shared_nb_hole, "")).first(shared_nb_hole) %>
+
+        <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; overflow-x: auto;">
+          <table class="table-card input-scorecard" data-nb-hole="<%= shared_nb_hole %>">
+            <tr>
+              <td class="scorecard-label">Hole</td>
+              <% shared_nb_hole.times do |index| %>
+                <td class="scorecard-zone"><%= index + 1 %></td>
+                <% if show_split_totals && index == 8 %>
+                  <td class="scorecard-zone scorecard-label">Front</td>
+                <% end %>
+              <% end %>
+              <% if show_split_totals %>
+                <td class="scorecard-zone scorecard-label">Back</td>
+                <td class="scorecard-zone scorecard-label">Total</td>
+              <% end %>
+            </tr>
+
+            <tr>
+              <td class="scorecard-label">Par</td>
+              <% shared_nb_hole.times do |index| %>
+                <td class="scorecard-zone team-par" data-hole="<%= index %>"><%= shared_par_values[index] %></td>
+                <% if show_split_totals && index == 8 %>
+                  <td class="scorecard-zone scorecard-label"><%= shared_par_values.first(9).sum %></td>
+                <% end %>
+              <% end %>
+              <% if show_split_totals %>
+                <td class="scorecard-zone scorecard-label"><%= shared_par_values.last(9).sum %></td>
+                <td class="scorecard-zone scorecard-label"><%= shared_par_values.sum %></td>
+              <% end %>
+            </tr>
+
+            <% @scores.each do |score| %>
+              <% entry = score.entry %>
+              <% slot = score.slot %>
+              <% course = slot&.flight&.config_teetime&.course %>
+              <% score_nb_hole = course&.nb_hole.to_i %>
+              <% score_nb_hole = 18 if score_nb_hole <= 0 %>
+              <% brut_values = (score.brut_str || "").split(",").first(score_nb_hole) %>
+              <% recu_values = (score.computed_recu_array || []).first(score_nb_hole) %>
+              <% brut_values = (brut_values + Array.new(score_nb_hole, "")).first(score_nb_hole) %>
+              <% recu_values = (recu_values + Array.new(score_nb_hole, 0)).first(score_nb_hole) %>
+
+              <tr>
+                <td class="scorecard-label" colspan="<%= score_nb_hole + 1 + (show_split_totals ? 3 : 0) %>" style="text-align: left;">
+                  <%= entry&.player&.full_name || "N/A" %> | PHCP: <%= score.playing_hcp || "x" %>
+                </td>
+              </tr>
+
+              <tr data-score-id="<%= score.id %>">
+                <td class="scorecard-label">Brut</td>
+                <% score_nb_hole.times do |index| %>
+                  <td class="scorecard-zone">
+                    <%= text_field_tag "cards[#{score.id}][brut][#{index}]",
+                                      brut_values[index],
+                                      class: "team-card-input team-card-brut",
+                                      style: "width: 45px; text-align: center;",
+                                      autocomplete: "off",
+                                      inputmode: "numeric",
+                                      pattern: "[0-9]*",
+                                      data: { score_id: score.id, hole: index, recu: recu_values[index] } %>
+                  </td>
+                  <% if show_split_totals && index == 8 %>
+                    <td class="scorecard-zone scorecard-label" data-player-zone="brut" data-player-score-id="<%= score.id %>" data-split="front"></td>
+                  <% end %>
+                <% end %>
+                <% if show_split_totals %>
+                  <td class="scorecard-zone scorecard-label" data-player-zone="brut" data-player-score-id="<%= score.id %>" data-split="back"></td>
+                  <td class="scorecard-zone scorecard-label" data-player-zone="brut" data-player-score-id="<%= score.id %>" data-split="total"></td>
+                <% end %>
+              </tr>
+            <% end %>
+
+            <tr>
+              <td class="scorecard-label" colspan="<%= shared_nb_hole + 1 + (show_split_totals ? 3 : 0) %>" style="text-align: left;">
+                Team result
+              </td>
+            </tr>
+
+            <tr>
+              <td class="scorecard-label team-summary-brut">Team Brut</td>
+              <% shared_nb_hole.times do |index| %>
+                <td class="scorecard-zone team-summary-brut" data-team-zone="brut" data-hole="<%= index %>"><%= team_brut_values[index] %></td>
+                <% if show_split_totals && index == 8 %>
+                  <td class="scorecard-zone scorecard-label team-summary-brut" data-team-zone="brut" data-split="front"></td>
+                <% end %>
+              <% end %>
+              <% if show_split_totals %>
+                <td class="scorecard-zone scorecard-label team-summary-brut" data-team-zone="brut" data-split="back"></td>
+                <td class="scorecard-zone scorecard-label team-summary-brut" data-team-zone="brut" data-split="total"></td>
+              <% end %>
+            </tr>
+
+            <tr>
+              <td class="scorecard-label team-summary-net">Team Net</td>
+              <% shared_nb_hole.times do |index| %>
+                <td class="scorecard-zone team-summary-net" data-team-zone="net" data-hole="<%= index %>"><%= team_net_values[index] %></td>
+                <% if show_split_totals && index == 8 %>
+                  <td class="scorecard-zone scorecard-label team-summary-net" data-team-zone="net" data-split="front"></td>
+                <% end %>
+              <% end %>
+              <% if show_split_totals %>
+                <td class="scorecard-zone scorecard-label team-summary-net" data-team-zone="net" data-split="back"></td>
+                <td class="scorecard-zone scorecard-label team-summary-net" data-team-zone="net" data-split="total"></td>
+              <% end %>
+            </tr>
+
+            <tr>
+              <td class="scorecard-label team-summary-stb">Team Stb</td>
+              <% shared_nb_hole.times do |index| %>
+                <td class="scorecard-zone team-summary-stb" data-team-zone="stb" data-hole="<%= index %>"><%= team_stb_values[index] %></td>
+                <% if show_split_totals && index == 8 %>
+                  <td class="scorecard-zone scorecard-label team-summary-stb" data-team-zone="stb" data-split="front"></td>
+                <% end %>
+              <% end %>
+              <% if show_split_totals %>
+                <td class="scorecard-zone scorecard-label team-summary-stb" data-team-zone="stb" data-split="back"></td>
+                <td class="scorecard-zone scorecard-label team-summary-stb" data-team-zone="stb" data-split="total"></td>
+              <% end %>
+            </tr>
+          </table>
+        </div>
+
+        <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+          <%= submit_tag "Save", class: "btt btt-add" %>
+          <%= link_to "Cancel", scoring_admin_round_path(@team_score.round, anchor: "team-score-#{@scores.first&.id}"), class: "btt btt-edit" %>
+        </div>
+      <% end %>
+    <% else %>
+      <p>No individual score cards found for this team and round.</p>
+    <% end %>
+
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    var inputs = Array.from(document.querySelectorAll('.team-card-brut'));
+    if (!inputs.length) return;
+
+    var allowedControlKeys = ['Backspace', 'Delete', 'Tab', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown'];
+
+    function updateInputState(input) {
+      input.classList.remove('bg-danger');
+      input.style.backgroundColor = '';
+
+      var value = (input.value || '').trim();
+      if (value === '') {
+        input.classList.add('bg-danger');
+        input.style.backgroundColor = '#ffebee';
+        return;
+      }
+
+      if (value === '0') {
+        input.style.backgroundColor = 'pink';
+      }
+    }
+
+    function focusNextInput(currentInput) {
+      var currentScoreId = currentInput.dataset.scoreId;
+      var rowInputs = inputs.filter(function(input) {
+        return String(input.dataset.scoreId) === String(currentScoreId);
+      });
+
+      var currentIndex = rowInputs.indexOf(currentInput);
+      if (currentIndex < 0) return;
+
+      var nextInput = rowInputs[currentIndex + 1];
+      if (nextInput) {
+        nextInput.focus();
+        nextInput.select();
+      } else {
+        var allIndex = inputs.indexOf(currentInput);
+        var globalNext = inputs[allIndex + 1];
+        if (globalNext) {
+          globalNext.focus();
+          globalNext.select();
+        } else {
+          var form = currentInput.closest('form');
+          if (form) form.requestSubmit();
+        }
+      }
+    }
+
+    function parForHole(hole) {
+      var cell = document.querySelector('.team-par[data-hole="' + hole + '"]');
+      if (!cell) return 0;
+      var par = parseInt((cell.textContent || '').trim(), 10);
+      return Number.isNaN(par) ? 0 : par;
+    }
+
+    function setTeamCell(zone, hole, value) {
+      var cell = document.querySelector('[data-team-zone="' + zone + '"][data-hole="' + hole + '"]');
+      if (cell) cell.textContent = value;
+    }
+
+    function computeZoneTotal(zone) {
+      var cells = Array.from(document.querySelectorAll('[data-team-zone="' + zone + '"][data-hole]'));
+      if (!cells.length) return '';
+
+      var isStbZone = zone === 'stb';
+      var hasX = false;
+      var total = 0;
+      var hasNumeric = false;
+
+      cells.forEach(function(cell) {
+        var raw = (cell.textContent || '').trim();
+        if (raw === 'x') {
+          if (!isStbZone) {
+            hasX = true;
+          }
+          return;
+        }
+        var value = parseInt(raw, 10);
+        if (!Number.isNaN(value)) {
+          total += value;
+          hasNumeric = true;
+        }
+      });
+
+      if (hasX) return 'x';
+      return hasNumeric ? String(total) : '';
+    }
+
+    function updateTeamTotals() {
+      var brutTotal = computeZoneTotal('brut');
+      var netTotal = computeZoneTotal('net');
+      var stbTotal = computeZoneTotal('stb');
+
+      var brutTarget = document.getElementById('team-brut-total');
+      var netTarget = document.getElementById('team-net-total');
+      var stbTarget = document.getElementById('team-stb-total');
+
+      if (brutTarget) brutTarget.textContent = 'Brut: ' + brutTotal;
+      if (netTarget) netTarget.textContent = 'Net: ' + netTotal;
+      if (stbTarget) stbTarget.textContent = 'Stb: ' + stbTotal;
+    }
+
+    function setSplitTarget(selector, value) {
+      var target = document.querySelector(selector);
+      if (target) target.textContent = value;
+    }
+
+    function updatePlayerBrutSplits(scoreId) {
+      var rowInputs = inputs
+        .filter(function(input) { return String(input.dataset.scoreId) === String(scoreId); })
+        .sort(function(a, b) { return parseInt(a.dataset.hole, 10) - parseInt(b.dataset.hole, 10); });
+
+      if (rowInputs.length !== 18) return;
+
+      var front = 0;
+      var back = 0;
+      var hasValue = false;
+
+      rowInputs.forEach(function(input, index) {
+        var raw = (input.value || '').trim();
+        if (raw === '') return;
+        var value = parseInt(raw, 10);
+        if (Number.isNaN(value)) return;
+        hasValue = true;
+
+        if (index <= 8) {
+          front += value;
+        } else {
+          back += value;
+        }
+      });
+
+      var total = front + back;
+      var frontDisplay = hasValue && front > 0 ? String(front) : '';
+      var backDisplay = hasValue && back > 0 ? String(back) : '';
+      var totalDisplay = hasValue && total > 0 ? String(total) : '';
+
+      setSplitTarget('[data-player-zone="brut"][data-player-score-id="' + scoreId + '"][data-split="front"]', frontDisplay);
+      setSplitTarget('[data-player-zone="brut"][data-player-score-id="' + scoreId + '"][data-split="back"]', backDisplay);
+      setSplitTarget('[data-player-zone="brut"][data-player-score-id="' + scoreId + '"][data-split="total"]', totalDisplay);
+    }
+
+    function splitValues(values) {
+      if (values.length !== 18) {
+        return { front: '', back: '', total: '' };
+      }
+
+      var front = 0;
+      var back = 0;
+      var hasNumeric = false;
+      var hasX = false;
+
+      values.forEach(function(raw, index) {
+        if (raw === 'x') {
+          hasX = true;
+          return;
+        }
+        var value = parseInt(raw, 10);
+        if (Number.isNaN(value)) return;
+        hasNumeric = true;
+        if (index <= 8) {
+          front += value;
+        } else {
+          back += value;
+        }
+      });
+
+      if (hasX) {
+        return { front: 'x', back: 'x', total: 'x' };
+      }
+
+      if (!hasNumeric) {
+        return { front: '', back: '', total: '' };
+      }
+
+      return {
+        front: front > 0 ? String(front) : '',
+        back: back > 0 ? String(back) : '',
+        total: (front + back) > 0 ? String(front + back) : ''
+      };
+    }
+
+    function splitValuesStb(values) {
+      if (values.length !== 18) {
+        return { front: '', back: '', total: '' };
+      }
+
+      var front = 0;
+      var back = 0;
+      var hasNumeric = false;
+
+      values.forEach(function(raw, index) {
+        if (raw === 'x') return;
+        var value = parseInt(raw, 10);
+        if (Number.isNaN(value)) return;
+        hasNumeric = true;
+        if (index <= 8) {
+          front += value;
+        } else {
+          back += value;
+        }
+      });
+
+      if (!hasNumeric) {
+        return { front: '', back: '', total: '' };
+      }
+
+      return {
+        front: String(front),
+        back: String(back),
+        total: String(front + back)
+      };
+    }
+
+    function updateTeamZoneSplits(zone) {
+      var holeCells = Array.from(document.querySelectorAll('[data-team-zone="' + zone + '"][data-hole]'))
+        .sort(function(a, b) { return parseInt(a.dataset.hole, 10) - parseInt(b.dataset.hole, 10); });
+      if (holeCells.length !== 18) return;
+
+      var values = holeCells.map(function(cell) {
+        return (cell.textContent || '').trim();
+      });
+
+      var split = zone === 'stb' ? splitValuesStb(values) : splitValues(values);
+
+      setSplitTarget('[data-team-zone="' + zone + '"][data-split="front"]', split.front);
+      setSplitTarget('[data-team-zone="' + zone + '"][data-split="back"]', split.back);
+      setSplitTarget('[data-team-zone="' + zone + '"][data-split="total"]', split.total);
+    }
+
+    function selectBestBall(values, mode) {
+      var numericValues = values
+        .filter(function(value) { return value !== '' && value !== 'x' && value !== '0'; })
+        .map(function(value) { return parseInt(value, 10); })
+        .filter(function(value) { return !Number.isNaN(value) && value !== 0; });
+
+      if (numericValues.length > 0) {
+        return String(mode === 'max' ? Math.max.apply(null, numericValues) : Math.min.apply(null, numericValues));
+      }
+
+      if (values.some(function(value) { return value === 'x' || value === '0'; })) {
+        return 'x';
+      }
+
+      return '';
+    }
+
+    function computeTeamRows() {
+      var scoreIds = Array.from(new Set(inputs.map(function(input) { return String(input.dataset.scoreId); })));
+      var holeCount = parseInt(document.querySelector('.input-scorecard')?.dataset.nbHole || '18', 10) || 18;
+
+      var playerRows = scoreIds.map(function(scoreId) {
+        var playerInputs = inputs
+          .filter(function(input) { return String(input.dataset.scoreId) === scoreId; })
+          .sort(function(a, b) { return parseInt(a.dataset.hole, 10) - parseInt(b.dataset.hole, 10); });
+
+        var brutValues = [];
+        var netValues = [];
+        var stbValues = [];
+
+        playerInputs.forEach(function(input) {
+          var hole = parseInt(input.dataset.hole, 10);
+          var raw = (input.value || '').trim();
+          var recu = parseInt(input.dataset.recu || '0', 10) || 0;
+          var par = parForHole(hole);
+
+          if (raw === '') {
+            brutValues[hole] = '';
+            netValues[hole] = '';
+            stbValues[hole] = '';
+            return;
+          }
+
+          var brut = parseInt(raw, 10);
+          if (Number.isNaN(brut)) {
+            brutValues[hole] = '';
+            netValues[hole] = '';
+            stbValues[hole] = '';
+            return;
+          }
+
+          brutValues[hole] = String(brut);
+
+          if (brut === 0) {
+            netValues[hole] = 'x';
+            stbValues[hole] = 'x';
+            return;
+          }
+
+          var net = brut - recu;
+          var stb = (par - net) + 2;
+
+          netValues[hole] = String(net);
+          stbValues[hole] = stb < 0 ? 'x' : String(stb);
+        });
+
+        for (var i = 0; i < holeCount; i += 1) {
+          if (brutValues[i] === undefined) brutValues[i] = '';
+          if (netValues[i] === undefined) netValues[i] = '';
+          if (stbValues[i] === undefined) stbValues[i] = '';
+        }
+
+        return { brut: brutValues, net: netValues, stb: stbValues };
+      });
+
+      for (var hole = 0; hole < holeCount; hole += 1) {
+        var holeBrutValues = playerRows.map(function(row) { return row.brut[hole]; });
+        var holeNetValues = playerRows.map(function(row) { return row.net[hole]; });
+        var holeStbValues = playerRows.map(function(row) { return row.stb[hole]; });
+
+        setTeamCell('brut', hole, selectBestBall(holeBrutValues, 'min'));
+        setTeamCell('net', hole, selectBestBall(holeNetValues, 'min'));
+        setTeamCell('stb', hole, selectBestBall(holeStbValues, 'max'));
+      }
+
+      scoreIds.forEach(updatePlayerBrutSplits);
+      updateTeamZoneSplits('brut');
+      updateTeamZoneSplits('net');
+      updateTeamZoneSplits('stb');
+      updateTeamTotals();
+    }
+
+    function focusPreviousInput(currentInput) {
+      var currentScoreId = currentInput.dataset.scoreId;
+      var rowInputs = inputs.filter(function(input) {
+        return String(input.dataset.scoreId) === String(currentScoreId);
+      });
+
+      var currentIndex = rowInputs.indexOf(currentInput);
+      if (currentIndex > 0) {
+        var previousInput = rowInputs[currentIndex - 1];
+        previousInput.value = '';
+        updateInputState(previousInput);
+        previousInput.focus();
+        previousInput.select();
+        return;
+      }
+
+      var allIndex = inputs.indexOf(currentInput);
+      if (allIndex > 0) {
+        var globalPrevious = inputs[allIndex - 1];
+        globalPrevious.value = '';
+        updateInputState(globalPrevious);
+        globalPrevious.focus();
+        globalPrevious.select();
+      }
+    }
+
+    inputs.forEach(function(input) {
+      input.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter') {
+          event.preventDefault();
+          var form = input.closest('form');
+          if (form) form.requestSubmit();
+          return;
+        }
+
+        if (event.key === 'Backspace' && (input.value || '').length === 0) {
+          event.preventDefault();
+          focusPreviousInput(input);
+          computeTeamRows();
+          return;
+        }
+
+        if (allowedControlKeys.includes(event.key)) {
+          return;
+        }
+
+        if (!/^\d$/.test(event.key)) {
+          event.preventDefault();
+        }
+      });
+
+      input.addEventListener('focus', function() {
+        input.select();
+      });
+
+      input.addEventListener('input', function() {
+        input.value = (input.value || '').replace(/\D/g, '');
+        updateInputState(input);
+        computeTeamRows();
+
+        if (input.value.length > 0) {
+          focusNextInput(input);
+        }
+      });
+
+      updateInputState(input);
+    });
+
+    var firstEmpty = inputs.find(function(input) {
+      return (input.value || '').trim() === '';
+    });
+    computeTeamRows();
+    (firstEmpty || inputs[0]).focus();
+    (firstEmpty || inputs[0]).select();
+  });
+</script>

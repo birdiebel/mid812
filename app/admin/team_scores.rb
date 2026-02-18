@@ -13,6 +13,56 @@ ActiveAdmin.register TeamScore do
     redirect_to admin_team_score_path(resource), notice: "Team score recalculated successfully."
   end
 
+  member_action :cards, method: :get do
+    @team_score = resource
+    @scores = @team_score.team.entries.order(:id).map { |entry| Score.find_by(entry: entry, round: @team_score.round) }.compact
+  end
+
+  member_action :update_cards, method: :patch do
+    @team_score = resource
+    @scores = @team_score.team.entries.order(:id).map { |entry| Score.find_by(entry: entry, round: @team_score.round) }.compact
+
+    ActiveRecord::Base.transaction do
+      @scores.each do |score|
+        card_payload = params.dig(:cards, score.id.to_s, :brut)
+        next unless card_payload
+
+        brut_values = if card_payload.respond_to?(:to_unsafe_h)
+          card_payload.to_unsafe_h.sort_by { |index, _| index.to_i }.map { |_, value| value.to_s.strip }
+        else
+          card_payload.to_h.sort_by { |index, _| index.to_i }.map { |_, value| value.to_s.strip }
+        end
+
+        score.update!(brut_str: brut_values.join(","))
+      end
+
+      @team_score.recalculate!
+    end
+
+    redirect_to scoring_admin_round_path(@team_score.round), notice: "Player cards saved and team card recalculated."
+  rescue StandardError => e
+    redirect_to cards_admin_team_score_path(@team_score), alert: "Unable to save cards: #{e.message}"
+  end
+
+  controller do
+    helper_method :team_score_nb_cards, :team_score_is_multi_card?, :team_score_hole_count
+
+    def team_score_nb_cards(team_score)
+      formula = team_score.team.slots.first&.flight&.config_teetime&.formula
+      formula&.nb_cards.to_i
+    end
+
+    def team_score_is_multi_card?(team_score)
+      team_score_nb_cards(team_score) > 1
+    end
+
+    def team_score_hole_count(team_score)
+      slot = team_score.team.slots.joins(:flight).where(flights: { config_teetime_id: team_score.round.config_teetimes.pluck(:id) }).first
+      nb_hole = slot&.flight&.config_teetime&.course&.nb_hole.to_i
+      nb_hole.positive? ? nb_hole : 18
+    end
+  end
+
   index do
     selectable_column
     id_column
