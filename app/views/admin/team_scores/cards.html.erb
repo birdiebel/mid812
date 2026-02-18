@@ -155,7 +155,7 @@
 
         <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
           <%= submit_tag "Save", class: "btt btt-add" %>
-          <%= link_to "Cancel", scoring_admin_round_path(@team_score.round, anchor: "team-score-#{@scores.first&.id}"), class: "btt btt-edit" %>
+          <%= link_to "Cancel", scoring_admin_round_path(@team_score.round, anchor: "team-score-#{@team_score.id}"), class: "btt btt-edit" %>
         </div>
       <% end %>
     <% else %>

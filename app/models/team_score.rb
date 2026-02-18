@@ -35,11 +35,11 @@ class TeamScore < ApplicationRecord
   def recalculate!(score_status = nil)
     puts "param score_status: #{score_status}"
 
-    # Récupère la formule depuis le slot du team
-    slot = team.slots.joins(:flight).where(flights: { config_teetime_id: round.config_teetimes.pluck(:id) }).first
-    formula = slot&.flight&.config_teetime&.formula
+    scores = scores_for_round
+    formula = formula_for_round(scores)
+    nb_cards = formula&.nb_cards.to_i
     scoring_mode = self.team&.resultcat&.scoring
-    return unless formula
+    return if nb_cards <= 0
 
     # new_status = :pending # Valeur par défaut
 
@@ -55,13 +55,13 @@ class TeamScore < ApplicationRecord
 
     # Update le status du team si fourni
     self.status = score_status if score_status.present?
-    case formula.nb_cards
+    case nb_cards
     when 1
       # Single/Foursome/Greensome: copie du score unique
-      copy_from_single_score
-    when 2
-      # 4BBB: calcul best ball
-      calculate_best_ball
+      copy_from_single_score(scores)
+    else
+      # Multi-cards (4BBB): calcul best ball
+      calculate_best_ball(scores)
     end
 
     save!
@@ -89,16 +89,14 @@ class TeamScore < ApplicationRecord
 
   private
 
-    def copy_from_single_score
+    def copy_from_single_score(scores = nil)
+      round_scores = scores.presence || scores_for_round
+
       # Cherche le score qui a des données (brut_str present)
-      score = nil
-      team.entries.each do |e|
-        score = e.scores.where(round: round).find { |s| s.brut_str.present? }
-        break if score.present?
-      end
+      score = round_scores.find { |s| s.brut_str.present? }
 
       # Si aucun score avec données, prend le premier score de la première entry
-      score ||= team.entries.first&.scores&.order(:id)&.first
+      score ||= round_scores.first
       return unless score
 
       self.hole_played = score.hole_played || 0
@@ -121,8 +119,8 @@ class TeamScore < ApplicationRecord
       self.stroke_play_score = parse_stroke_play_score(sp_score)
     end
 
-  def calculate_best_ball
-    scores = team.entries.map { |e| e.scores.find_by(round: round) }.compact
+  def calculate_best_ball(scores = nil)
+    scores = scores.presence || scores_for_round
     return if scores.empty?
 
     course = scores.first.slot&.flight&.config_teetime&.course
@@ -159,15 +157,9 @@ class TeamScore < ApplicationRecord
     end
 
     # Pour 4BBB: on prendra le meilleur score par trou
-    # Pour l'instant, on prend le meilleur total (à affiner selon les règles)
-    brut_totals = scores.map { |s| s.brut("total") || 0 }
-    self.brut_total = brut_totals.min
-
-    net_totals = scores.map { |s| s.net("total") || 0 }
-    self.net_total = net_totals.min
-
-    stb_totals = scores.map { |s| s.stb("total") || 0 }
-    self.stb_total = stb_totals.max
+    self.brut_total = total_from_team_array(team_brut)
+    self.net_total = total_from_team_array(team_net)
+    self.stb_total = total_from_team_array(team_stb)
 
     # Calcul du stroke play score
     sp_scores = scores.map { |s| parse_stroke_play_score(s.stroke_play_score) }.compact
@@ -207,6 +199,13 @@ class TeamScore < ApplicationRecord
     end
   end
 
+  def total_from_team_array(values)
+    values.sum do |value|
+      integer_value = value.to_i
+      integer_value.positive? ? integer_value : 0
+    end
+  end
+
   def par_and_diff_for_score(score)
     return { par_total: 0, diff_par: 0 } unless score&.brut_str.present?
 
@@ -230,5 +229,23 @@ class TeamScore < ApplicationRecord
     brut_total_played = played_holes.sum { |index| brut_values[index] || 0 }
 
     { par_total: par_total, diff_par: brut_total_played - par_total }
+  end
+
+  def scores_for_round
+    team.entries.map { |entry| entry.scores.find_by(round: round) }.compact
+  end
+
+  def formula_for_round(scores)
+    score_formula = scores.filter_map { |score| score.slot&.flight&.config_teetime&.formula }.first
+    return score_formula if score_formula
+
+    slot = round.slots
+                .joins(:flight)
+                .where(team_id: team_id)
+                .where(flights: { config_teetime_id: round.config_teetimes.select(:id) })
+                .order("flights.flight_time ASC")
+                .first
+
+    slot&.flight&.config_teetime&.formula
   end
 end

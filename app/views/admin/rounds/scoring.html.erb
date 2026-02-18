@@ -41,12 +41,13 @@
             <% scoring_class = "scoring-#{slot.team.resultcat&.scoring_short.downcase}" %>
             <% scoring_mode = slot.team.resultcat&.scoring_short.downcase %>
 
+            <% next unless team_score %>
+
             <!-- Get first entry's score -->
             <% first_entry_id = team.entries.first&.id %>
             <% score = @scores_by_entry_id[first_entry_id] %>
-            <% next unless score %>
 
-            <% tr_id = "team-score-#{score.id}" %>
+            <% tr_id = "team-score-#{team_score.id}" %>
             <% scoring_class = "scoring-#{team_score.status}" if team_score %>
 
             <!-- Ligne TeamScore -->
@@ -58,8 +59,8 @@
                 <strong><%= slot.team.team_name_short %></strong>
               </td>
               <td><%= slot.team.show_status %></td>
-              <td id="score-status-<%= score.id %>" class="scoring-tr <%= scoring_class %>">
-                <%= score.status %>
+              <td id="score-status-<%= team_score.id %>" class="scoring-tr <%= scoring_class %>">
+                <%= team_score.status %>
               </td>
               <td>
                 <div>
