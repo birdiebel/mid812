@@ -118,6 +118,50 @@
           <% end %>
         </tbody>
       </table>
+
+      <div style="margin-top: 20px;">
+        <h4>Team Cards</h4>
+        <% format_card_for_holes = lambda do |card_str, nb_hole|
+             values = card_str.to_s.split(",")
+             values = values.first(nb_hole)
+             values.join(",")
+           end %>
+        <table class="table-scoring">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Team</th>
+              <th>Holes</th>
+              <th>Start</th>
+              <th>Hcp</th>
+              <th>Brut Card</th>
+              <th>Net Card</th>
+              <th>Stb Card</th>
+              <th>Recu</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% slots.each do |slot| %>
+              <% team = slot.team %>
+              <% team_score = @team_scores_by_team_id[team.id] %>
+              <% next unless team_score %>
+              <% course_nb_hole = slot.flight&.config_teetime&.course&.nb_hole.to_i %>
+              <% course_nb_hole = 18 if course_nb_hole <= 0 %>
+              <tr>
+                <td><%= team.num %></td>
+                <td class="text-left"><%= team.team_name_short %></td>
+                <td><%= team_score.hole_played || 0 %></td>
+                <td><%= team_score.start_hole || 1 %></td>
+                <td><%= team_score.playing_hcp || "x" %></td>
+                <td class="text-left"><%= format_card_for_holes.call(team_score.brut_str, course_nb_hole) %></td>
+                <td class="text-left"><%= format_card_for_holes.call(team_score.net_str, course_nb_hole) %></td>
+                <td class="text-left"><%= format_card_for_holes.call(team_score.stb_str, course_nb_hole) %></td>
+                <td class="text-left"><%= format_card_for_holes.call(team_score.recu_str, course_nb_hole) %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     <% else %>
       <p>No slots with teams assigned for this round.</p>
     <% end %>

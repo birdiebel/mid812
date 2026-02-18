@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_02_17_000002) do
+ActiveRecord::Schema[8.1].define(version: 2026_02_18_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -102,7 +102,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_000002) do
     t.bigint "licence_id"
     t.bigint "player_id", null: false
     t.bigint "playercat_id"
-    t.integer "playing_hcp"
     t.integer "status", default: 0, null: false
     t.bigint "team_id"
     t.datetime "updated_at", null: false
@@ -260,17 +259,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_000002) do
     t.bigint "entry_id"
     t.integer "hole_played"
     t.string "net_str"
+    t.integer "playing_hcp"
     t.string "recu_str"
     t.bigint "round_id", null: false
     t.bigint "slot_id"
     t.integer "start_hole"
     t.integer "status"
     t.string "stb_str"
+    t.bigint "team_id"
     t.datetime "updated_at", null: false
     t.index ["entry_id"], name: "index_scores_on_entry_id"
     t.index ["round_id", "entry_id"], name: "index_scores_on_round_id_and_entry_id_unique", unique: true, where: "(entry_id IS NOT NULL)"
+    t.index ["round_id", "team_id"], name: "index_scores_on_round_id_and_team_id"
     t.index ["round_id"], name: "index_scores_on_round_id"
     t.index ["slot_id"], name: "index_scores_on_slot_id"
+    t.index ["team_id"], name: "index_scores_on_team_id"
   end
 
   create_table "slots", force: :cascade do |t|
@@ -285,14 +288,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_000002) do
   end
 
   create_table "team_scores", force: :cascade do |t|
+    t.string "brut_str"
     t.integer "brut_total", default: 0
     t.datetime "created_at", null: false
     t.integer "diff_par", default: 0, null: false
     t.integer "hole_played", default: 0
+    t.string "net_str"
     t.integer "net_total", default: 0
     t.integer "par_total", default: 0, null: false
+    t.integer "playing_hcp"
+    t.string "recu_str"
     t.bigint "round_id", null: false
+    t.integer "start_hole"
     t.integer "status", default: 0
+    t.string "stb_str"
     t.integer "stb_total", default: 0
     t.integer "stroke_play_score", default: 0
     t.bigint "team_id", null: false
@@ -378,6 +387,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_17_000002) do
   add_foreign_key "scores", "entries"
   add_foreign_key "scores", "rounds"
   add_foreign_key "scores", "slots"
+  add_foreign_key "scores", "teams"
   add_foreign_key "slots", "flights"
   add_foreign_key "slots", "teams"
   add_foreign_key "team_scores", "rounds"

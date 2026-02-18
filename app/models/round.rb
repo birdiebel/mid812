@@ -40,13 +40,23 @@ class Round < ApplicationRecord
     scoring_slots.each do |slot|
       slot.team.entries.each do |entry|
         score = scores.find_or_initialize_by(entry_id: entry.id)
+        score_playing_hcp = slot.score_playing_hcp_for(entry)
 
         if score.new_record?
           score.slot = slot
+          score.team_id = slot.team_id
+          score.playing_hcp = score_playing_hcp
           score.status ||= :pending
           score.save!
-        elsif score.slot_id != slot.id
-          score.update_columns(slot_id: slot.id, updated_at: Time.current)
+        else
+          attributes_to_update = {}
+          attributes_to_update[:slot_id] = slot.id if score.slot_id != slot.id
+          attributes_to_update[:team_id] = slot.team_id if score.team_id != slot.team_id
+          attributes_to_update[:playing_hcp] = score_playing_hcp if score.playing_hcp != score_playing_hcp
+
+          next if attributes_to_update.empty?
+
+          score.update_columns(attributes_to_update.merge(updated_at: Time.current))
         end
       end
     end

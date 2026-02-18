@@ -1,5 +1,6 @@
 ActiveAdmin.register TeamScore do
-  permit_params :team_id, :round_id, :status, :hole_played, :brut_total, :net_total, :stb_total, :stroke_play_score
+  permit_params :team_id, :round_id, :status, :hole_played, :start_hole, :playing_hcp, :brut_str, :net_str, :stb_str, :recu_str,
+                :brut_total, :net_total, :stb_total, :stroke_play_score
 
   menu label: "Team Scores", parent: "Config", priority: 14
 
@@ -25,6 +26,8 @@ ActiveAdmin.register TeamScore do
       ts.show_status_ts
     end
     column :hole_played
+    column :start_hole
+    column :playing_hcp
     column "+-" do |ts|
       ts.stroke_play_score
     end
@@ -38,6 +41,8 @@ ActiveAdmin.register TeamScore do
   filter :round, as: :select, collection: -> { Round.includes(:event).order("events.name").map { |r| [ r.event.name, r.id ] } }
   filter :status, as: :select, collection: TeamScore.statuses.keys
   filter :hole_played
+  filter :start_hole
+  filter :playing_hcp
   filter :brut_total
   filter :net_total
   filter :stb_total
@@ -48,6 +53,12 @@ ActiveAdmin.register TeamScore do
       f.input :round, as: :select, collection: Round.includes(:event).order("events.name").map { |r| [ r.event.name, r.id ] }
       f.input :status, as: :select, collection: TeamScore.statuses.keys
       f.input :hole_played
+      f.input :start_hole
+      f.input :playing_hcp
+      f.input :brut_str
+      f.input :net_str
+      f.input :stb_str
+      f.input :recu_str
       f.input :brut_total
       f.input :net_total
       f.input :stb_total
@@ -79,8 +90,13 @@ ActiveAdmin.register TeamScore do
       end
       row :hole_played
       row :start_hole do |ts|
-        ts.start_hole
+        ts.start_hole || 1
       end
+      row :playing_hcp
+      row :brut_str
+      row :net_str
+      row :stb_str
+      row :recu_str
       row "Stroke Play Score", :stroke_play_score do |ts|
         if ts.stroke_play_score && ts.stroke_play_score != 0
           ts.stroke_play_score

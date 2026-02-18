@@ -220,16 +220,6 @@
       const team = slotData.team;
       const teamName = team.team_name || '';
 
-      // Générer le HTML pour chaque entry (joueur)
-      const entriesHtml = slotData.team.entries.map(p => {
-      const playingHcp = p.playing_hcp || 'x';
-      const iconTeebox = p.playercat?.icon_teebox || '';
-
-      return `<div style="display: flex; justify-content: center; align-items: center; gap: 5px;">
-             <div>HCP: ${team.total_hcp}</div>
-             </div>`;
-            }).join('');
-
       // Construire le HTML final du slot
       slotElement.innerHTML = `
         <strong>${teamName}</strong>

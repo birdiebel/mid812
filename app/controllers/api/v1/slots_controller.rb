@@ -63,8 +63,14 @@ module Api
                           .first
 
           if team_slot
-            Score.where(round_id: round.id, entry_id: entry_ids)
-                 .update_all(slot_id: team_slot.id, updated_at: Time.current)
+            Score.where(round_id: round.id, entry_id: entry_ids).includes(:entry).find_each do |score|
+              score.update_columns(
+                slot_id: team_slot.id,
+                team_id: team.id,
+                playing_hcp: team_slot.score_playing_hcp_for(score.entry),
+                updated_at: Time.current
+              )
+            end
           else
             Score.where(round_id: round.id, entry_id: entry_ids)
                  .update_all(slot_id: nil, updated_at: Time.current)

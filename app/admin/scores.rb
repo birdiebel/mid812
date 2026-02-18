@@ -1,5 +1,5 @@
 ActiveAdmin.register Score do
-  permit_params :round_id, :slot_id, :entry_id, :status, :brut_str, :net_str, :stb_str, :hole_played, :start_hole,
+  permit_params :round_id, :slot_id, :entry_id, :team_id, :playing_hcp, :status, :brut_str, :net_str, :stb_str, :hole_played, :start_hole,
                 slot_attributes: [ :id, team_attributes: [ :id, :status ] ]
 
   menu label: "Scores", parent: "Config", priority: 13
@@ -14,6 +14,8 @@ ActiveAdmin.register Score do
     column :round
     column :slot
     column :entry
+    column :team
+    column :playing_hcp
     column :status
     column :hole_played
     column :start_hole
@@ -27,6 +29,8 @@ ActiveAdmin.register Score do
   filter :round
   filter :slot
   filter :entry
+  filter :team
+  filter :playing_hcp
   filter :status, as: :select, collection: Score.statuses.keys
   filter :hole_played
   filter :start_hole
@@ -57,9 +61,11 @@ ActiveAdmin.register Score do
       row :id
       row :round
       row :slot
+      row :team
       row :entry do |score|
         score.entry&.player&.full_name || "N/A"
       end
+      row :playing_hcp
       row :status
       row :hole_played
       row :start_hole
@@ -86,6 +92,8 @@ ActiveAdmin.register Score do
           :round_id,
           :slot_id,
           :entry_id,
+          :team_id,
+          :playing_hcp,
           :status,
           :brut_str,
           :net_str,

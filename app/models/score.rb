@@ -2,6 +2,7 @@ class Score < ApplicationRecord
   belongs_to :round
   belongs_to :slot, optional: true
   belongs_to :entry, optional: true
+  belongs_to :team, optional: true
 
   accepts_nested_attributes_for :slot
 
@@ -13,11 +14,11 @@ class Score < ApplicationRecord
   after_save :update_team_score
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "brut_str", "created_at", "entry_id", "hole_played", "id", "id_value", "net_str", "recu_str", "round_id", "slot_id", "start_hole", "status", "stb_str", "updated_at" ]
+    [ "brut_str", "created_at", "entry_id", "hole_played", "id", "id_value", "net_str", "playing_hcp", "recu_str", "round_id", "slot_id", "start_hole", "status", "stb_str", "team_id", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    [ "entry", "round", "slot" ]
+    [ "entry", "round", "slot", "team" ]
   end
 
   def brut(var)
@@ -127,12 +128,14 @@ class Score < ApplicationRecord
   end
 
   def effective_playing_hcp_for_recu
+    return playing_hcp.to_i if playing_hcp.present?
+
     formula_key = slot&.flight&.config_teetime&.formula&.name.to_s.downcase.gsub(/[^a-z0-9]/, "")
 
     if formula_key.include?("foursome")
-      entry.team&.entries&.order(:id)&.first&.playing_hcp&.to_i
+      slot&.playing_hcp&.to_i
     else
-      entry.playing_hcp&.to_i
+      slot&.score_playing_hcp_for(entry)&.to_i
     end
   end
 
@@ -183,10 +186,10 @@ class Score < ApplicationRecord
   end
 
   def update_team_score
-    team = entry&.team
-    return unless team && round
+    score_team = team || entry&.team
+    return unless score_team && round
 
-    team_score = TeamScore.find_or_create_by(team: team, round: round)
+    team_score = TeamScore.find_or_create_by(team: score_team, round: round)
     team_score.recalculate!(self.status)
   end
 end

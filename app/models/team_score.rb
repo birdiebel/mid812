@@ -9,8 +9,8 @@ class TeamScore < ApplicationRecord
   validates :team_id, uniqueness: { scope: :round_id }
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "brut_total", "created_at", "diff_par", "hole_played", "id", "net_total", "par_total",
-      "round_id", "status", "stb_total", "stroke_play_score", "team_id", "updated_at" ]
+    [ "brut_str", "brut_total", "created_at", "diff_par", "hole_played", "id", "net_str", "net_total", "par_total",
+      "playing_hcp", "recu_str", "round_id", "start_hole", "status", "stb_str", "stb_total", "stroke_play_score", "team_id", "updated_at" ]
   end
 
   def self.ransackable_associations(auth_object = nil)
@@ -67,11 +67,6 @@ class TeamScore < ApplicationRecord
     save!
   end
 
-  def start_hole
-    score = team.entries.first&.scores&.find_by(round: round)
-    score&.start_hole || 1
-  end
-
   def parse_stroke_play_score(sp_score)
     return 0 if sp_score.nil? || sp_score == "N.A."
     return 0 if sp_score == "even"
@@ -107,6 +102,12 @@ class TeamScore < ApplicationRecord
       return unless score
 
       self.hole_played = score.hole_played || 0
+      self.start_hole = score.start_hole || 1
+      self.playing_hcp = score.playing_hcp
+      self.brut_str = score.brut_str
+      self.net_str = score.net_str
+      self.stb_str = score.stb_str
+      self.recu_str = score.recu_str
       self.status = score.status || :pending
       self.brut_total = score.brut("total").to_i
       self.net_total = score.net("total").to_i
@@ -124,11 +125,38 @@ class TeamScore < ApplicationRecord
     scores = team.entries.map { |e| e.scores.find_by(round: round) }.compact
     return if scores.empty?
 
-    # Prend le minimum de hole_played (le plus conservateur)
-    self.hole_played = scores.map { |s| s.hole_played || 0 }.min
+    course = scores.first.slot&.flight&.config_teetime&.course
+    nb_hole = course&.nb_hole.to_i
+    nb_hole = 18 if nb_hole <= 0
 
-    # Status: si l'un est complete, le team est complete
-    self.status = scores.any? { |s| s.status == "complete" } ? :complete : :partial
+    brut_arrays = scores.map { |score| split_score_array(score.brut_str, nb_hole) }
+    net_arrays = scores.map { |score| split_score_array(score.net_str, nb_hole) }
+    stb_arrays = scores.map { |score| split_score_array(score.stb_str, nb_hole) }
+
+    team_brut = build_best_ball_array(brut_arrays, :min)
+    team_net = build_best_ball_array(net_arrays, :min)
+    team_stb = build_best_ball_array(stb_arrays, :max)
+
+    self.brut_str = team_brut.join(",")
+    self.net_str = team_net.join(",")
+    self.stb_str = team_stb.join(",")
+    self.recu_str = nil
+    self.start_hole = scores.first.start_hole || 1
+    self.playing_hcp = nil
+
+    # Prend le minimum de hole_played (le plus conservateur)
+    self.hole_played = team_brut.count { |value| value.present? }
+
+    # Status team based on individual score statuses
+    if scores.any? { |score| score.status == "invalide" }
+      self.status = :invalide
+    elsif scores.all? { |score| score.status == "completed" }
+      self.status = :completed
+    elsif scores.any? { |score| score.status == "partial" || score.status == "completed" }
+      self.status = :partial
+    else
+      self.status = :pending
+    end
 
     # Pour 4BBB: on prendra le meilleur score par trou
     # Pour l'instant, on prend le meilleur total (à affiner selon les règles)
@@ -149,6 +177,34 @@ class TeamScore < ApplicationRecord
     par_and_diff = par_and_diff_for_score(best_score)
     self.par_total = par_and_diff[:par_total]
     self.diff_par = par_and_diff[:diff_par]
+  end
+
+  def split_score_array(score_str, size)
+    values = (score_str || "").split(",")
+    (0...size).map { |index| values[index].to_s.strip }
+  end
+
+  def build_best_ball_array(arrays, mode)
+    return [] if arrays.empty?
+
+    hole_count = arrays.first.size
+
+    (0...hole_count).map do |index|
+      hole_values = arrays.map { |array| array[index] }
+      numeric_values = hole_values.filter_map do |value|
+        next if value.blank? || value == "x" || value.to_i.zero?
+        value.to_i
+      end
+
+      if numeric_values.any?
+        selected_value = mode == :max ? numeric_values.max : numeric_values.min
+        selected_value.to_s
+      elsif hole_values.any? { |value| value == "x" || value == "0" }
+        "x"
+      else
+        ""
+      end
+    end
   end
 
   def par_and_diff_for_score(score)
