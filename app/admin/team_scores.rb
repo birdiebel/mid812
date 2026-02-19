@@ -45,6 +45,8 @@ ActiveAdmin.register TeamScore do
   end
 
   controller do
+    helper ActiveAdminViewsHelper
+
     helper_method :team_score_nb_cards, :team_score_is_multi_card?, :team_score_hole_count
 
     def team_score_nb_cards(team_score)
@@ -79,7 +81,7 @@ ActiveAdmin.register TeamScore do
     column :start_hole
     column :playing_hcp
     column "+-" do |ts|
-      ts.stroke_play_score
+      stroke_play_badge(ts.stroke_play_score)
     end
     column :brut_total
     column :net_total
@@ -148,11 +150,7 @@ ActiveAdmin.register TeamScore do
       row :stb_str
       row :recu_str
       row "Stroke Play Score", :stroke_play_score do |ts|
-        if ts.stroke_play_score && ts.stroke_play_score != 0
-          ts.stroke_play_score
-        else
-          "N/A"
-        end
+        stroke_play_badge(ts.stroke_play_score)
       end
       row :brut_total
       row :net_total

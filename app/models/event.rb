@@ -155,17 +155,6 @@ class Event < ApplicationRecord
 
     return { par_total: 0, diff_par: nil } if scores.empty?
 
-    # If any card contains a 0 score, diff/par is considered non-calculable.
-    if scores.any? { |score|
-         score
-           .brut_str
-           .to_s
-           .split(",")
-           .any? { |value| value.present? && value.to_i.zero? }
-       }
-      return { par_total: 0, diff_par: nil }
-    end
-
     par_total = 0
     brut_total = 0
 

@@ -207,9 +207,6 @@ class TeamScore < ApplicationRecord
 
     brut_values = score.brut_str.split(",").map { |value| value.blank? || value.strip == "" ? nil : value.to_i }
 
-    # If any played score is 0, diff_par is not calculable.
-    return { par_total: 0, diff_par: 0 } if brut_values.compact.any?(&:zero?)
-
     played_holes = brut_values.each_with_index.select { |value, _| value && value > 0 }.map { |_, index| index }
     return { par_total: 0, diff_par: 0 } if played_holes.empty?
 

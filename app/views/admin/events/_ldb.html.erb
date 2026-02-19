@@ -7,13 +7,12 @@
           <tr>
             <th>Pos</th>
             <th>Team</th>
+            <th>+-</th>
             <th>Hole</th>
             <% event.rounds.order(:num).each do |round| %>
               <th style="text-align: center;">R<%= round.num %></th>
             <% end %>
             <th>Brut</th>
-            <th>Par</th>
-            <th>Diff</th>
             <th>Net</th>
             <th>Stb</th>
           </tr>
@@ -21,84 +20,67 @@
         <tbody>
           <% event.resultcats.order(priority: :asc).each do |r| %>
             <% event_teams = event.teams_brut_totals_with_rounds(r.id) %>
+            <%# Titre Cat %>
             <% if event_teams.present? %>
-              <tr><td colspan="99" bgcolor="yellow" font-weight="bold"><%= r.name %></td></tr>
+              <tr>
+                <td colspan="99" bgcolor="yellow" font-weight="bold"><%= r.name %></td>
+              </tr>
             <% end %>
+            <%# Row lbd %>
             <% event_teams&.each do |row| %>
               <% stableford_scoring = row[:team].resultcat&.scoring == "stableford" %>
-                  <tr>
-                    <td><%= row[:position] %></td>
-                    <td style="text-align: left;"><%= row[:team].name %></td>
-                    <td><%= row[:team_hole_played] %></td>
-                    <% event.rounds.order(:num).each do |round| %>
-                    <td>
-                      <% score = stableford_scoring ? row[:stb_by_round][round.id] : row[:brut_by_round][round.id] %>
-                      <% if score.nil? || score==0 %>
-                        <%= row[:team].start_time_for_round(round.id) %>
-                      <% else %>
-                        <%= score %>
-                      <% end %>
-                    </td>
-                    <% end %>
-
-                    <% if stableford_scoring %>
-                      <td></td>
-                    <% elsif row[:brut_total] > 0 %>
-                      <td class="top-brut"><%= row[:brut_total] %></td>
+              <tr>
+                <%# Position %>
+                <td><%= row[:position] %></td>
+                <%# Team Name %>
+                <td style="text-align: left; font-weight: bold;"><%= row[:team].team_name_short %></td>
+                <%# Against Par %>
+                <% if stableford_scoring %>
+                  <td></td>
+                <% else %>
+                  <td>
+                    <%= against_par_badge(row[:diff_par], row[:par_total]) %>
+                  </td>
+                <% end %>
+                <%# Holes Played %>
+                <td><%= row[:team_hole_played] %></td>
+                <%# Each Round : score or start time %>
+                <% event.rounds.order(:num).each do |round| %>
+                  <td>
+                    <% score = stableford_scoring ? row[:stb_by_round][round.id] : row[:brut_by_round][round.id] %>
+                    <% if score.nil? || score==0 %>
+                      <%= row[:team].start_time_for_round(round.id) %>
                     <% else %>
-                      <td></td>
+                      <%= score %>
                     <% end %>
-
-                    <% if stableford_scoring %>
-                      <td></td>
-                    <% elsif row[:par_total] > 0 %>
-                      <td><%= row[:par_total] %></td>
-                    <% else %>
-                      <td></td>
-                    <% end %>
-
-                    <% if stableford_scoring %>
-                      <td></td>
-                    <% else %>
-                      <td>
-                        <% if row[:diff_par].nil? %>
-                          <div class="div-against-par" style="font-weight: bold;">
-                            N.A.
-                          </div>
-                        <% elsif row[:diff_par].positive? %>
-                          <div class="div-against-par" style="font-weight: bold; color: red;">
-                            +<%= row[:diff_par] %>
-                          </div>
-                        <% elsif row[:diff_par].negative? %>
-                          <div class="div-against-par" style="font-weight: bold; color: green;">
-                            <%= row[:diff_par] %>
-                          </div>
-                        <% else %>
-                          <div class="div-against-par" style="font-weight: bold;">
-                            PAR
-                          </div>
-                        <% end %>
-                      </td>
-                    <% end %>
-
-                    <% if stableford_scoring %>
-                      <td></td>
-                    <% elsif row[:net_total]> 0 %>
-                      <td class="top-net">
-                        <%= row[:net_total] %>
-                      </td>
-                    <% else %>
-                      <td></td>
-                    <% end %>
-
-                    <% if row[:net_total] > 0 %>
-                      <td class="top-stb"><%= row[:stb_total] %></td>
-                    <% else %>
-                      <td></td>
-                    <% end %>
-
-                  </tr>
-              <% end %>
+                  </td>
+                <% end %>
+                <%# Brut %>
+                <% if stableford_scoring %>
+                  <td></td>
+                <% elsif row[:brut_total] > 0 %>
+                  <td class="scoring-sp"><%= row[:brut_total] %></td>
+                <% else %>
+                  <td></td>
+                <% end %>
+                <%# Net %>
+                <% if stableford_scoring %>
+                  <td></td>
+                <% elsif row[:net_total]> 0 %>
+                  <td class="top-net">
+                    <%= row[:net_total] %>
+                  </td>
+                <% else %>
+                  <td></td>
+                <% end %>
+                <%# Stb %>
+                <% if row[:net_total] > 0 %>
+                  <td class="top-stb"><%= row[:stb_total] %></td>
+                <% else %>
+                  <td></td>
+                <% end %>
+              </tr>
+            <% end %>
           <% end %>
         </tbody>
       </table>

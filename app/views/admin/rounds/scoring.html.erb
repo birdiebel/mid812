@@ -24,8 +24,6 @@
             <th></th>
             <th>Holes</th>
             <th>+-</th>
-            <th>Par</th>
-            <th>Diff</th>
             <th>Brut</th>
             <th>Net</th>
             <th>Stb</th>
@@ -47,44 +45,34 @@
             <% scoring_class = "scoring-#{team_score.status}" if team_score %>
             <!-- Ligne TeamScore -->
             <tr id="<%= tr_id %>" class="<%= scoring_class %>">
+              <%# Time %>
               <td><%= slot.flight.myTime %></td>
+              <%# Start Hole %>
               <td><%= slot.flight.config_teetime.start_hole %></td>
+              <%# team num %>
               <td class="team-num"><%= slot.team.num %></td>
+              <%# team name %>
               <td class="text-left">
                 <strong><%= slot.team.team_name_short %></strong>
               </td>
+              <%# team status %>
               <td><%= slot.team.show_status %></td>
+              <%# team score status %>
               <td id="score-status-<%= team_score.id %>" class="scoring-tr <%= scoring_class %>">
                 <%= team_score.status %>
               </td>
+              <%# scoring mode %>
               <td>
                 <div>
                   <%= slot.team.resultcat&.scoring_short %>
                 </div>
               </td>
+              <%# Holes Played %>
               <td><%= team_score.hole_played_show %></td>
-              <% scoring_mode == "sp" ? ts_score = team_score.stroke_play_score : ts_score = "x" %>
-              <td>
-                <% if ts_score.nil? || ts_score == "N.A." %>
-                  <div class="div-against-par"><strong><%= ts_score %></strong></div>
-                <% elsif ts_score.to_i.zero? %>
-                  <div class="div-against-par" style="color: green;"><strong><%= ts_score %></strong></div>
-                <% elsif ts_score.to_i.negative? %>
-                  <div class="div-against-par" style="color: red;"><strong><%= ts_score %></strong></div>
-                <% else %>
-                  <div class="div-against-par" style="color: blue;"><strong><%= ts_score %></strong></div>
-                <% end %>
-              </td>
-              <td><%= scoring_mode == "sp" ? team_score.par_total : "x" %></td>
+              <%# Against Par %>
               <td>
                 <% if scoring_mode == "sp" %>
-                  <% if team_score.par_total.to_i.zero? %>
-                    N.A.
-                  <% elsif team_score.diff_par.to_i.positive? %>
-                    +<%= team_score.diff_par %>
-                  <% else %>
-                    <%= team_score.diff_par %>
-                  <% end %>
+                  <%= stroke_play_badge(team_score.stroke_play_score) %>
                 <% else %>
                   x
                 <% end %>

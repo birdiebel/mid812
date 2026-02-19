@@ -55,4 +55,8 @@ ActiveAdmin.register Event do
       f.cancel_link(url_for(:back))
     end
   end
+
+  controller do
+    helper ActiveAdminViewsHelper
+  end
 end

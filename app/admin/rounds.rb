@@ -89,6 +89,8 @@ ActiveAdmin.register Round do
   end
 
   controller do
+    helper ActiveAdminViewsHelper
+
     before_action :prepare_start_list_data, only: [ :show, :start_list ]
 
     def create
