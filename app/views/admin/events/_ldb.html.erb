@@ -1,89 +1,17 @@
-<div id="ldb" style="display: none">
+<div id="ldb">
   <div class="panel">
     <h3>Rounds</h3>
     <div class="panel_contents">
-      <table class="leaderboard-table">
-        <thead>
-          <tr>
-            <th>Pos</th>
-            <th>Team</th>
-            <th>+-</th>
-            <th>Hole</th>
-            <% event.rounds.order(:num).each do |round| %>
-              <th style="text-align: center;">R<%= round.num %></th>
-            <% end %>
-            <th>Brut</th>
-            <th>Net</th>
-            <th>Stb</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% event.resultcats.order(priority: :asc).each do |r| %>
-            <% event_teams = event.teams_brut_totals_with_rounds(r.id) %>
-            <%# Titre Cat %>
-            <% if event_teams.present? %>
-              <tr>
-                <td colspan="99" bgcolor="yellow" font-weight="bold"><%= r.name %></td>
-              </tr>
-            <% end %>
-            <%# Row lbd %>
-            <% event_teams&.each do |row| %>
-              <% stableford_scoring = row[:team].resultcat&.scoring == "stableford" %>
-              <tr>
-                <%# Position %>
-                <td><%= row[:position] %></td>
-                <%# Team Name %>
-                <td style="text-align: left; font-weight: bold;"><%= row[:team].team_name_short %></td>
-                <%# Against Par %>
-                <% if stableford_scoring %>
-                  <td></td>
-                <% else %>
-                  <td>
-                    <%= against_par_badge(row[:diff_par], row[:par_total]) %>
-                  </td>
-                <% end %>
-                <%# Holes Played %>
-                <td><%= row[:team_hole_played] %></td>
-                <%# Each Round : score or start time %>
-                <% event.rounds.order(:num).each do |round| %>
-                  <td>
-                    <% score = stableford_scoring ? row[:stb_by_round][round.id] : row[:brut_by_round][round.id] %>
-                    <% if score.nil? || score==0 %>
-                      <%= row[:team].start_time_for_round(round.id) %>
-                    <% else %>
-                      <%= score %>
-                    <% end %>
-                  </td>
-                <% end %>
-                <%# Brut %>
-                <% if stableford_scoring %>
-                  <td></td>
-                <% elsif row[:brut_total] > 0 %>
-                  <td class="scoring-sp"><%= row[:brut_total] %></td>
-                <% else %>
-                  <td></td>
-                <% end %>
-                <%# Net %>
-                <% if stableford_scoring %>
-                  <td></td>
-                <% elsif row[:net_total]> 0 %>
-                  <td class="top-net">
-                    <%= row[:net_total] %>
-                  </td>
-                <% else %>
-                  <td></td>
-                <% end %>
-                <%# Stb %>
-                <% if row[:net_total] > 0 %>
-                  <td class="top-stb"><%= row[:stb_total] %></td>
-                <% else %>
-                  <td></td>
-                <% end %>
-              </tr>
-            <% end %>
+      <% event.resultcats.order(priority: :asc).each do |r| %>
+        <%= puts r.scoring %>
+        <% if event.entries.exists? %>
+          <% if r.scoring == "stroke_play"%>
+            <%= render "admin/events/leaderboards/ldb_sp", event: event, r: r %>
+          <% elsif r.scoring == "stableford"%>
+            <%= render "admin/events/leaderboards/ldb_stb", event: event, r: r %>
           <% end %>
-        </tbody>
-      </table>
+        <% end %>
+      <% end %>
     </div>
   </div>
 </div>

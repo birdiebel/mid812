@@ -1,0 +1,63 @@
+<table class="leaderboard-table">
+  <tbody>
+    <% event_teams = event.teams_brut_totals_with_rounds(r.id) %>
+    <%# Titre Cat %>
+    <% if event_teams.present? %>
+      <tr>
+        <td colspan="99" bgcolor="yellow" font-weight="bold">
+          <%= r.name %> | <%= r.scoring.humanize %>
+        </td>
+      </tr>
+    <% end %>
+    <tr>
+      <th>Pos</th>
+      <th>Team</th>
+      <th>+-</th>
+      <th>Hole</th>
+      <% event.rounds.order(:num).each do |round| %>
+        <th style="text-align: center;">R<%= round.num %></th>
+      <% end %>
+      <th>Net</th>
+      <th>Stb</th>
+      <th>Brut</th>
+    </tr>
+    <%# Row lbd %>
+    <% event_teams&.each do |row| %>
+      <tr>
+        <%# Position %>
+        <td><%= row[:position] %></td>
+        <%# Team Name %>
+        <td style="text-align: left; font-weight: bold;"><%= row[:team].team_name_short %></td>
+        <%# Against Par %>
+        <td>
+          <%= against_par_badge(row[:diff_par], row[:par_total]) %>
+        </td>
+        <%# Holes Played %>
+        <td><%= row[:team_hole_played] %></td>
+        <%# Each Round : score or start time %>
+        <% event.rounds.order(:num).each do |round| %>
+          <td>
+            <% score = row[:brut_by_round][round.id] %>
+            <% if score.nil? || score==0 %>
+              <%= row[:team].start_time_for_round(round.id) %>
+            <% else %>
+              <%= score %>
+            <% end %>
+          </td>
+        <% end %>
+        <%# Net %>
+        <td class="">
+          <%= row[:net_total] %>
+        </td>
+        <%# Stb %>
+        <% if row[:net_total] > 0 %>
+          <td class=""><%= row[:stb_total] %></td>
+        <% else %>
+          <td></td>
+        <% end %>
+        <%# Brut %>
+        <td class="top-brut"><%= row[:brut_total] %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
