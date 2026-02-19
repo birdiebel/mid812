@@ -41,18 +41,6 @@ class TeamScore < ApplicationRecord
     scoring_mode = self.team&.resultcat&.scoring
     return if nb_cards <= 0
 
-    # new_status = :pending # Valeur par défaut
-
-    if score_status.present? && scoring_mode == "stroke_play" && score_status == "invalide"
-      self.team.status = :disqualified
-    else
-      self.team.status = :enter
-    end
-    self.team.save!
-
-
-    puts "Setting team #{team_id} status to #{self.team.status} due to score status #{score_status}"
-
     # Update le status du team si fourni
     self.status = score_status if score_status.present?
     case nb_cards
@@ -63,6 +51,17 @@ class TeamScore < ApplicationRecord
       # Multi-cards (4BBB): calcul best ball
       calculate_best_ball(scores)
     end
+
+    if scoring_mode == "stroke_play" && team_invalid_for_stroke_play?
+      self.status = :invalide
+      self.team.status = :disqualified
+    else
+      self.team.status = :enter
+    end
+
+    self.team.save!
+
+    puts "Setting team #{team_id} status to #{self.team.status} with team_score status #{self.status}"
 
     save!
   end
@@ -145,10 +144,7 @@ class TeamScore < ApplicationRecord
     # Prend le minimum de hole_played (le plus conservateur)
     self.hole_played = team_brut.count { |value| value.present? }
 
-    # Status team based on individual score statuses
-    if scores.any? { |score| score.status == "invalide" }
-      self.status = :invalide
-    elsif scores.all? { |score| score.status == "completed" }
+    if scores.all? { |score| score.status == "completed" }
       self.status = :completed
     elsif scores.any? { |score| score.status == "partial" || score.status == "completed" }
       self.status = :partial
@@ -247,5 +243,10 @@ class TeamScore < ApplicationRecord
                 .first
 
     slot&.flight&.config_teetime&.formula
+  end
+
+  def team_invalid_for_stroke_play?
+    values = (brut_str || "").split(",").map { |value| value.to_s.strip.downcase }
+    values.any? { |value| value == "0" || value == "x" }
   end
 end

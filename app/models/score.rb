@@ -231,22 +231,12 @@ class Score < ApplicationRecord
 
     self.hole_played = played
 
-    # Check if stroke_play and if there are any zeros
-    team = slot&.team
-    has_zero = brut_values.any? { |v| v.present? && v.to_i == 0 }
-
-    puts "HAS_ZERO: #{has_zero}, TEAM RESULTCAT SCORING: #{team&.resultcat&.scoring}"
-
-    if team&.resultcat&.scoring == "stroke_play" && has_zero
-      self.status = :invalide
+    if played >= nb_hole
+      self.status = :completed
+    elsif played > 0
+      self.status = :partial
     else
-      if played >= nb_hole
-        self.status = :completed
-      elsif played > 0
-        self.status = :partial
-      else
-        self.status = :pending
-      end
+      self.status = :pending
     end
   end
 

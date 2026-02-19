@@ -32,6 +32,7 @@
         <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; overflow-x: auto;">
           <table class="table-card input-scorecard" data-nb-hole="<%= shared_nb_hole %>">
             <tr>
+              <%# HOLE %>
               <td class="scorecard-label">Hole</td>
               <% shared_nb_hole.times do |index| %>
                 <td class="scorecard-zone zone-hole"><%= index + 1 %></td>
@@ -44,10 +45,11 @@
                 <td class="scorecard-zone scorecard-label">Total</td>
               <% end %>
             </tr>
+            <%# PAR %>
             <tr>
               <td class="scorecard-label">Par</td>
               <% shared_nb_hole.times do |index| %>
-                <td class="scorecard-zone zone-par" data-hole="<%= index %>"><%= shared_par_values[index] %></td>
+                <td class="scorecard-zone par zone-par" data-hole="<%= index %>"><%= shared_par_values[index] %></td>
                 <% if show_split_totals && index == 8 %>
                   <td class="scorecard-zone scorecard-label"><%= shared_par_values.first(9).sum %></td>
                 <% end %>
@@ -67,15 +69,17 @@
               <% recu_values = (score.computed_recu_array || []).first(score_nb_hole) %>
               <% brut_values = (brut_values + Array.new(score_nb_hole, "")).first(score_nb_hole) %>
               <% recu_values = (recu_values + Array.new(score_nb_hole, 0)).first(score_nb_hole) %>
+              <%# Player infos %>
               <tr>
                 <td class="scorecard-label" colspan="<%= score_nb_hole + 1 + (show_split_totals ? 3 : 0) %>" style="text-align: left;">
                   <%= entry&.player&.full_name || "N/A" %> | PHCP: <%= score.playing_hcp || "x" %>
                 </td>
               </tr>
+              <%# Inputs Brut %>
               <tr data-score-id="<%= score.id %>">
                 <td class="scorecard-label">Brut</td>
                 <% score_nb_hole.times do |index| %>
-                  <td class="scorecard-zone">
+                  <td class="scorecard-zone brut zone-brut" data-hole="<%= index %>">
                     <%= text_field_tag "cards[#{score.id}][brut][#{index}]",
                                       brut_values[index],
                                       class: "team-card-input team-card-brut",
@@ -95,11 +99,13 @@
                 <% end %>
               </tr>
             <% end %>
+            <%# Team result summary %>
             <tr>
               <td class="scorecard-label" colspan="<%= shared_nb_hole + 1 + (show_split_totals ? 3 : 0) %>" style="text-align: left;">
                 Team result
               </td>
             </tr>
+            <%# Team result brut %>
             <tr>
               <td class="scorecard-label team-summary-brut">Team Brut</td>
               <% shared_nb_hole.times do |index| %>
@@ -113,6 +119,7 @@
                 <td class="scorecard-zone scorecard-label team-summary-brut" data-team-zone="brut" data-split="total"></td>
               <% end %>
             </tr>
+            <%# Team result net %>
             <tr>
               <td class="scorecard-label team-summary-net">Team Net</td>
               <% shared_nb_hole.times do |index| %>
@@ -126,6 +133,7 @@
                 <td class="scorecard-zone scorecard-label team-summary-net" data-team-zone="net" data-split="total"></td>
               <% end %>
             </tr>
+            <%# Team result stb %>
             <tr>
               <td class="scorecard-label team-summary-stb">Team Stb</td>
               <% shared_nb_hole.times do |index| %>
@@ -201,7 +209,7 @@
     }
 
     function parForHole(hole) {
-      var cell = document.querySelector('.team-par[data-hole="' + hole + '"]');
+      var cell = document.querySelector('.zone-par[data-hole="' + hole + '"]');
       if (!cell) return 0;
       var par = parseInt((cell.textContent || '').trim(), 10);
       return Number.isNaN(par) ? 0 : par;
@@ -259,6 +267,12 @@
       if (target) target.textContent = value;
     }
 
+    function setSplitTargets(baseSelector, split) {
+      setSplitTarget(baseSelector + '[data-split="front"]', split.front);
+      setSplitTarget(baseSelector + '[data-split="back"]', split.back);
+      setSplitTarget(baseSelector + '[data-split="total"]', split.total);
+    }
+
     function updatePlayerBrutSplits(scoreId) {
       var rowInputs = inputs
         .filter(function(input) { return String(input.dataset.scoreId) === String(scoreId); })
@@ -285,20 +299,16 @@
       });
 
       var total = front + back;
-      var frontDisplay = hasValue && front > 0 ? String(front) : '';
-      var backDisplay = hasValue && back > 0 ? String(back) : '';
-      var totalDisplay = hasValue && total > 0 ? String(total) : '';
+      var split = {
+        front: hasValue && front > 0 ? String(front) : '',
+        back: hasValue && back > 0 ? String(back) : '',
+        total: hasValue && total > 0 ? String(total) : ''
+      };
 
-      setSplitTarget('[data-player-zone="brut"][data-player-score-id="' + scoreId + '"][data-split="front"]', frontDisplay);
-      setSplitTarget('[data-player-zone="brut"][data-player-score-id="' + scoreId + '"][data-split="back"]', backDisplay);
-      setSplitTarget('[data-player-zone="brut"][data-player-score-id="' + scoreId + '"][data-split="total"]', totalDisplay);
+      setSplitTargets('[data-player-zone="brut"][data-player-score-id="' + scoreId + '"]', split);
     }
 
-    function splitValues(values) {
-      if (values.length !== 18) {
-        return { front: '', back: '', total: '' };
-      }
-
+    function computeSplitAccumulator(values, ignoreX) {
       var front = 0;
       var back = 0;
       var hasNumeric = false;
@@ -306,7 +316,7 @@
 
       values.forEach(function(raw, index) {
         if (raw === 'x') {
-          hasX = true;
+          if (!ignoreX) hasX = true;
           return;
         }
         var value = parseInt(raw, 10);
@@ -319,18 +329,30 @@
         }
       });
 
-      if (hasX) {
-        return { front: 'x', back: 'x', total: 'x' };
-      }
+      return { front: front, back: back, hasNumeric: hasNumeric, hasX: hasX };
+    }
 
-      if (!hasNumeric) {
+    function splitValues(values) {
+      if (values.length !== 18) {
         return { front: '', back: '', total: '' };
       }
 
+      var computed = computeSplitAccumulator(values, false);
+
+      if (computed.hasX) {
+        return { front: 'x', back: 'x', total: 'x' };
+      }
+
+      if (!computed.hasNumeric) {
+        return { front: '', back: '', total: '' };
+      }
+
+      var total = computed.front + computed.back;
+
       return {
-        front: front > 0 ? String(front) : '',
-        back: back > 0 ? String(back) : '',
-        total: (front + back) > 0 ? String(front + back) : ''
+        front: computed.front > 0 ? String(computed.front) : '',
+        back: computed.back > 0 ? String(computed.back) : '',
+        total: total > 0 ? String(total) : ''
       };
     }
 
@@ -339,30 +361,16 @@
         return { front: '', back: '', total: '' };
       }
 
-      var front = 0;
-      var back = 0;
-      var hasNumeric = false;
+      var computed = computeSplitAccumulator(values, true);
 
-      values.forEach(function(raw, index) {
-        if (raw === 'x') return;
-        var value = parseInt(raw, 10);
-        if (Number.isNaN(value)) return;
-        hasNumeric = true;
-        if (index <= 8) {
-          front += value;
-        } else {
-          back += value;
-        }
-      });
-
-      if (!hasNumeric) {
+      if (!computed.hasNumeric) {
         return { front: '', back: '', total: '' };
       }
 
       return {
-        front: String(front),
-        back: String(back),
-        total: String(front + back)
+        front: String(computed.front),
+        back: String(computed.back),
+        total: String(computed.front + computed.back)
       };
     }
 
@@ -376,10 +384,7 @@
       });
 
       var split = zone === 'stb' ? splitValuesStb(values) : splitValues(values);
-
-      setSplitTarget('[data-team-zone="' + zone + '"][data-split="front"]', split.front);
-      setSplitTarget('[data-team-zone="' + zone + '"][data-split="back"]', split.back);
-      setSplitTarget('[data-team-zone="' + zone + '"][data-split="total"]', split.total);
+      setSplitTargets('[data-team-zone="' + zone + '"]', split);
     }
 
     function selectBestBall(values, mode) {
