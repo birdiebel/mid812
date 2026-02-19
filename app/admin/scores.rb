@@ -45,9 +45,10 @@ ActiveAdmin.register Score do
     #   f.input :start_hole
     # end
 
+    # Not Use : see team_score
     f.inputs "Result-Card" do
       puts "Rendering result card partial for score form with round ID  : #{f.object.round_id}"
-      render "admin/scores/result_card", f: f, score: f.object
+      render "admin/team_scores/card", f: f, score: f.object
     end
 
     f.actions do

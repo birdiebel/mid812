@@ -3,7 +3,6 @@
   <div class="panel_contents">
     <% round = @round %>
     <% slots = @slots || round.scoring_slots %>
-
     <% if slots.any? %>
       <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
         <input type="text" id="search-team-num" placeholder="Search team #..." style="padding: 8px;  font-size: 1em;" autocomplete="off">
@@ -40,16 +39,12 @@
             <% team_score = @team_scores_by_team_id[team.id] %>
             <% scoring_class = "scoring-#{slot.team.resultcat&.scoring_short.downcase}" %>
             <% scoring_mode = slot.team.resultcat&.scoring_short.downcase %>
-
             <% next unless team_score %>
-
             <!-- Get first entry's score -->
             <% first_entry_id = team.entries.first&.id %>
             <% score = @scores_by_entry_id[first_entry_id] %>
-
             <% tr_id = "team-score-#{team_score.id}" %>
             <% scoring_class = "scoring-#{team_score.status}" if team_score %>
-
             <!-- Ligne TeamScore -->
             <tr id="<%= tr_id %>" class="<%= scoring_class %>">
               <td><%= slot.flight.myTime %></td>
@@ -99,9 +94,10 @@
               <td><%= team_score.stb_total %></td>
               <td>
                 <% formula_nb_cards = slot.flight&.config_teetime&.formula&.nb_cards.to_i %>
-                <% if formula_nb_cards > 1 && team_score %>
+                <% if formula_nb_cards >= 1 && team_score %>
                   <%= link_to "Scores", cards_admin_team_score_path(team_score), class: "btt btt-add" %>
                 <% elsif score %>
+                  <%# Not use %>
                   <%= link_to "Scores", edit_admin_score_path(score), class: "btt btt-add" %>
                 <% end %>
               </td>
@@ -113,153 +109,108 @@
                     <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>
                   <% end %>
                 <% elsif scoring_mode != "sp" %>
-                    <%= form_with model: slot.team, url: admin_team_path(slot.team), method: :patch, local: true, style: "display: inline-flex; gap: 5px; align-items: center;" do |f| %>
-                      <%= hidden_field_tag :round_id, round.id %>
-                      <%= f.select :status, Team.statuses.keys.reject { |s| s == "refused" }.map { |s| [s.humanize, s] }, { selected: slot.team.status }, { style: "padding: 4px; font-size: 0.9em;" } %>
-                      <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>
-                    <% end %>
+                  <%= form_with model: slot.team, url: admin_team_path(slot.team), method: :patch, local: true, style: "display: inline-flex; gap: 5px; align-items: center;" do |f| %>
+                    <%= hidden_field_tag :round_id, round.id %>
+                    <%= f.select :status, Team.statuses.keys.reject { |s| s == "refused" }.map { |s| [s.humanize, s] }, { selected: slot.team.status }, { style: "padding: 4px; font-size: 0.9em;" } %>
+                    <%= f.submit "Change Status", class: "btt btt-edit", style: "padding: 4px 8px; font-size: 0.9em;" %>
+                  <% end %>
                 <% end %>
               </td>
             </tr>
           <% end %>
         </tbody>
       </table>
-
-      <div style="margin-top: 20px;">
-        <h4>Team Cards</h4>
-        <% format_card_for_holes = lambda do |card_str, nb_hole|
-             values = card_str.to_s.split(",")
-             values = values.first(nb_hole)
-             values.join(",")
-           end %>
-        <table class="table-scoring">
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Team</th>
-              <th>Holes</th>
-              <th>Start</th>
-              <th>Hcp</th>
-              <th>Brut Card</th>
-              <th>Net Card</th>
-              <th>Stb Card</th>
-              <th>Recu</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% slots.each do |slot| %>
-              <% team = slot.team %>
-              <% team_score = @team_scores_by_team_id[team.id] %>
-              <% next unless team_score %>
-              <% course_nb_hole = slot.flight&.config_teetime&.course&.nb_hole.to_i %>
-              <% course_nb_hole = 18 if course_nb_hole <= 0 %>
-              <tr>
-                <td><%= team.num %></td>
-                <td class="text-left"><%= team.team_name_short %></td>
-                <td><%= team_score.hole_played || 0 %></td>
-                <td><%= team_score.start_hole || 1 %></td>
-                <td><%= team_score.playing_hcp || "x" %></td>
-                <td class="text-left"><%= format_card_for_holes.call(team_score.brut_str, course_nb_hole) %></td>
-                <td class="text-left"><%= format_card_for_holes.call(team_score.net_str, course_nb_hole) %></td>
-                <td class="text-left"><%= format_card_for_holes.call(team_score.stb_str, course_nb_hole) %></td>
-                <td class="text-left"><%= format_card_for_holes.call(team_score.recu_str, course_nb_hole) %></td>
-              </tr>
-            <% end %>
-          </tbody>
-        </table>
-      </div>
     <% else %>
       <p>No slots with teams assigned for this round.</p>
     <% end %>
   </div>
 </div>
 <script>
+  $(document).ready(function() {
 
-$(document).ready(function() {
+    // Focus on search input when scores section is visible
+      var searchInput = $('#search-team-num');
+      var scoresRound = $('#scores-round');
 
-  // Focus on search input when scores section is visible
-    var searchInput = $('#search-team-num');
-    var scoresRound = $('#scores-round');
+      if (!window.location.hash) {
+          if ("#scores-status" == "partial") {
+            $this.css("background-color", "yellow");
+          }
+      }
 
-    if (!window.location.hash) {
-        if ("#scores-status" == "partial") {
-          $this.css("background-color", "yellow");
+      // Hide all sections
+      $('#config-times, #status, #round-details').hide();
+
+      // Show only scores section
+      $('#scores-round').show();
+
+      // Update menu buttons
+      $('.menu-event-button').removeClass('is-active');
+      $('a[href="#scores-round"]').addClass('is-active');
+
+    // Refresh button handler
+    $('#refresh-scores-btn').on('click', function() {
+      location.reload();
+    });
+
+    // Watch for visibility changes on scores-round
+    // var scoresRoundObserver = new MutationObserver(function(mutations) {
+    //   mutations.forEach(function(mutation) {
+    //     if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
+    //       if ($('#scores-round').is(':visible')) {
+    //         setTimeout(function() {
+    //           init_search_team();
+    //         }, 100);
+    //       }
+    //     }
+    //   });
+    // });
+
+    // var scoresRound = document.getElementById('scores-round');
+    // if (scoresRound) {
+    //   scoresRoundObserver.observe(scoresRound, {
+    //     attributes: true,
+    //     attributeFilter: ['style', 'class']
+    //   });
+    // }
+
+    // Also listen to turbo events
+    // $(document).on('turbo:load', function() {
+    //   init_search_team();
+    // });
+
+    $(document).on('keyup', '#search-team-num', function() {
+      var searchValue = $(this).val().trim();
+      var rows = $('#scores-table tbody tr');
+
+      if (searchValue === '') {
+        rows.show();
+        return;
+      }
+
+      rows.each(function() {
+        var teamNum = $(this).find('.team-num').text().trim();
+        if (teamNum === searchValue) {
+          $(this).show();
+        } else {
+          $(this).hide();
         }
-    }
+      });
+    });
 
-    // Hide all sections
-    $('#config-times, #status, #round-details').hide();
+    $(document).on('keypress', '#search-team-num', function(e) {
+      if (e.which == 13) { // Enter key
+        e.preventDefault();
+        var searchValue = $(this).val().trim();
+        var visibleRows = $('#scores-table tbody tr:visible');
 
-    // Show only scores section
-    $('#scores-round').show();
-
-    // Update menu buttons
-    $('.menu-event-button').removeClass('is-active');
-    $('a[href="#scores-round"]').addClass('is-active');
-
-  // Refresh button handler
-  $('#refresh-scores-btn').on('click', function() {
-    location.reload();
-  });
-
-  // Watch for visibility changes on scores-round
-  // var scoresRoundObserver = new MutationObserver(function(mutations) {
-  //   mutations.forEach(function(mutation) {
-  //     if (mutation.attributeName === 'style' || mutation.attributeName === 'class') {
-  //       if ($('#scores-round').is(':visible')) {
-  //         setTimeout(function() {
-  //           init_search_team();
-  //         }, 100);
-  //       }
-  //     }
-  //   });
-  // });
-
-  // var scoresRound = document.getElementById('scores-round');
-  // if (scoresRound) {
-  //   scoresRoundObserver.observe(scoresRound, {
-  //     attributes: true,
-  //     attributeFilter: ['style', 'class']
-  //   });
-  // }
-
-  // Also listen to turbo events
-  // $(document).on('turbo:load', function() {
-  //   init_search_team();
-  // });
-
-  $(document).on('keyup', '#search-team-num', function() {
-    var searchValue = $(this).val().trim();
-    var rows = $('#scores-table tbody tr');
-
-    if (searchValue === '') {
-      rows.show();
-      return;
-    }
-
-    rows.each(function() {
-      var teamNum = $(this).find('.team-num').text().trim();
-      if (teamNum === searchValue) {
-        $(this).show();
-      } else {
-        $(this).hide();
+        if (visibleRows.length === 1) {
+          var editButton = visibleRows.find('a.btt-add').first();
+          if (editButton.length) {
+            window.location.href = editButton.attr('href');
+          }
+        }
       }
     });
   });
-
-  $(document).on('keypress', '#search-team-num', function(e) {
-    if (e.which == 13) { // Enter key
-      e.preventDefault();
-      var searchValue = $(this).val().trim();
-      var visibleRows = $('#scores-table tbody tr:visible');
-
-      if (visibleRows.length === 1) {
-        var editButton = visibleRows.find('a.btt-add').first();
-        if (editButton.length) {
-          window.location.href = editButton.attr('href');
-        }
-      }
-    }
-  });
-});
 </script>

@@ -9,10 +9,8 @@
       <span class="scoring-stb" id="team-stb-total">Stb: <%= @team_score.stb_total.presence || "" %></span>
     </span>
   </h3>
-
   <div class="panel_contents">
     <% nb_hole = team_score_hole_count(@team_score) %>
-
     <% if @scores.any? %>
       <%= form_with url: update_cards_admin_team_score_path(@team_score), method: :patch, local: true do %>
         <% shared_score = @scores.first %>
@@ -31,13 +29,12 @@
         <% team_brut_values = (team_brut_values + Array.new(shared_nb_hole, "")).first(shared_nb_hole) %>
         <% team_net_values = (team_net_values + Array.new(shared_nb_hole, "")).first(shared_nb_hole) %>
         <% team_stb_values = (team_stb_values + Array.new(shared_nb_hole, "")).first(shared_nb_hole) %>
-
         <div style="margin-bottom: 20px; border: 1px solid #ddd; padding: 10px; overflow-x: auto;">
           <table class="table-card input-scorecard" data-nb-hole="<%= shared_nb_hole %>">
             <tr>
               <td class="scorecard-label">Hole</td>
               <% shared_nb_hole.times do |index| %>
-                <td class="scorecard-zone"><%= index + 1 %></td>
+                <td class="scorecard-zone zone-hole"><%= index + 1 %></td>
                 <% if show_split_totals && index == 8 %>
                   <td class="scorecard-zone scorecard-label">Front</td>
                 <% end %>
@@ -47,11 +44,10 @@
                 <td class="scorecard-zone scorecard-label">Total</td>
               <% end %>
             </tr>
-
             <tr>
               <td class="scorecard-label">Par</td>
               <% shared_nb_hole.times do |index| %>
-                <td class="scorecard-zone team-par" data-hole="<%= index %>"><%= shared_par_values[index] %></td>
+                <td class="scorecard-zone zone-par" data-hole="<%= index %>"><%= shared_par_values[index] %></td>
                 <% if show_split_totals && index == 8 %>
                   <td class="scorecard-zone scorecard-label"><%= shared_par_values.first(9).sum %></td>
                 <% end %>
@@ -61,7 +57,6 @@
                 <td class="scorecard-zone scorecard-label"><%= shared_par_values.sum %></td>
               <% end %>
             </tr>
-
             <% @scores.each do |score| %>
               <% entry = score.entry %>
               <% slot = score.slot %>
@@ -72,13 +67,11 @@
               <% recu_values = (score.computed_recu_array || []).first(score_nb_hole) %>
               <% brut_values = (brut_values + Array.new(score_nb_hole, "")).first(score_nb_hole) %>
               <% recu_values = (recu_values + Array.new(score_nb_hole, 0)).first(score_nb_hole) %>
-
               <tr>
                 <td class="scorecard-label" colspan="<%= score_nb_hole + 1 + (show_split_totals ? 3 : 0) %>" style="text-align: left;">
                   <%= entry&.player&.full_name || "N/A" %> | PHCP: <%= score.playing_hcp || "x" %>
                 </td>
               </tr>
-
               <tr data-score-id="<%= score.id %>">
                 <td class="scorecard-label">Brut</td>
                 <% score_nb_hole.times do |index| %>
@@ -102,13 +95,11 @@
                 <% end %>
               </tr>
             <% end %>
-
             <tr>
               <td class="scorecard-label" colspan="<%= shared_nb_hole + 1 + (show_split_totals ? 3 : 0) %>" style="text-align: left;">
                 Team result
               </td>
             </tr>
-
             <tr>
               <td class="scorecard-label team-summary-brut">Team Brut</td>
               <% shared_nb_hole.times do |index| %>
@@ -122,7 +113,6 @@
                 <td class="scorecard-zone scorecard-label team-summary-brut" data-team-zone="brut" data-split="total"></td>
               <% end %>
             </tr>
-
             <tr>
               <td class="scorecard-label team-summary-net">Team Net</td>
               <% shared_nb_hole.times do |index| %>
@@ -136,7 +126,6 @@
                 <td class="scorecard-zone scorecard-label team-summary-net" data-team-zone="net" data-split="total"></td>
               <% end %>
             </tr>
-
             <tr>
               <td class="scorecard-label team-summary-stb">Team Stb</td>
               <% shared_nb_hole.times do |index| %>
@@ -152,7 +141,6 @@
             </tr>
           </table>
         </div>
-
         <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
           <%= submit_tag "Save", class: "btt btt-add" %>
           <%= link_to "Cancel", scoring_admin_round_path(@team_score.round, anchor: "team-score-#{@team_score.id}"), class: "btt btt-edit" %>
@@ -161,10 +149,8 @@
     <% else %>
       <p>No individual score cards found for this team and round.</p>
     <% end %>
-
   </div>
 </div>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
     var inputs = Array.from(document.querySelectorAll('.team-card-brut'));

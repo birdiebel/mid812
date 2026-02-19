@@ -3,9 +3,7 @@
     Config Times
   </a>
   <%= link_to "Start List", start_list_admin_round_path(round), method: :get, class: "menu-button menu-event-button", style: "background-color: #43a047; color: white;" %>
-
   <%= link_to "Scoring", "/admin/rounds/#{round.id}/scoring", method: :get, class: "menu-button menu-event-button", style: "background-color: #43a047; color: white;" %>
-
   <a href="#round-details" class="menu-button menu-event-button" data-target="#round-details">
     Round Details
   </a>
@@ -13,7 +11,6 @@
     <%= round.status.upcase %>
   </a>
 </div>
-
 <style>
   .round-menu-section {
     display: none;

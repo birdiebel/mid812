@@ -5,21 +5,18 @@
 <% tee = course&.tees&.find_by(teebox: entry&.playercat&.teebox) %>
 <% nb_hole = course&.nb_hole.to_i %>
 <% nb_hole = 18 if nb_hole <= 0 %>
-
 <% par = tee&.str_to_array("par_str") || [] %>
 <% stroke = tee&.str_to_array("stroke_str") || [] %>
 <% recu = score.computed_recu_array.presence || (score.recu_str.present? ? score.recu_str.split(",").map(&:to_i) : []) %>
 <% brut = score.brut_str.present? ? score.brut_str.split(",") : [] %>
 <% net = score.net_str.present? ? score.net_str.split(",") : [] %>
 <% stb = score.stb_str.present? ? score.stb_str.split(",") : [] %>
-
 <% par = (par + Array.new(nb_hole, 0)).first(nb_hole) %>
 <% stroke = (stroke + Array.new(nb_hole, 0)).first(nb_hole) %>
 <% recu = (recu + Array.new(nb_hole, 0)).first(nb_hole) %>
 <% brut = (brut + Array.new(nb_hole, "")).first(nb_hole) %>
 <% net = (net + Array.new(nb_hole, "")).first(nb_hole) %>
 <% stb = (stb + Array.new(nb_hole, "")).first(nb_hole) %>
-
 <% par_total = tee&.par.to_i %>
 <% brut_values_for_diff = score.brut_str.present? ? score.brut_str.split(",").map { |value| value.present? ? value.to_i : nil } : [] %>
 <% diff_not_calculable = brut_values_for_diff.compact.any?(&:zero?) %>
@@ -35,7 +32,6 @@
                                             else
                                                 diff_par_initial_value.to_s
                                             end %>
-
 <div class="panel">
   <h3 style="display: flex; justify-content: space-between; align-items: center;">
     <span style="display: flex; gap: 10px; align-items: center;">
@@ -51,128 +47,118 @@
       </span>
     </span>
     <span style="display: flex; gap: 5px;">
-        <span class="brut_total scoring-sp" player="<%= player %>"></span>
-        <span class="net_total scoring-net" player="<%= player %>"></span>
-        <span class="stb_total scoring-stb" player="<%= player %>"></span>
-        <span class="par_total" player="<%= player %>">Par : <%= par_total_played %></span>
-        <span class="diff_par" player="<%= player %>">Diff : <%= diff_par_initial %></span>
+      <span class="brut_total scoring-sp" player="<%= player %>"></span>
+      <span class="net_total scoring-net" player="<%= player %>"></span>
+      <span class="stb_total scoring-stb" player="<%= player %>"></span>
+      <span class="par_total hide" player="<%= player %>">Par : <%= par_total_played %></span>
+      <span class="diff_par hide" player="<%= player %>">Diff : <%= diff_par_initial %></span>
     </span>
   </h3>
-    <div style="padding: 5px;">
+  <div style="padding: 5px;">
     <% if tee %>
-        <div class="scorecard-title <%= tee.teebox.downcase %>">
+      <div class="scorecard-title <%= tee.teebox.downcase %>">
         <%= tee.teebox %> tees
-        </div>
+      </div>
     <% end %>
-
     <span id="nb_cards" class="hide"><%= player %></span>
     <span id="nb_hole" class="hide"><%= nb_hole %></span>
-
     <table class="table-card input-scorecard" data-nb-hole="<%= nb_hole %>">
-        <tr>
-        <td class="scorecard-label">Tour Num</td>
+      <tr>
+        <td class="scorecard-label">Hole</td>
         <% nb_hole.times do |i| %>
-            <td class="scorecard-zone"><%= i + 1 %></td>
-            <% if nb_hole == 18 && i == 8 %>
+          <td class="scorecard-zone zone-hole"><%= i + 1 %></td>
+          <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone scorecard-label">Front</td>
-            <% end %>
+          <% end %>
         <% end %>
         <% if nb_hole == 18 %>
-            <td class="scorecard-zone scorecard-label">Back</td>
-            <td class="scorecard-zone scorecard-label">Total</td>
+          <td class="scorecard-zone scorecard-label">Back</td>
+          <td class="scorecard-zone scorecard-label">Total</td>
         <% end %>
-        </tr>
-
-        <tr>
+      </tr>
+      <tr>
         <td class="scorecard-label">Par</td>
         <% nb_hole.times do |i| %>
-            <td class="scorecard-zone par" player="<%= player %>" hole="<%= i %>"><%= par[i] %></td>
-            <% if nb_hole == 18 && i == 8 %>
+          <td class="scorecard-zone par zone-par" player="<%= player %>" hole="<%= i %>"><%= par[i] %></td>
+          <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone scorecard-label"><%= par.first(9).sum %></td>
-            <% end %>
+          <% end %>
         <% end %>
         <% if nb_hole == 18 %>
-            <td class="scorecard-zone scorecard-label"><%= par.last(9).sum %></td>
-            <td class="scorecard-zone scorecard-label"><%= par.first(nb_hole).sum %></td>
+          <td class="scorecard-zone scorecard-label"><%= par.last(9).sum %></td>
+          <td class="scorecard-zone scorecard-label"><%= par.first(nb_hole).sum %></td>
         <% end %>
-        </tr>
-
-        <tr>
+      </tr>
+      <tr>
         <td class="scorecard-label">Stroke</td>
         <% nb_hole.times do |i| %>
-            <td class="scorecard-zone stroke" player="<%= player %>" hole="<%= i %>"><%= stroke[i] %></td>
-            <% if nb_hole == 18 && i == 8 %>
+          <td class="scorecard-zone stroke zone-stroke" player="<%= player %>" hole="<%= i %>"><%= stroke[i] %></td>
+          <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone"></td>
-            <% end %>
+          <% end %>
         <% end %>
         <% if nb_hole == 18 %>
-            <td class="scorecard-zone"></td>
-            <td class="scorecard-zone"></td>
+          <td class="scorecard-zone"></td>
+          <td class="scorecard-zone"></td>
         <% end %>
-        </tr>
-
-        <tr>
+      </tr>
+      <tr>
         <td class="scorecard-label">Recus</td>
         <% nb_hole.times do |i| %>
-            <td class="scorecard-zone recu" player="<%= player %>" hole="<%= i %>"><%= recu[i] %></td>
-            <% if nb_hole == 18 && i == 8 %>
+          <td class="scorecard-zone recu zone-recus" player="<%= player %>" hole="<%= i %>"><%= recu[i] %></td>
+          <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone"></td>
-            <% end %>
+          <% end %>
         <% end %>
         <% if nb_hole == 18 %>
-            <td class="scorecard-zone"></td>
-            <td class="scorecard-zone"></td>
+          <td class="scorecard-zone"></td>
+          <td class="scorecard-zone"></td>
         <% end %>
-        </tr>
-
-        <tr>
+      </tr>
+      <tr>
         <td class="scorecard-label">Brut</td>
         <% nb_hole.times do |i| %>
-            <td class="scorecard-zone">
+          <td class="scorecard-zone">
             <%= text_field_tag "brut_inputs[#{i}]", brut[i], class: "score-input brut", style: "width: 100%", autocomplete: "off", player: player, hole: i %>
-            </td>
-            <% if nb_hole == 18 && i == 8 %>
+          </td>
+          <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone scorecard-label brut_front" player="<%= player %>"></td>
-            <% end %>
+          <% end %>
         <% end %>
         <% if nb_hole == 18 %>
-            <td class="scorecard-zone scorecard-label brut_back" player="<%= player %>"></td>
-            <td class="scorecard-zone scorecard-label brut_total" player="<%= player %>"></td>
+          <td class="scorecard-zone scorecard-label brut_back" player="<%= player %>"></td>
+          <td class="scorecard-zone scorecard-label brut_total" player="<%= player %>"></td>
         <% end %>
-        </tr>
-
-        <tr>
+      </tr>
+      <tr>
         <td class="scorecard-label">Net</td>
         <% nb_hole.times do |i| %>
-            <td class="scorecard-zone net" player="<%= player %>" hole="<%= i %>"><%= net[i] %></td>
-            <% if nb_hole == 18 && i == 8 %>
+          <td class="scorecard-zone net" player="<%= player %>" hole="<%= i %>"><%= net[i] %></td>
+          <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone scorecard-label net_front" player="<%= player %>"></td>
-            <% end %>
+          <% end %>
         <% end %>
         <% if nb_hole == 18 %>
-            <td class="scorecard-zone scorecard-label net_back" player="<%= player %>"></td>
-            <td class="scorecard-zone scorecard-label net_total" player="<%= player %>"></td>
+          <td class="scorecard-zone scorecard-label net_back" player="<%= player %>"></td>
+          <td class="scorecard-zone scorecard-label net_total" player="<%= player %>"></td>
         <% end %>
-        </tr>
-
-        <tr>
+      </tr>
+      <tr>
         <td class="scorecard-label">Stb</td>
         <% nb_hole.times do |i| %>
-            <td class="scorecard-zone stb" player="<%= player %>" hole="<%= i %>"><%= stb[i] %></td>
-            <% if nb_hole == 18 && i == 8 %>
+          <td class="scorecard-zone stb" player="<%= player %>" hole="<%= i %>"><%= stb[i] %></td>
+          <% if nb_hole == 18 && i == 8 %>
             <td class="scorecard-zone scorecard-label stb_front" player="<%= player %>"></td>
-            <% end %>
+          <% end %>
         <% end %>
         <% if nb_hole == 18 %>
-            <td class="scorecard-zone scorecard-label stb_back" player="<%= player %>"></td>
-            <td class="scorecard-zone scorecard-label stb_total" player="<%= player %>"></td>
+          <td class="scorecard-zone scorecard-label stb_back" player="<%= player %>"></td>
+          <td class="scorecard-zone scorecard-label stb_total" player="<%= player %>"></td>
         <% end %>
-        </tr>
+      </tr>
     </table>
-
     <%= f.input :brut_str, as: :hidden, input_html: { class: "initial_brut", player: player } %>
     <%= f.input :net_str, as: :hidden, input_html: { class: "initial_net", player: player } %>
     <%= f.input :stb_str, as: :hidden, input_html: { class: "initial_stb", player: player } %>
     <%= f.input :par_total, as: :hidden, input_html: { class: "par_total_value", value: par_total, player: player } %>
-
-</div>
+  </div>
