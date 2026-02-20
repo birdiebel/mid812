@@ -48,6 +48,7 @@ ActiveAdmin.register Round do
 
   member_action :pdf_scorecard, method: :get do
     @round = Round.find(params[:id])
+    @round.ensure_scores_for_scoring!
     respond_to do |format|
       format.html
       format.pdf do
