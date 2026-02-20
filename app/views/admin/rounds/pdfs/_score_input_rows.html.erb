@@ -1,0 +1,27 @@
+<tr class="card-inputs-row">
+  <% (1..holes).each do |hole| %>
+    <td colspan="1" class="card-td"></td>
+    <% if hole == 9 && holes == 18 %>
+      <td colspan="1" class="card-td"></td>
+    <% end %>
+    <% if hole == 18 && holes == 18 %>
+      <td colspan="1" class="card-td"></td>
+    <% end %>
+  <% end %>
+  <td colspan="2" class="card-td"></td>
+</tr>
+<% if show_stb %>
+  <tr class="card-inputs-row">
+    <td colspan="2" class="card-td">Stb</td>
+    <% (1..holes).each do |hole| %>
+      <td colspan="1" class="card-td"></td>
+      <% if hole == 9 && holes == 18 %>
+        <td colspan="1" class="card-td"></td>
+      <% end %>
+      <% if hole == 18 && holes == 18 %>
+        <td colspan="1" class="card-td"></td>
+      <% end %>
+    <% end %>
+    <td colspan="2" class="card-td"></td>
+  </tr>
+<% end %>

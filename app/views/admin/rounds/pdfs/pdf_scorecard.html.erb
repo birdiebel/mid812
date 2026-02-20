@@ -1,6 +1,6 @@
 <% round = @round %>
 <% event = round.event %>
-<% slots = round.slots.includes(team: :entries) %>
+<% slots = round.slots.includes(:scores, { team: [ :entries, :resultcat ] }, { flight: { config_teetime: [ :formula, { course: [ :club, :tees ] } ] } }) %>
 <% table_cols = 24 %>
 <div>
   <% slots.each do |slot| %>
@@ -8,25 +8,23 @@
       <%# Init vars %>
       <% course = slot&.flight&.config_teetime&.course %>
       <% start_hole = slot&.flight&.config_teetime&.start_hole %>
+      <% next if course.blank? %>
       <% holes = course.nb_hole.to_i %>
-      <% playing_hcp = slot.scores.map { |p| p.playing_hcp }.join(" / ") %>
-      <% tees = slot.scores.map { |p| p.entry.playercat.teebox }.join(" / ") %>
-      <% teebox = slot.team.entries.first.playercat.teebox %>
-      <% par_tee = course.tees.find_by(teebox: teebox) %>
-      <% pars = par_tee.str_to_array("par_str")%>
-      <% strokes = par_tee.str_to_array("stroke_str")%>
-      <% formule = slot.flight.config_teetime.formula %>
-      <% scoring = slot.team.resultcat.scoring %>
-      <% nb_cards = formule.nb_cards %>
-      <% entries = slot.team.entries %>
-      <% scores = slot.scores %>
-      <% if nb_cards > 1 %>
-        <% entries = entries.first(nb_cards) %>
-      <% else %>
-        <% entries = entries.first(1) %>
-      <% end %>
-      <% marker = slot.flight.set_marker %>
-      <%= puts "Marker: #{marker[slot]&.team&.team_name}" %>
+      <% next if holes <= 0 %>
+      <% scores = slot.scores.includes(entry: :playercat) %>
+      <% playing_hcp = scores.map(&:playing_hcp).join(" / ") %>
+      <% tees = scores.map { |p| p.entry&.playercat&.teebox }.compact.join(" / ") %>
+      <% teebox = slot.team.entries.first&.playercat&.teebox %>
+      <% next if teebox.blank? %>
+      <% par_tee = course.tees.find { |tee| tee.teebox == teebox } %>
+      <% next if par_tee.blank? %>
+      <% pars = par_tee.str_to_array("par_str") %>
+      <% strokes = par_tee.str_to_array("stroke_str") %>
+      <% formule = slot.flight&.config_teetime&.formula %>
+      <% next if formule.blank? %>
+      <% scoring = slot.team.resultcat&.scoring %>
+      <% marker_by_slot = slot.flight.set_marker %>
+      <% marker_scores = marker_by_slot[slot]&.scores || [] %>
       <%# Start card %>
       <div class="alwaysbreak">
         <table class="pdf-table-scorecard">
@@ -54,7 +52,7 @@
           <%# Ligne 3 %>
           <tr>
             <td colspan="12" class="card-td"><%= formule.name.upcase %></td>
-            <td colspan="12" class="card-td"><%= course.club.name.humanize %></td>
+            <td colspan="12" class="card-td"><%= course.club&.name.to_s.humanize %></td>
           </tr>
           <%# Ligne 4 hole number %>
           <tr>
@@ -103,35 +101,7 @@
             <%# recus %>
             <% recus = score.computed_recu_array %>
             <%= render partial: "admin/rounds/pdfs/recus", locals: { holes: holes, recus: recus, entry: score.entry } %>
-            <%# Bruts %>
-            <tr class="card-inputs-row">
-              <% (1..holes).each do |hole| %>
-                <td colspan="1" class="card-td"></td>
-                <% if hole == 9 && holes == 18 %>
-                  <td colspan="1" class="card-td"></td>
-                <% end %>
-                <% if hole == 18 && holes == 18 %>
-                  <td colspan="1" class="card-td"></td>
-                <% end %>
-              <% end %>
-              <td colspan="2" class="card-td"></td>
-            </tr>
-            <%# Stbs %>
-            <% if scoring == "stableford" || event.format == "single" %>
-              <tr class="card-inputs-row">
-                <td colspan="2" class="card-td">Stb</td>
-                <% (1..holes).each do |hole| %>
-                  <td colspan="1" class="card-td"></td>
-                  <% if hole == 9 && holes == 18 %>
-                    <td colspan="1" class="card-td"></td>
-                  <% end %>
-                  <% if hole == 18 && holes == 18 %>
-                    <td colspan="1" class="card-td"></td>
-                  <% end %>
-                <% end %>
-                <td colspan="2" class="card-td"></td>
-              </tr>
-            <% end %>
+            <%= render partial: "admin/rounds/pdfs/score_input_rows", locals: { holes: holes, show_stb: scoring == "stableford" || event.format == "single" } %>
           <% end %>
           <%# Line space %>
           <tr class="card-recu-row"></tr>
@@ -145,11 +115,11 @@
           </tr>
           <%# Cases signatures & totaux %>
           <tr class="card-signature-row">
-            <td colspan="6"  class="card-td"></td>
-            <td colspan="6"  class="card-td"></td>
-            <td colspan="4"  class="card-td"></td>
-            <td colspan="4"  class="card-td"></td>
-            <td colspan="4"  class="card-td"></td>
+            <td colspan="6" class="card-td"></td>
+            <td colspan="6" class="card-td"></td>
+            <td colspan="4" class="card-td"></td>
+            <td colspan="4" class="card-td"></td>
+            <td colspan="4" class="card-td"></td>
           </tr>
           <%# marker %>
           <% if formule == "single" %>
@@ -161,11 +131,13 @@
             <td colspan="2" style="border-bottom: 1px solid black; font-size: 12px;">MARKER</td>
             <td colspan="22" style="border-bottom: 1px solid black; font-size: 12px; font-weight: bold;">PLACING : NO !</td>
           </tr>
-          <% marker[slot]&.scores.each do |score| %>
+          <% marker_scores.each do |score| %>
             <%# Ligne 5 dist %>
-            <% m_teebox = score.entry.playercat.teebox %>
-            <% m_dist_tee = course.tees.find_by(teebox: m_teebox) %>
-            <% dists = m_dist_tee.str_to_array("dist_str")%>
+            <% m_teebox = score.entry&.playercat&.teebox %>
+            <% next if m_teebox.blank? %>
+            <% m_dist_tee = course.tees.find { |tee| tee.teebox == m_teebox } %>
+            <% next if m_dist_tee.blank? %>
+            <% dists = m_dist_tee.str_to_array("dist_str") %>
             <tr>
               <td colspan="2" class="card-td"><%= m_dist_tee.teebox %></td>
               <% (1..holes).each do |hole| %>
@@ -182,35 +154,7 @@
             <%# recus %>
             <% recus = score.computed_recu_array %>
             <%= render partial: "admin/rounds/pdfs/recus", locals: { holes: holes, recus: recus, entry: score.entry } %>
-            <%# Bruts %>
-            <tr class="card-inputs-row">
-              <% (1..holes).each do |hole| %>
-                <td colspan="1" class="card-td"></td>
-                <% if hole == 9 && holes == 18 %>
-                  <td colspan="1" class="card-td"></td>
-                <% end %>
-                <% if hole == 18 && holes == 18 %>
-                  <td colspan="1" class="card-td"></td>
-                <% end %>
-              <% end %>
-              <td colspan="2" class="card-td"></td>
-            </tr>
-            <%# Stbs %>
-            <% if event.format == "single" %>
-              <tr class="card-inputs-row">
-                <td colspan="2" class="card-td">Stb</td>
-                <% (1..holes).each do |hole| %>
-                  <td colspan="1" class="card-td"></td>
-                  <% if hole == 9 && holes == 18 %>
-                    <td colspan="1" class="card-td"></td>
-                  <% end %>
-                  <% if hole == 18 && holes == 18 %>
-                    <td colspan="1" class="card-td"></td>
-                  <% end %>
-                <% end %>
-                <td colspan="2" class="card-td"></td>
-              </tr>
-            <% end %>
+            <%= render partial: "admin/rounds/pdfs/score_input_rows", locals: { holes: holes, show_stb: event.format == "single" } %>
           <% end %>
         </table>
       </div>
