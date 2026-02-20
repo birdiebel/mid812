@@ -1,0 +1,156 @@
+<% round = @round %>
+<% event = round.event %>
+<% slots = round.slots.includes(team: :entries) %>
+<% table_cols = 24 %>
+<div>
+  <% slots.each do |slot| %>
+    <% if slot.team.present? %>
+      <%# Init vars %>
+      <% course = slot&.flight&.config_teetime&.course %>
+      <% start_hole = slot&.flight&.config_teetime&.start_hole %>
+      <% holes = course.nb_hole.to_i %>
+      <% playing_hcp = slot.scores.map { |p| p.playing_hcp }.join(" / ") %>
+      <% tees = slot.scores.map { |p| p.entry.playercat.teebox }.join(" / ") %>
+      <% teebox = slot.team.entries.first.playercat.teebox %>
+      <% par_tee = course.tees.find_by(teebox: teebox) %>
+      <% pars = par_tee.str_to_array("par_str")%>
+      <% strokes = par_tee.str_to_array("stroke_str")%>
+      <% formule = slot.flight.config_teetime.formula %>
+      <% scoring = slot.team.resultcat.scoring %>
+      <% nb_cards = formule.nb_cards %>
+      <% entries = slot.team.entries %>
+      <% scores = slot.scores %>
+      <% if nb_cards > 1 %>
+        <% entries = entries.first(nb_cards) %>
+      <% else %>
+        <% entries = entries.first(1) %>
+      <% end %>
+      <%# Start card %>
+      <div class="alwaysbreak">
+        <table class="pdf-table-scorecard">
+          <%# ligne 0 %>
+          <tr style="display: none;">
+            <% (1..table_cols).each do |i| %>
+              <td colspan="1" class="card-td"><%= i %></td>
+            <% end %>
+          </tr>
+          <%# Ligne 1 %>
+          <tr>
+            <td colspan="5" class="card-td" style="text-align: left;">Tee <%= start_hole %> | <%= course.name %></td>
+            <td colspan="16" class="card-td" style="text-align: left;"><%= slot.team.team_name_short %></td>
+            <td colspan="3" class="card-td">PHCP : <%= playing_hcp %></td>
+          </tr>
+          <%# Ligne 2 %>
+          <tr>
+            <td colspan="2" class="card-td"><%= slot.team.resultcat&.scoring.humanize %></td>
+            <td colspan="3" class="card-td"><%= tees %></td>
+            <td colspan="2" class="card-td"><%= slot.team.start_time_for_round(round.id) %></td>
+            <td colspan="13" class="card-td"><%= event.name %></td>
+            <td colspan="3" class="card-td"><%= round.date_for_display %></td>
+            <td class="card-td">R <%= round.num %></td>
+          </tr>
+          <%# Ligne 3 %>
+          <tr>
+            <td colspan="12" class="card-td"><%= formule.name.humanize %></td>
+            <td colspan="12" class="card-td"><%= course.club.name %></td>
+          </tr>
+          <%# Ligne 4 hole number %>
+          <tr>
+            <td colspan="2" class="card-td">Hole</td>
+            <% (1..holes).each do |hole| %>
+              <td colspan="1" class="card-td"><%= hole %></td>
+              <% if hole == 9 && holes == 18 %>
+                <td colspan="1" class="card-td">Front</td>
+              <% end %>
+              <% if hole == 18 && holes == 18 %>
+                <td colspan="1" class="card-td">Back</td>
+              <% end %>
+            <% end %>
+            <td colspan="2" class="card-td">Total</td>
+          </tr>
+          <%# Ligne 5 par %>
+          <tr>
+            <td colspan="2" class="card-td">Par</td>
+            <% (1..holes).each do |hole| %>
+              <td colspan="1" class="card-td"><%= pars[hole - 1] %></td>
+              <% if hole == 9 && holes == 18 %>
+                <td colspan="1" class="card-td"><%= pars[0..8].sum %></td>
+              <% end %>
+              <% if hole == 18 && holes == 18 %>
+                <td colspan="1" class="card-td"><%= pars[9..17].sum %></td>
+              <% end %>
+            <% end %>
+            <td colspan="2" class="card-td"><%= pars.sum %></td>
+          </tr>
+          <%# Ligne 6 strokes %>
+          <tr>
+            <td colspan="2" class="card-td">Stroke</td>
+            <% (1..holes).each do |hole| %>
+              <td colspan="1" class="card-td"><%= strokes[hole - 1] %></td>
+              <% if hole == 9 && holes == 18 %>
+                <td colspan="1" class="card-td"></td>
+              <% end %>
+              <% if hole == 18 && holes == 18 %>
+                <td colspan="1" class="card-td"></td>
+              <% end %>
+            <% end %>
+            <td colspan="2" class="card-td"></td>
+          </tr>
+          <%# Ligne 8 & 8 bis brut & stb inputs %>
+          <% scores.each do |score| %>
+            <%# recus %>
+            <% recus = score.computed_recu_array %>
+            <%= render partial: "admin/rounds/pdfs/recus", locals: { holes: holes, recus: recus } %>
+            <%# Bruts %>
+            <tr class="card-inputs-row">
+              <% (1..holes).each do |hole| %>
+                <td colspan="1" class="card-td"></td>
+                <% if hole == 9 && holes == 18 %>
+                  <td colspan="1" class="card-td"></td>
+                <% end %>
+                <% if hole == 18 && holes == 18 %>
+                  <td colspan="1" class="card-td"></td>
+                <% end %>
+              <% end %>
+              <td colspan="2" class="card-td"></td>
+            </tr>
+            <%# Stbs %>
+            <% if scoring == "stableford" %>
+              <tr class="card-inputs-row">
+                <td colspan="2" class="card-td">Stb</td>
+                <% (1..holes).each do |hole| %>
+                  <td colspan="1" class="card-td"></td>
+                  <% if hole == 9 && holes == 18 %>
+                    <td colspan="1" class="card-td"></td>
+                  <% end %>
+                  <% if hole == 18 && holes == 18 %>
+                    <td colspan="1" class="card-td"></td>
+                  <% end %>
+                <% end %>
+                <td colspan="2" class="card-td"></td>
+              </tr>
+            <% end %>
+          <% end %>
+          <%# Line space %>
+          <tr class="card-recu-row"></tr>
+          <%# Ligne 9 Signatures & totaux %>
+          <tr class="card-recu-row" style="background-color: lightgray;">
+            <td colspan="6" class="card-recu-td card-sign-title">Signature Player</td>
+            <td colspan="6" class="card-recu-td card-sign-title">Signature Marker</td>
+            <td colspan="4" class="card-recu-td card-sign-title">Stb</td>
+            <td colspan="4" class="card-recu-td card-sign-title">Net</td>
+            <td colspan="4" class="card-recu-td card-sign-title">Brut</td>
+          </tr>
+          <%# Cases signatures & totaux %>
+          <tr class="card-signature-row">
+            <td colspan="6"  class="card-td"></td>
+            <td colspan="6"  class="card-td"></td>
+            <td colspan="4"  class="card-td"></td>
+            <td colspan="4"  class="card-td"></td>
+            <td colspan="4"  class="card-td"></td>
+          </tr>
+        </table>
+      </div>
+    <% end %>
+  <% end %>
+</div>

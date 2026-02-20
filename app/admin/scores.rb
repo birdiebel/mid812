@@ -19,10 +19,6 @@ ActiveAdmin.register Score do
     column :status
     column :hole_played
     column :start_hole
-    column :brut_str
-    column :net_str
-    column :stb_str
-    column :recu_str
     actions
   end
 

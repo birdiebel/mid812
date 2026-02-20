@@ -93,6 +93,13 @@ class Team < ApplicationRecord
     }.join("</br>").html_safe
   end
 
+  def team_teebox
+    entries.map {
+      |e|
+      "#{e.playercat.teebox} "
+    }.join("/").html_safe
+  end
+
   def team_teebox_pdf
     entries.map {
       |e|

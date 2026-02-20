@@ -10,9 +10,6 @@ ActiveAdmin.register Round do
     link_to "Close", admin_tour_event_path(resource.event.tour, resource.event, anchor: "rounds")
   end
 
-  # action_item "Scoring", only: [ :show ] do
-  #   link_to "Scoring", "/admin/rounds/#{resource.id}/scoring", method: :get
-  # end
   member_action :scoring, method: :get do
     @round = Round.find(params[:id])
     @round.ensure_scores_for_scoring!
@@ -42,8 +39,23 @@ ActiveAdmin.register Round do
       format.html
       format.pdf do
         render pdf: "start_list_pdf",   # Excluding ".pdf" extension.
-               template: "admin/rounds/pdf_start_list",
+               template: "admin/rounds/pdfs/pdf_start_list",
                formats: [ :html ],
+               layout: "pdf" # Optional, use 'pdf' to render app/views/layouts/pdf.html.erb
+      end
+    end
+  end
+
+  member_action :pdf_scorecard, method: :get do
+    @round = Round.find(params[:id])
+    respond_to do |format|
+      format.html
+      format.pdf do
+        render pdf: "scorecard_pdf",   # Excluding ".pdf" extension.
+               template: "admin/rounds/pdfs/pdf_scorecard",
+               formats: [ :html ],
+               page_size: "A5",
+               orientation: "Landscape",
                layout: "pdf" # Optional, use 'pdf' to render app/views/layouts/pdf.html.erb
       end
     end

@@ -14,6 +14,10 @@ class Round < ApplicationRecord
   validates :status, presence: true
   validates :num, presence: true, numericality: { only_integer: true, greater_than: 0 }
 
+  def date_for_display
+    date.strftime("%d/%m/%Y")
+  end
+
   def slots_taked
     config_teetimes.joins(flights: :slots).where.not(slots: { team_id: nil }).count
   end

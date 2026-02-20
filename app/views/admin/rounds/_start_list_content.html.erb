@@ -1,7 +1,8 @@
 <div class="panel" style="text-align: center;">
   <h3>Start List</h3>
-  <div>
+  <div class="flex-center " style="gap: 10px;">
     <%= link_to "PDF Start List", pdf_start_list_admin_round_path(@round, format: :pdf), class: "button" %>
+    <%= link_to "PDF Scorecards", pdf_scorecard_admin_round_path(@round, format: :pdf), class: "button" %>
   </div>
   <div class="flex-container" style="gap: 20px; justify-content: center; align-items: stretch; height: 70vh;">
     <div style="height: 100%;">
@@ -233,7 +234,7 @@
   slotElement.setAttribute('data-hcp', team.total_hcp);
   slotElement.classList.remove('slot-item--empty');
   slotElement.classList.add('slot-item--occupied');
-}
+  }
 
     // Make slots with assigned teams draggable
     function makeSlotsDraggable() {

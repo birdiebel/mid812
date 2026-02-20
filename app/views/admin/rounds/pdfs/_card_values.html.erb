@@ -1,0 +1,32 @@
+<div class="alwaysbreak">
+  <table class="pdf-table" style="width: 100%;">
+    <%# Ligne 1 : team name & playing HCP %>
+    <tr>
+      <td colspan="20" class="card-td" style="text-align: left;"><%= slot.team.team_name_short%></td>
+      <td colspan="2" class="card-td">str: <%= playing_hcp %></td>
+    </tr>
+    <%# Ligne 2 : scoring mode, tee, time, hole, event name, date, round number %>
+    <tr>
+      <td colspan="2" class="card-td"><%= slot.team.resultcat&.scoring.humanize %></td>
+      <td colspan="3" class="card-td"><%= tees %></td>
+      <td colspan="2" class="card-td"><%= slot.team.start_time_for_round(round.id) %></td>
+      <td colspan="11" class="card-td"><%= event.name %></td>
+      <td colspan="3" class="card-td"><%= round.date_for_display %></td>
+      <td class="card-td">R <%= round.num %></td>
+    </tr>
+    <%# Formule & club %>
+    <tr>
+      <td colspan="11" class="card-td"><%= formule.name.humanize %></td>
+      <td colspan="11" class="card-td"><%= course.club.name %></td>
+    </tr>
+    <%# Ligne 4 : Hole numbers %>
+    <tr>
+      <td colspan="2" class="card-td">Hole</td>
+      <% (1..holes).each do |hole| %>
+        <td colspan="1" class="card-td"><%= hole %></td>
+      <% end %>
+      <td colspan="2" class="card-td">Hole</td>
+    </tr>
+    <%# Ligne 5 : Par %>
+  </table>
+</div>

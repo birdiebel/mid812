@@ -9,7 +9,7 @@ class Playercat < ApplicationRecord
   end
 
   enum :sexe, [ :Men, :Ladies ]
-  enum :teebox, [ "Black", "White", "Yellow", "Blue", "Red" ]
+  enum :teebox, { "Black": 0, "White": 1, "Yellow": 2, "Blue": 3, "Red": 4 }
   enum :format, [ :single, :team ]
 
   default_scope { order(name: :asc, version: :desc) }
@@ -20,6 +20,10 @@ class Playercat < ApplicationRecord
 
   def teebox_index
     self.teebox.index
+  end
+
+  def tee
+    Tee.find_by(teebox: self.teebox)
   end
 
   def icon_teebox

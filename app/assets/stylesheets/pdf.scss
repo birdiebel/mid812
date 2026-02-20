@@ -3,6 +3,10 @@ body {
   margin: 20px;
 }
 
+.alwaysbreak {
+  page-break-after: always;
+}
+
 h1 {
   color: #2563eb;
   text-align: center;
@@ -10,7 +14,6 @@ h1 {
 }
 
 .pdf-table {
-  width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
   width: auto;
@@ -55,4 +58,48 @@ tr:hover {
   padding: 10px;
   background-color: #eff6ff;
   border-left: 4px solid #2563eb;
+}
+
+.pdf-table-scorecard {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.card-td {
+  border: 1px solid black !important;
+  vertical-align: middle;
+  padding: 5px !important;
+  width: 4.54% !important;
+}
+
+.card-recu-td {
+  border-bottom: 1px solid black !important;
+  vertical-align: middle;
+  width: 4.54% !important;
+  font-size: 12px;
+  line-height: 12px !important;
+  height: 12px !important;
+  padding-top: 5px !important;
+  padding-bottom: 0 !important;
+  font-weight: bold;
+}
+
+.card-inputs-row {
+  height: 40px !important;
+} 
+
+.card-recu-row {
+  height: 12px !important;
+}
+
+.card-sign-title {
+  padding-bottom: 5px !important;
+}
+
+.card-signature-row {
+  border: 1px solid black !important;
+  vertical-align: middle;
+  width: 20% !important;
+  height: 40px !important;
 }
