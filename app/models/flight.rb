@@ -12,6 +12,31 @@ class Flight < ApplicationRecord
     [ "config_teetime" ]
   end
 
+  def set_marker
+    nbTeams = self.slots.where.not(team_id: nil).count
+    puts "nbTeams: #{nbTeams}"
+    teams = self.slots.where.not(team_id: nil)
+    slots = self.slots.where.not(team_id: nil)
+    puts "Teams in flight #{id}: #{teams.map(&:team_id).join(', ')}"
+    marker = {}
+    if nbTeams == 2
+      marker[slots[0]] = teams[1]
+      marker[slots[1]] = teams[0]
+    end
+    if nbTeams == 3
+      marker[slots[0]] = teams[2]
+      marker[slots[2]] = teams[1]
+      marker[slots[1]] = teams[0]
+    end
+    if nbTeams == 4
+      marker[slots[0]] = teams[3]
+      marker[slots[1]] = teams[2]
+      marker[slots[3]] = teams[0]
+      marker[slots[2]] = teams[1]
+    end
+    marker
+  end
+
   def myTime
     base_time = config_teetime.start_time
     step_minutes = config_teetime.step

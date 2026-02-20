@@ -15,7 +15,6 @@ class Slot < ApplicationRecord
 
   before_update :before_update_callback
   # after_commit :sync_playing_hcps, on: [ :create, :update ]
-
   def tee
     flight&.config_teetime&.course&.tees&.find_by(teebox: team.entries.first.playercat.teebox) if team && team.entries.exists?
   end

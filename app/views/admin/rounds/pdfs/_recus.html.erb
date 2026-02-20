@@ -1,22 +1,28 @@
 <tr class="card-recu-row">
   <td colspan="2" rowspan="2" class="card-recu-td">
-    <span style="font-size: 14px;">Brut
+    <div>
+      <span style="font-size: 14px; font-weight: 500;">Brut</span>
+      <br/>
+      <span style="font-size: 14px;"><%= entry.player.name_abbreviated %></span>
+      <br/>
+      <span style="font-size: 12px; font-weight:500;"><%= entry.hcp %></span>
+    </div>
+  </td>
+  <% (1..holes).each do |hole| %>
+    <% nb_stars = recus[hole - 1] %>
+    <td colspan="1" class="card-recu-td">
+      <% if nb_stars %>
+        <%= nb_stars.times.map { "*" }.join %>
+      <% else %>
+        &nbsp;
+      <% end %>
     </td>
-    <% (1..holes).each do |hole| %>
-      <% nb_stars = recus[hole - 1] %>
-      <td colspan="1" class="card-recu-td">
-        <% if nb_stars %>
-          <%= nb_stars.times.map { "*" }.join %>
-        <% else %>
-          &nbsp;
-        <% end %>
-      </td>
-      <% if hole == 9 && holes == 18 %>
-        <td colspan="1" class="card-recu-td"></td>
-      <% end %>
-      <% if hole == 18 && holes == 18 %>
-        <td colspan="1" class="card-recu-td"></td>
-      <% end %>
+    <% if hole == 9 && holes == 18 %>
+      <td colspan="1" class="card-recu-td"></td>
     <% end %>
-    <td colspan="2" class="card-recu-td"></td>
-  </tr>
+    <% if hole == 18 && holes == 18 %>
+      <td colspan="1" class="card-recu-td"></td>
+    <% end %>
+  <% end %>
+  <td colspan="2" class="card-recu-td"></td>
+</tr>

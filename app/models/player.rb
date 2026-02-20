@@ -25,6 +25,10 @@ class Player < ApplicationRecord
       "#{self.firstname} #{self.lastname}"
     end
 
+    def name_abbreviated
+      "#{self.firstname[0, 1]}. #{self.lastname[0, 7]}"
+    end
+
     def my_user
       if self.user
         self.user.email
