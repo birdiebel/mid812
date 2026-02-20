@@ -51,7 +51,8 @@
           </tr>
           <%# Ligne 3 %>
           <tr>
-            <td colspan="12" class="card-td"><%= formule.name.upcase %></td>
+            <td colspan="3" class="card-td">TEAM # <%= slot.team.num %></td>
+            <td colspan="9" class="card-td"><%= formule.name.upcase %></td>
             <td colspan="12" class="card-td"><%= course.club&.name.to_s.humanize %></td>
           </tr>
           <%# Ligne 4 hole number %>
