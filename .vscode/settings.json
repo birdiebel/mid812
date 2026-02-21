@@ -2,9 +2,13 @@
   "editor.formatOnSave": true,
   "[ruby]": {
     "editor.defaultFormatter": "Shopify.ruby-lsp",
-    "editor.formatOnSave": true
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file"
   },
-  "rubyLsp.formatter": "rubocop",
+  "rubyLsp.formatter": "syntax_tree",
+  "rubyLsp.rubyVersionManager": {
+    "identifier": "rbenv"
+  },
   "[erb]": {
     "editor.defaultFormatter": "aliariff.vscode-erb-beautify",
     "editor.formatOnSave": true

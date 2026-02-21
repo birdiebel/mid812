@@ -6,18 +6,17 @@
       <%= event.tour.name %>
     </h4>
     <div>
-      <% if event.status == "running" %>
+      <% if event.status.in?(["running"]) %>
         <%= link_to "Open", admin_tour_event_path(event.tour, event, page: "ldb"), class: "btt btt-open" %>
       <% end %>
-      <% if event.status=="registration" %>
+      <% if event.status.in?(["online", "registration", "waiting"]) %>
         <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "event-entries" ), class: "btt btt-open" %>
       <% end %>
-      <% if event.status == "created" || event.status == "pending" %>
+      <% if event.status.in?(["created"]) %>
         <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "rounds" ), class: "btt btt-open" %>
       <% end %>
     </div>
   </div>
-
   <!-- Rounds -->
   <div style="margin-left: 20px; ">
     <% event.rounds.order(:num).each do |round| %>

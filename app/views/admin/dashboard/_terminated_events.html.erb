@@ -1,0 +1,17 @@
+<% Event.where(status: ["terminated", "canceled"]).each do |event| %>
+  <!-- Event -->
+  <div class="flex-between" style="background-color: lightyellow; border-bottom: 1px solid lightgrey;">
+    <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @ 
+      <%= event.date_event&.strftime("%A %d-%b-%Y") %> |
+      <%= event.tour.name %>
+    </h4>
+    <div>
+      <% if event.status.in?(["terminated"]) %>
+        <%= link_to "Open", admin_tour_event_path(event.tour, event, page: "ldb"), class: "btt btt-open" %>
+      <% end %>
+      <% if event.status.in?(["canceled"]) %>
+        <%= link_to "Open" , admin_tour_event_path(event.tour, event ), class: "btt btt-open" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
