@@ -1,7 +1,18 @@
-// Sassy
+body {
+   font-family: Arial, sans-serif;
+   font-size: 16px;
+}
+.container {
+   max-width: 1200px;
+   margin: 0 auto;
+   padding: 10px;
+}
 
-// .main-menu-div {
-//     background-color: lightblue;
-//     padding: 5px;
-//
-// }
+.public-main-menu {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: space-between;
+  background-color: rgb(243, 243, 104);
+  padding: 10px;
+}

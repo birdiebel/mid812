@@ -1,0 +1,26 @@
+  
+<div id="main-menu" class="public-main-menu">
+  <div>
+    MidamSeries
+  </div>
+  <div style="display: flex; gap: 10px; justify-content: flex-end;">
+    <%# User signed in %>
+    <% if user_signed_in? %>
+      <%# Display user email and admin link if applicable %>
+      <div class=""><%= current_user.email %></div>
+      <%# Display admin link if user is an admin %>
+      <% if current_user.role=="admin" %>
+        <div class=""><%= link_to "Admin" , admin_path %></div>
+      <% end %>
+      <%# Display logout button %>
+      <div class="">
+        <%= button_to "Log out" , destroy_user_session_path, method: :delete %>
+      </div>
+      <%# Display login link if user is not signed in %>
+    <% else %>
+      <div class="">
+        <%= link_to "Login" , new_user_session_path %>
+      </div>
+    <% end %>
+  </div>
+</div>

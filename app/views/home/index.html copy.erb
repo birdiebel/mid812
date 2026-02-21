@@ -1,0 +1,68 @@
+<div id="main-menu" class="public-main-menu">
+  <div">
+    <%= link_to "Home" , root_path %>
+  </div>
+  <div>
+    <%= link_to "About" , root_path %>
+  </div>
+</div>
+<%#  %>
+<%#  %>
+<div class="flex flex-row">
+  <div>Active User</div>
+</div>
+<div class="flex flex-row-reverse">
+  <% if user_signed_in? %>
+    <div class="main-menu-div">
+      <%= button_to "Log out" , destroy_user_session_path, method: :delete %>
+    </div>
+    <% if current_user.role=="admin" %>
+      <div class="main-menu-div"><%= link_to "Admin" , admin_path %></div>
+    <% end %>
+    <div class="main-menu-div"><%= current_user.email %></div>
+  <% else %>
+    <div class="main-menu-div">
+      <%= link_to "Login" , new_user_session_path %>
+    </div>
+  <% end %>
+</div>
+<div class="bg-red-100 p-4">
+  <h1 class="font-bold text-4xl text-red-300">Accueil Mon General</h1>
+  <p>
+    <% if user_signed_in? %> <%= current_user.email %> || <%= current_user.role %>
+    <% end %>
+  </p>
+</div>
+<div class="text-2xl">
+  <% if user_signed_in? && current_user.role=="admin" %>
+    <%= link_to "Admin" ,  admin_path %>
+    <%= link_to "Test PDF" ,  home_test_pdf_path, target: "_blank" %>
+  <% end %>
+</div>
+<div class="text-2xl">
+  <%= link_to "Login" , new_user_session_path %> <%= button_to "Log out" ,  destroy_user_session_path, method: :delete %>
+</div>
+<div class="bg-amber-200 p-3 flex flex-row text-2xl">
+  <div class="flex flex-row">
+    <div>Active User</div>
+  </div>
+  <div class="flex flex-row-reverse">
+    <% if user_signed_in? %>
+      <div class="main-menu-div">
+        <%= button_to "Log out" , destroy_user_session_path, method: :delete %>
+      </div>
+      <% if current_user.role=="admin" %>
+        <div class="main-menu-div"><%= link_to "Admin" , admin_path %></div>
+      <% end %>
+      <div class="main-menu-div"><%= current_user.email %></div>
+    <% else %>
+      <div class="main-menu-div">
+        <%= link_to "Login" , new_user_session_path %>
+      </div>
+    <% end %>
+  </div>
+  <div>
+    <h2 class="font-bold text-3xl">Home#index</h2>
+    <p>Welcome to the Home#index page!</p>
+  </div>
+</div>

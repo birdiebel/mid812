@@ -6,9 +6,9 @@ class HomeController < ApplicationController
     respond_to do |format|
       format.html
       format.pdf do
-        render pdf: "test_pdf",   # Excluding ".pdf" extension.
+        render pdf: "test_pdf", # Excluding ".pdf" extension.
                template: "home/test_pdf",
-               formats: [ :html ],
+               formats: [:html],
                layout: "pdf" # Optional, use 'pdf' to render app/views/layouts/pdf.html.erb
       end
     end
