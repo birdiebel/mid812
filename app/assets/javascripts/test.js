@@ -6,7 +6,7 @@ function initMenuButtons() {
   let sections = []
 
   if (callMenu == "event-menu") {
-    sections = ["#event-entries", "#rounds", "#ldb", "#courses", "#player-categories", "#event-status", "#event-details"]
+    sections = ["#event-entries", "#rounds", "#courses", "#player-categories", "#event-status", "#event-details"]
   }
   if (callMenu == "round-menu") {
     sections = [ "#config-times", "#scores-round", "#status", "#round-details"]

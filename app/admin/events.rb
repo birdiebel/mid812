@@ -2,7 +2,21 @@ ActiveAdmin.register Event do
   belongs_to :tour
   includes :tour
 
-  permit_params :name, :status, :actif, :tour_id, :format, :date_event, :date_open, :date_close, :nb_rounds, :fee, :fee_member, :actif_round, :scoring, :min_players, :max_players,
+  permit_params :name,
+                :status,
+                :actif,
+                :tour_id,
+                :format,
+                :date_event,
+                :date_open,
+                :date_close,
+                :nb_rounds,
+                :fee,
+                :fee_member,
+                :actif_round,
+                :scoring,
+                :min_players,
+                :max_players,
                 course_ids: [],
                 playercats_ids: [],
                 resultcats_ids: []
@@ -10,15 +24,25 @@ ActiveAdmin.register Event do
   menu false
   config.batch_actions = false
 
-  action_item "Close", only: [ :show ] do
+  action_item "Close", only: [:show] do
     link_to "Close", admin_tour_path(resource.tour_id)
   end
 
-  myTitle = proc { |event| "#{event.tour.name} : #{event.name} : #{event.status.upcase}" }
+  action_item "Close", only: [:leaderboard] do
+    link_to "Close", admin_tour_event_path(resource.tour, resource)
+  end
+
+  member_action :leaderboard, method: :get do
+    @event = Event.find(params[:id])
+  end
+
+  myTitle =
+    proc do |event|
+      "#{event.tour.name} : #{event.name} : #{event.status.upcase}"
+    end
   filter :name_cont, as: :string, label: "Name"
 
   includes :entries, :playercats, :resultcats
-
 
   index do
     column "Name" do |event|
@@ -31,7 +55,10 @@ ActiveAdmin.register Event do
       event.playercats.map(&:name).join(", ")
     end
     column "" do |event|
-      button_to "Edit", edit_admin_tour_event_path(event.tour, event), method: :get, class: "btt btt-edit"
+      button_to "Edit",
+                edit_admin_tour_event_path(event.tour, event),
+                method: :get,
+                class: "btt btt-edit"
     end
   end
 
@@ -43,20 +70,17 @@ ActiveAdmin.register Event do
     render "admin/events/player_categories", event: event
     render "admin/events/event_details", event: event
     render "admin/events/event_status", event: event
-    render "admin/events/ldb", event: event
     page_call = params[:page] || "entries"
     div id: "round_menu_page_call", data: { page_call: page_call }
   end
 
   form do |f|
-    render partial: "admin/events/form", handlers: [ :arb ], locals: { f: }
+    render partial: "admin/events/form", handlers: [:arb], locals: { f: }
     f.actions do
       f.action :submit
       f.cancel_link(url_for(:back))
     end
   end
 
-  controller do
-    helper ActiveAdminViewsHelper
-  end
+  controller { helper ActiveAdminViewsHelper }
 end

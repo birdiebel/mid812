@@ -2,19 +2,39 @@ class TeamScore < ApplicationRecord
   belongs_to :team
   belongs_to :round
 
+  after_commit :broadcast_ldb_refresh, on: %i[create update]
+
   # enum :status, { enter: 0, refused: 1, canceled: 2, disqualified: 3, noshow: 4 }
   enum :status, { pending: 0, partial: 1, completed: 2, invalide: 3 }
-
 
   validates :team_id, uniqueness: { scope: :round_id }
 
   def self.ransackable_attributes(auth_object = nil)
-    [ "brut_str", "brut_total", "created_at", "diff_par", "hole_played", "id", "net_str", "net_total", "par_total",
-      "playing_hcp", "recu_str", "round_id", "start_hole", "status", "stb_str", "stb_total", "stroke_play_score", "team_id", "updated_at" ]
+    %w[
+      brut_str
+      brut_total
+      created_at
+      diff_par
+      hole_played
+      id
+      net_str
+      net_total
+      par_total
+      playing_hcp
+      recu_str
+      round_id
+      start_hole
+      status
+      stb_str
+      stb_total
+      stroke_play_score
+      team_id
+      updated_at
+    ]
   end
 
   def self.ransackable_associations(auth_object = nil)
-    [ "round", "team" ]
+    %w[round team]
   end
 
   def show_status_ts
@@ -88,35 +108,35 @@ class TeamScore < ApplicationRecord
 
   private
 
-    def copy_from_single_score(scores = nil)
-      round_scores = scores.presence || scores_for_round
+  def copy_from_single_score(scores = nil)
+    round_scores = scores.presence || scores_for_round
 
-      # Cherche le score qui a des données (brut_str present)
-      score = round_scores.find { |s| s.brut_str.present? }
+    # Cherche le score qui a des données (brut_str present)
+    score = round_scores.find { |s| s.brut_str.present? }
 
-      # Si aucun score avec données, prend le premier score de la première entry
-      score ||= round_scores.first
-      return unless score
+    # Si aucun score avec données, prend le premier score de la première entry
+    score ||= round_scores.first
+    return unless score
 
-      self.hole_played = score.hole_played || 0
-      self.start_hole = score.start_hole || 1
-      self.playing_hcp = score.playing_hcp
-      self.brut_str = score.brut_str
-      self.net_str = score.net_str
-      self.stb_str = score.stb_str
-      self.recu_str = score.recu_str
-      self.status = score.status || :pending
-      self.brut_total = score.brut("total").to_i
-      self.net_total = score.net("total").to_i
-      self.stb_total = score.stb("total").to_i
-      par_and_diff = par_and_diff_for_score(score)
-      self.par_total = par_and_diff[:par_total]
-      self.diff_par = par_and_diff[:diff_par]
+    self.hole_played = score.hole_played || 0
+    self.start_hole = score.start_hole || 1
+    self.playing_hcp = score.playing_hcp
+    self.brut_str = score.brut_str
+    self.net_str = score.net_str
+    self.stb_str = score.stb_str
+    self.recu_str = score.recu_str
+    self.status = score.status || :pending
+    self.brut_total = score.brut("total").to_i
+    self.net_total = score.net("total").to_i
+    self.stb_total = score.stb("total").to_i
+    par_and_diff = par_and_diff_for_score(score)
+    self.par_total = par_and_diff[:par_total]
+    self.diff_par = par_and_diff[:diff_par]
 
-      # stroke_play_score retourne une string, il faut la convertir
-      sp_score = score.stroke_play_score
-      self.stroke_play_score = parse_stroke_play_score(sp_score)
-    end
+    # stroke_play_score retourne une string, il faut la convertir
+    sp_score = score.stroke_play_score
+    self.stroke_play_score = parse_stroke_play_score(sp_score)
+  end
 
   def calculate_best_ball(scores = nil)
     scores = scores.presence || scores_for_round
@@ -126,9 +146,12 @@ class TeamScore < ApplicationRecord
     nb_hole = course&.nb_hole.to_i
     nb_hole = 18 if nb_hole <= 0
 
-    brut_arrays = scores.map { |score| split_score_array(score.brut_str, nb_hole) }
-    net_arrays = scores.map { |score| split_score_array(score.net_str, nb_hole) }
-    stb_arrays = scores.map { |score| split_score_array(score.stb_str, nb_hole) }
+    brut_arrays =
+      scores.map { |score| split_score_array(score.brut_str, nb_hole) }
+    net_arrays =
+      scores.map { |score| split_score_array(score.net_str, nb_hole) }
+    stb_arrays =
+      scores.map { |score| split_score_array(score.stb_str, nb_hole) }
 
     team_brut = build_best_ball_array(brut_arrays, :min)
     team_net = build_best_ball_array(net_arrays, :min)
@@ -146,7 +169,9 @@ class TeamScore < ApplicationRecord
 
     if scores.all? { |score| score.status == "completed" }
       self.status = :completed
-    elsif scores.any? { |score| score.status == "partial" || score.status == "completed" }
+    elsif scores.any? do |score|
+          score.status == "partial" || score.status == "completed"
+        end
       self.status = :partial
     else
       self.status = :pending
@@ -158,7 +183,8 @@ class TeamScore < ApplicationRecord
     self.stb_total = total_from_team_array(team_stb)
 
     # Calcul du stroke play score
-    sp_scores = scores.map { |s| parse_stroke_play_score(s.stroke_play_score) }.compact
+    sp_scores =
+      scores.map { |s| parse_stroke_play_score(s.stroke_play_score) }.compact
     self.stroke_play_score = sp_scores.min || 0
 
     best_score = scores.min_by { |s| s.brut("total") || 0 }
@@ -179,10 +205,11 @@ class TeamScore < ApplicationRecord
 
     (0...hole_count).map do |index|
       hole_values = arrays.map { |array| array[index] }
-      numeric_values = hole_values.filter_map do |value|
-        next if value.blank? || value == "x" || value.to_i.zero?
-        value.to_i
-      end
+      numeric_values =
+        hole_values.filter_map do |value|
+          next if value.blank? || value == "x" || value.to_i.zero?
+          value.to_i
+        end
 
       if numeric_values.any?
         selected_value = mode == :max ? numeric_values.max : numeric_values.min
@@ -205,9 +232,17 @@ class TeamScore < ApplicationRecord
   def par_and_diff_for_score(score)
     return { par_total: 0, diff_par: 0 } unless score&.brut_str.present?
 
-    brut_values = score.brut_str.split(",").map { |value| value.blank? || value.strip == "" ? nil : value.to_i }
+    brut_values =
+      score
+        .brut_str
+        .split(",")
+        .map { |value| value.blank? || value.strip == "" ? nil : value.to_i }
 
-    played_holes = brut_values.each_with_index.select { |value, _| value && value > 0 }.map { |_, index| index }
+    played_holes =
+      brut_values
+        .each_with_index
+        .select { |value, _| value && value > 0 }
+        .map { |_, index| index }
     return { par_total: 0, diff_par: 0 } if played_holes.empty?
 
     course = score.slot&.flight&.config_teetime&.course
@@ -229,21 +264,46 @@ class TeamScore < ApplicationRecord
   end
 
   def formula_for_round(scores)
-    score_formula = scores.filter_map { |score| score.slot&.flight&.config_teetime&.formula }.first
+    score_formula =
+      scores
+        .filter_map { |score| score.slot&.flight&.config_teetime&.formula }
+        .first
     return score_formula if score_formula
 
-    slot = round.slots
-                .joins(:flight)
-                .where(team_id: team_id)
-                .where(flights: { config_teetime_id: round.config_teetimes.select(:id) })
-                .order("flights.flight_time ASC")
-                .first
+    slot =
+      round
+        .slots
+        .joins(:flight)
+        .where(team_id: team_id)
+        .where(
+          flights: {
+            config_teetime_id: round.config_teetimes.select(:id)
+          }
+        )
+        .order("flights.flight_time ASC")
+        .first
 
     slot&.flight&.config_teetime&.formula
   end
 
   def team_invalid_for_stroke_play?
-    values = (brut_str || "").split(",").map { |value| value.to_s.strip.downcase }
+    values =
+      (brut_str || "").split(",").map { |value| value.to_s.strip.downcase }
     values.any? { |value| value == "0" || value == "x" }
+  end
+
+  def broadcast_ldb_refresh
+    event_id = team&.event_id
+    return unless event_id
+
+    ActionCable.server.broadcast(
+      "ldb_refresh_event_#{event_id}",
+      {
+        type: "scoring_saved",
+        event_id: event_id,
+        team_id: team_id,
+        round_id: round_id
+      }
+    )
   end
 end

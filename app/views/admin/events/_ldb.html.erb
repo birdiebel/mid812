@@ -19,3 +19,104 @@
     </div>
   </div>
 </div>
+<script>
+  (function($) {
+    function isLdbPage() {
+      return !!document.getElementById("ldb-external-page");
+    }
+
+    function resolveCableConsumer() {
+      if (window.App && window.App.cable) return window.App.cable;
+      if (!window.ldbCable && window.ActionCable) {
+        window.ldbCable = window.ActionCable.createConsumer();
+      }
+      return window.ldbCable;
+    }
+
+    function cleanupLdbAutoReload() {
+      if (window.ldbFallbackTimer) {
+        window.clearInterval(window.ldbFallbackTimer);
+        window.ldbFallbackTimer = null;
+      }
+
+      if (window.ldbRefreshSubscription) {
+        const cable = resolveCableConsumer();
+        if (cable) {
+          cable.subscriptions.remove(window.ldbRefreshSubscription);
+        }
+        window.ldbRefreshSubscription = null;
+      }
+    }
+
+    function bindLdbCableReload() {
+      if (!isLdbPage()) {
+        cleanupLdbAutoReload();
+        return;
+      }
+
+      const eventId = <%= event.id.to_json %>;
+      const cable = resolveCableConsumer();
+      const fallbackMs = 60000;
+
+      function startFallback() {
+        if (window.ldbFallbackTimer) return;
+        window.ldbFallbackTimer = window.setInterval(function() {
+          if (!isLdbPage()) {
+            cleanupLdbAutoReload();
+            return;
+          }
+          window.location.reload();
+        }, fallbackMs);
+      }
+
+      if (!eventId) return;
+
+      startFallback();
+
+      if (!cable) {
+        return;
+      }
+
+      if (window.ldbRefreshSubscription) {
+        cable.subscriptions.remove(window.ldbRefreshSubscription);
+      }
+
+      window.ldbRefreshSubscription = cable.subscriptions.create(
+        { channel: "LdbRefreshChannel", event_id: eventId },
+        {
+          connected() {
+            // Keep fallback active as safety net in case broadcasts are missed.
+          },
+          disconnected() {
+            startFallback();
+          },
+          rejected() {
+            startFallback();
+          },
+          received() {
+            if (!isLdbPage()) return;
+            window.location.reload();
+          }
+        }
+      );
+    }
+
+    bindLdbCableReload();
+
+    window.removeEventListener("hashchange", window.ldbHashChangeHandler);
+    window.ldbHashChangeHandler = bindLdbCableReload;
+    window.addEventListener("hashchange", window.ldbHashChangeHandler);
+
+    document.removeEventListener("turbo:before-cache", window.ldbBeforeCacheHandler);
+    window.ldbBeforeCacheHandler = cleanupLdbAutoReload;
+    document.addEventListener("turbo:before-cache", window.ldbBeforeCacheHandler);
+
+    window.removeEventListener("pagehide", window.ldbPageHideHandler);
+    window.ldbPageHideHandler = cleanupLdbAutoReload;
+    window.addEventListener("pagehide", window.ldbPageHideHandler);
+
+    document.removeEventListener("turbo:load", window.ldbReloadHandler);
+    window.ldbReloadHandler = bindLdbCableReload;
+    document.addEventListener("turbo:load", window.ldbReloadHandler);
+  })(jQuery);
+</script>
