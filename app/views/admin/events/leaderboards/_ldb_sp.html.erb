@@ -30,10 +30,10 @@
         <td style="text-align: left; font-weight: bold;"><%= row[:team].team_name_short %></td>
         <%# Against Par %>
         <td>
-          <%= against_par_badge(row[:diff_par], row[:par_total]) %>
+          <%= row[:diff_par] && row[:par_total] > 0 ? against_par_badge(row[:diff_par], row[:par_total]) : "" %>
         </td>
         <%# Holes Played %>
-        <td><%= row[:team_hole_played] %></td>
+        <td><%= row[:team_hole_played] > 0 ? row[:team_hole_played] : "" %></td>
         <%# Each Round : score or start time %>
         <% event.rounds.order(:num).each do |round| %>
           <td>
@@ -56,7 +56,7 @@
           <td></td>
         <% end %>
         <%# Brut %>
-        <td class="top-brut"><%= row[:brut_total] %></td>
+        <td class="top-brut"><%= row[:brut_total] > 0 ? row[:brut_total] : "" %></td>
       </tr>
     <% end %>
   </tbody>

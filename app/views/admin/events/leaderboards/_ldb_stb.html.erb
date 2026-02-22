@@ -26,7 +26,7 @@
         <%# Team Name %>
         <td style="text-align: left; font-weight: bold;"><%= row[:team].team_name_short %></td>
         <%# Holes Played %>
-        <td><%= row[:team_hole_played] %></td>
+        <td><%= row[:team_hole_played] > 0 ? row[:team_hole_played] : "" %></td>
         <%# Each Round : score or start time %>
         <% event.rounds.order(:num).each do |round| %>
           <td>
