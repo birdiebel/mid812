@@ -24,11 +24,11 @@ ActiveAdmin.register Event do
   menu false
   config.batch_actions = false
 
-  action_item "Close", only: [:show] do
+  action_item "Close", only: [ :show ] do
     link_to "Close", admin_tour_path(resource.tour_id)
   end
 
-  action_item "Close", only: [:leaderboard] do
+  action_item "Close", only: [ :leaderboard ] do
     link_to "Close", admin_tour_event_path(resource.tour, resource)
   end
 
@@ -65,7 +65,7 @@ ActiveAdmin.register Event do
   show title: myTitle do
     render "admin/events/menu", event: event
     render "admin/events/courses", event: event
-    render "admin/events/entries", event: event
+      render "admin/events/entries", event: event
     render "admin/events/rounds", event: event
     render "admin/events/player_categories", event: event
     render "admin/events/event_details", event: event
@@ -75,7 +75,7 @@ ActiveAdmin.register Event do
   end
 
   form do |f|
-    render partial: "admin/events/form", handlers: [:arb], locals: { f: }
+    render partial: "admin/events/form", handlers: [ :arb ], locals: { f: }
     f.actions do
       f.action :submit
       f.cancel_link(url_for(:back))

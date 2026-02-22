@@ -1,7 +1,7 @@
 {
   "editor.formatOnSave": true,
   "[ruby]": {
-    "editor.defaultFormatter": "Shopify.ruby-lsp",
+    "editor.defaultFormatter": "rubocop.vscode-rubocop",
     "editor.formatOnSave": true,
     "editor.formatOnSaveMode": "file"
   },
