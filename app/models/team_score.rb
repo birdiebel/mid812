@@ -108,35 +108,35 @@ class TeamScore < ApplicationRecord
 
   private
 
-  def copy_from_single_score(scores = nil)
-    round_scores = scores.presence || scores_for_round
+    def copy_from_single_score(scores = nil)
+      round_scores = scores.presence || scores_for_round
 
-    # Cherche le score qui a des données (brut_str present)
-    score = round_scores.find { |s| s.brut_str.present? }
+      # Cherche le score qui a des données (brut_str present)
+      score = round_scores.find { |s| s.brut_str.present? }
 
-    # Si aucun score avec données, prend le premier score de la première entry
-    score ||= round_scores.first
-    return unless score
+      # Si aucun score avec données, prend le premier score de la première entry
+      score ||= round_scores.first
+      return unless score
 
-    self.hole_played = score.hole_played || 0
-    self.start_hole = score.start_hole || 1
-    self.playing_hcp = score.playing_hcp
-    self.brut_str = score.brut_str
-    self.net_str = score.net_str
-    self.stb_str = score.stb_str
-    self.recu_str = score.recu_str
-    self.status = score.status || :pending
-    self.brut_total = score.brut("total").to_i
-    self.net_total = score.net("total").to_i
-    self.stb_total = score.stb("total").to_i
-    par_and_diff = par_and_diff_for_score(score)
-    self.par_total = par_and_diff[:par_total]
-    self.diff_par = par_and_diff[:diff_par]
+      self.hole_played = score.hole_played || 0
+      self.start_hole = score.start_hole || 1
+      self.playing_hcp = score.playing_hcp
+      self.brut_str = score.brut_str
+      self.net_str = score.net_str
+      self.stb_str = score.stb_str
+      self.recu_str = score.recu_str
+      self.status = score.status || :pending
+      self.brut_total = score.brut("total").to_i
+      self.net_total = score.net("total").to_i
+      self.stb_total = score.stb("total").to_i
+      par_and_diff = par_and_diff_for_score(score)
+      self.par_total = par_and_diff[:par_total]
+      self.diff_par = par_and_diff[:diff_par]
 
-    # stroke_play_score retourne une string, il faut la convertir
-    sp_score = score.stroke_play_score
-    self.stroke_play_score = parse_stroke_play_score(sp_score)
-  end
+      # stroke_play_score retourne une string, il faut la convertir
+      sp_score = score.stroke_play_score
+      self.stroke_play_score = parse_stroke_play_score(sp_score)
+    end
 
   def calculate_best_ball(scores = nil)
     scores = scores.presence || scores_for_round

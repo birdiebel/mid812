@@ -57,11 +57,11 @@ class Event < ApplicationRecord
     this_order =
       case resultcat_scoring
       when "stroke_play"
-        ->(h) { [h[:diff_par].nil? ? Float::INFINITY : h[:diff_par]] }
+        ->(h) { [ h[:diff_par].nil? ? Float::INFINITY : h[:diff_par] ] }
       when "stableford"
-        ->(h) { [-h[:stb_total]] }
+        ->(h) { [ -h[:stb_total] ] }
       else
-        ->(h) { [h[:brut_total]] }
+        ->(h) { [ h[:brut_total] ] }
       end
 
     ranking_value =
@@ -276,7 +276,7 @@ class Event < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    ["tour"]
+    [ "tour" ]
   end
   def self.ransackable_attributes(auth_object = nil)
     %w[
