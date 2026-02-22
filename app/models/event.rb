@@ -46,9 +46,8 @@ class Event < ApplicationRecord
       teams_scope
         .where(
           resultcat_id: valid_resultcat_ids
-        )# .where.not(team_scores: { hole_played: 0 })
-        .
-        includes(team_scores: :round, resultcat: {})
+        ) # .where.not(team_scores: { hole_played: 0 })
+        .includes(team_scores: :round, resultcat: {})
         .order("resultcats.priority ASC")
 
     # On prépare le classement selon le scoring du premier team (ou par défaut)
