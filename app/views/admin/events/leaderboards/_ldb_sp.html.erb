@@ -1,26 +1,26 @@
 <table class="leaderboard-table">
   <tbody>
-    <% event_teams = event.teams_brut_totals_with_rounds(r.id) %>
+    <% event_teams ||= event.teams_brut_totals_with_rounds(r.id) %>
     <%# Titre Cat %>
+    <tr>
+      <td colspan="99" bgcolor="yellow" font-weight="bold">
+        <%= r.name %> | <%= r.scoring.humanize %>
+      </td>
+    </tr>
     <% if event_teams.present? %>
       <tr>
-        <td colspan="99" bgcolor="yellow" font-weight="bold">
-          <%= r.name %> | <%= r.scoring.humanize %>
-        </td>
+        <th>Pos</th>
+        <th>Team</th>
+        <th>+-</th>
+        <th>Hole</th>
+        <% event.rounds.order(:num).each do |round| %>
+          <th style="text-align: center;">R<%= round.num %></th>
+        <% end %>
+        <th>Net</th>
+        <th>Stb</th>
+        <th>Brut</th>
       </tr>
     <% end %>
-    <tr>
-      <th>Pos</th>
-      <th>Team</th>
-      <th>+-</th>
-      <th>Hole</th>
-      <% event.rounds.order(:num).each do |round| %>
-        <th style="text-align: center;">R<%= round.num %></th>
-      <% end %>
-      <th>Net</th>
-      <th>Stb</th>
-      <th>Brut</th>
-    </tr>
     <%# Row lbd %>
     <% event_teams&.each do |row| %>
       <tr>

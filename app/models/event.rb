@@ -35,10 +35,16 @@ class Event < ApplicationRecord
   # Résultat : array de hashes
   # [{ team: <Team>, brut_total: <somme>, par_total: <somme>, diff_par: <somme ou nil>, ... }, ...]
   def teams_brut_totals_with_rounds(resultcat_id = nil)
+    teams_scope = teams.joins(:resultcat).where(status: :enter)
     teams_scope =
-      teams
-        .joins(:resultcat)
-        .where(status: :enter, resultcat_id: resultcat_id)
+      teams_scope.where(resultcat_id: resultcat_id) if resultcat_id.present?
+
+    valid_resultcat_ids = teams_scope.distinct.pluck(:resultcat_id).compact
+    return [] if valid_resultcat_ids.empty?
+
+    teams_scope =
+      teams_scope
+        .where(resultcat_id: valid_resultcat_ids)
         .where.not(team_scores: { hole_played: 0 })
         .includes(team_scores: :round, resultcat: {})
         .order("resultcats.priority ASC")
@@ -50,11 +56,11 @@ class Event < ApplicationRecord
     this_order =
       case resultcat_scoring
       when "stroke_play"
-        ->(h) { [ h[:diff_par].nil? ? Float::INFINITY : h[:diff_par] ] }
+        ->(h) { [h[:diff_par].nil? ? Float::INFINITY : h[:diff_par]] }
       when "stableford"
-        ->(h) { [ -h[:stb_total] ] }
+        ->(h) { [-h[:stb_total]] }
       else
-        ->(h) { [ h[:brut_total] ] }
+        ->(h) { [h[:brut_total]] }
       end
 
     ranking_value =
@@ -269,7 +275,7 @@ class Event < ApplicationRecord
   end
 
   def self.ransackable_associations(auth_object = nil)
-    [ "tour" ]
+    ["tour"]
   end
   def self.ransackable_attributes(auth_object = nil)
     %w[

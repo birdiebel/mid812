@@ -1,72 +1,70 @@
 <div style="margin-bottom: 15px;">
   <input type="text" id="search-single" placeholder="Rechercher par nom ou licence..." class="search-entries" style="padding: 8px; width: 300px; border: 1px solid #ccc; border-radius: 4px;" autocomplete="off">
 </div>
-
-<% teams = event.teams.includes(entries: [:player, :playercat]).order("entries.playercat_id ASC, entries.created_at DESC") %>
+<% teams = event.teams.joins(entries: [:player, :playercat]).order("playercat.priority ASC, entries.created_at DESC") %>
 <% teams_by_playercat = teams.group_by { |team| team.entries.first&.playercat } %>
 <% teams_by_playercat.each do |playercat, teams_in_cat| %>
-    <div class="panel-table-subtitre">
-        Cat: <%= playercat&.name || 'Undefined' %> : <%= teams_in_cat.count { |item| item.status == 'enter' } %>
-    </div>
-    <table class="index_table entries-table-single">
-        <tbody>
-        <% teams_in_cat.each do |team| %>
-            <% entry = team.entries.first %>
-            <% next unless entry %>
-            <tr class="entry-row" data-name="<%= entry.player.full_name %>" data-licence="<%= entry.player.my_licence %>">
-            <td><%= entry.player.icon_age_category %></td>
-            <td><%= entry.player.full_name %></td>
-            <td><%= entry.player.sexe %></td>
-            <td><%= entry.player.age %></td>
-            <td><%= entry.player.my_licence %></td>
-            <td><%= entry.hcp %></td>
-            <% if !entry.playercat.nil? %>
-              <td><%= sanitize(entry.playercat.icon_teebox, tags: %w[i span], attributes: %w[class style]) %></td>
-            <% else %>
-                <td class="is_red is_bold"><span>N/A</span></td>
-            <% end %>
-            <td><%= entry.player.my_club %></td>
-            <% if team.status == "enter" %>
-                <td class="is_green is_bold"><span><%= team.status.upcase %></span></td>
-            <% else %>
-                <td class="is_red is_bold"><span><%= team.status.upcase %></span></td>
-            <% end %>
-            <td><%= team.updated_at %></td>
-            <td>
-                <div class="table-btn-action">
-                    <div>
-                        <%= button_to "Edit", edit_admin_team_path(team), method: :get, class: "btt btt-edit" %>
-                    </div>
-                    <div>
-                            <%= button_to "Delete", admin_team_path(team), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %>
-                    </div>
-                </div>
-            </td>
-            </tr>
-        <% end %>
-        </tbody>
-    </table>
+  <div class="panel-table-subtitre">
+    Cat: <%= playercat&.name || 'Undefined' %> : <%= teams_in_cat.count { |item| item.status == 'enter' } %>
+  </div>
+  <table class="index_table entries-table-single">
+    <tbody>
+      <% teams_in_cat.each do |team| %>
+        <% entry = team.entries.first %>
+        <% next unless entry %>
+        <tr class="entry-row" data-name="<%= entry.player.full_name %>" data-licence="<%= entry.player.my_licence %>">
+          <td><%= entry.player.icon_age_category %></td>
+          <td><%= entry.player.full_name %></td>
+          <td><%= entry.player.sexe %></td>
+          <td><%= entry.player.age %></td>
+          <td><%= entry.player.my_licence %></td>
+          <td><%= entry.hcp %></td>
+          <% if !entry.playercat.nil? %>
+            <td><%= sanitize(entry.playercat.icon_teebox, tags: %w[i span], attributes: %w[class style]) %></td>
+          <% else %>
+            <td class="is_red is_bold"><span>N/A</span></td>
+          <% end %>
+          <td><%= entry.player.my_club %></td>
+          <% if team.status == "enter" %>
+            <td class="is_green is_bold"><span><%= team.status.upcase %></span></td>
+          <% else %>
+            <td class="is_red is_bold"><span><%= team.status.upcase %></span></td>
+          <% end %>
+          <td><%= team.updated_at %></td>
+          <td>
+            <div class="table-btn-action">
+              <div>
+                <%= button_to "Edit", edit_admin_team_path(team), method: :get, class: "btt btt-edit" %>
+              </div>
+              <div>
+                <%= button_to "Delete", admin_team_path(team), method: :delete, data: { confirm: "Are you sure?" }, class: "btt btt-cancel" %>
+              </div>
+            </div>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
 <% end %>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const searchInput = document.getElementById('search-single');
-  if (!searchInput) return;
+  document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('search-single');
+    if (!searchInput) return;
 
-  searchInput.addEventListener('keyup', function() {
-    const searchTerm = this.value.toLowerCase();
-    const rows = document.querySelectorAll('.entries-table-single .entry-row');
+    searchInput.addEventListener('keyup', function() {
+      const searchTerm = this.value.toLowerCase();
+      const rows = document.querySelectorAll('.entries-table-single .entry-row');
 
-    rows.forEach(row => {
-      const name = row.getAttribute('data-name').toLowerCase();
-      const licence = row.getAttribute('data-licence').toLowerCase();
+      rows.forEach(row => {
+        const name = row.getAttribute('data-name').toLowerCase();
+        const licence = row.getAttribute('data-licence').toLowerCase();
 
-      if (name.includes(searchTerm) || licence.includes(searchTerm)) {
-        row.style.display = '';
-      } else {
-        row.style.display = 'none';
-      }
+        if (name.includes(searchTerm) || licence.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
     });
   });
-});
 </script>

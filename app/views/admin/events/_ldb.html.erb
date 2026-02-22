@@ -2,13 +2,17 @@
   <div class="panel">
     <h3>Rounds</h3>
     <div class="panel_contents">
-      <% event.resultcats.order(priority: :asc).each do |r| %>
-        <%= puts r.scoring %>
-        <% if event.entries.exists? %>
-          <% if r.scoring == "stroke_play"%>
-            <%= render "admin/events/leaderboards/ldb_sp", event: event, r: r %>
-          <% elsif r.scoring == "stableford"%>
-            <%= render "admin/events/leaderboards/ldb_stb", event: event, r: r %>
+      <% if event.entries.exists? %>
+        <%# Boucle sur les catégories de résultats avec des équipes %>
+        <% resultcat_ids_with_teams = event.teams.where(status: :enter).select(:resultcat_id) %>
+        <% event.resultcats.where(id: resultcat_ids_with_teams).order(priority: :asc).each do |r| %>
+          <% event_teams = event.teams_brut_totals_with_rounds(r.id) %>
+          <% next if event_teams.blank? %>
+          <%# stroke play or stableford %>
+          <% if r.scoring == "stroke_play" %>
+            <%= render "admin/events/leaderboards/ldb_sp", event: event, r: r, event_teams: event_teams %>
+          <% elsif r.scoring == "stableford" %>
+            <%= render "admin/events/leaderboards/ldb_stb", event: event, r: r, event_teams: event_teams %>
           <% end %>
         <% end %>
       <% end %>
