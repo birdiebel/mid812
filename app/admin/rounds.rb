@@ -7,7 +7,23 @@ ActiveAdmin.register Round do
   config.batch_actions = false
 
   action_item "Close", only: [ :show ] do
-    link_to "Close", admin_tour_event_path(resource.event.tour, resource.event, anchor: "rounds")
+    link_to "Close", rounds_admin_tour_event_path(resource.event.tour, resource.event)
+  end
+
+  action_item "Close", only: [ :config_times, :round_details, :round_status, :start_list, :scoring ] do
+    link_to "Close", rounds_admin_tour_event_path(resource.event.tour, resource.event)
+  end
+
+  member_action :config_times, method: :get do
+    @round = Round.find(params[:id])
+  end
+
+  member_action :round_details, method: :get do
+    @round = Round.find(params[:id])
+  end
+
+  member_action :round_status, method: :get do
+    @round = Round.find(params[:id])
   end
 
   member_action :scoring, method: :get do
@@ -62,18 +78,6 @@ ActiveAdmin.register Round do
     end
   end
 
-  myTitle = proc { |round| "#{round.event.name} : round #{round.num} on #{round.date} | #{round.status.upcase}" }
-
-  show title: myTitle do
-    render "admin/rounds/menu", round: round
-    render "admin/rounds/config_times", round: round
-    render "admin/rounds/status", round: round
-    render "admin/rounds/round_details", round: round
-    page_call = params[:page] || "config_times"
-    div id: "round_menu_page_call", data: { page_call: page_call }
-  end
-
-
   index do
     column :num
     column :event
@@ -104,7 +108,11 @@ ActiveAdmin.register Round do
   controller do
     helper ActiveAdminViewsHelper
 
-    before_action :prepare_start_list_data, only: [ :show, :start_list ]
+    before_action :prepare_start_list_data, only: [ :show, :start_list, :config_times, :round_details, :round_status ]
+
+    def show
+      redirect_to config_times_admin_round_path(resource)
+    end
 
     def create
       @round = Round.new(permitted_params[:round])
@@ -118,7 +126,7 @@ ActiveAdmin.register Round do
     def update
       @round = Round.find(params[:id])
       if @round.update(permitted_params[:round])
-        redirect_to admin_event_round_path(@round.event, @round), notice: "Round updated successfully."
+        redirect_to config_times_admin_round_path(@round), notice: "Round updated successfully."
       else
         render :edit
       end

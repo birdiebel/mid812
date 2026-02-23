@@ -1,35 +1,39 @@
-<div id="player-categories" style="display:none;">
-  <div class="panel">
-    <h3>Player Categories</h3>
-    <div class="panel_contents">
-      <table class="index_table">
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Format</th>
-            <th>Sexe</th>
-            <th>Teebox</th>
-            <th>Hcp Min</th>
-            <th>Hcp Max</th>
-            <th>Version</th>
-            <th>Age Cat</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% event.event_playercats.includes(:playercat).each do |event_playercat| %>
+<% if local_assigns[:external] %>
+  <div id="player-categories">
+  <% else %>
+    <div id="player-categories" style="display:none;">
+    <% end %>
+    <div class="panel">
+      <h3>Player Categories</h3>
+      <div class="panel_contents">
+        <table class="index_table">
+          <thead>
             <tr>
-              <td><%= event_playercat.playercat.name %></td>
-              <td><%= event_playercat.playercat.format %></td>
-              <td><%= event_playercat.playercat.sexe %></td>
-              <td><%= event_playercat.playercat.teebox %></td>
-              <td><%= event_playercat.playercat.hcp_min %></td>
-              <td><%= event_playercat.playercat.hcp_max %></td>
-              <td><%= event_playercat.playercat.version %></td>
-              <td><%= event_playercat.playercat.agecats.map(&:name).join(", ") %></td>
+              <th>Name</th>
+              <th>Format</th>
+              <th>Sexe</th>
+              <th>Teebox</th>
+              <th>Hcp Min</th>
+              <th>Hcp Max</th>
+              <th>Version</th>
+              <th>Age Cat</th>
             </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            <% event.event_playercats.includes(:playercat).each do |event_playercat| %>
+              <tr>
+                <td><%= event_playercat.playercat.name %></td>
+                <td><%= event_playercat.playercat.format %></td>
+                <td><%= event_playercat.playercat.sexe %></td>
+                <td><%= event_playercat.playercat.teebox %></td>
+                <td><%= event_playercat.playercat.hcp_min %></td>
+                <td><%= event_playercat.playercat.hcp_max %></td>
+                <td><%= event_playercat.playercat.version %></td>
+                <td><%= event_playercat.playercat.agecats.map(&:name).join(", ") %></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>

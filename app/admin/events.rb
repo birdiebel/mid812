@@ -32,14 +32,38 @@ ActiveAdmin.register Event do
     link_to "Close", admin_tour_event_path(resource.tour, resource)
   end
 
+  action_item "Close", only: [ :entries, :rounds, :player_categories, :courses, :event_details, :event_status ] do
+    link_to "Close", admin_tour_path(resource.tour_id)
+  end
+
   member_action :leaderboard, method: :get do
     @event = Event.find(params[:id])
   end
 
-  myTitle =
-    proc do |event|
-      "#{event.tour.name} : #{event.name} : #{event.status.upcase}"
-    end
+  member_action :entries, method: :get do
+    @event = Event.find(params[:id])
+  end
+
+  member_action :rounds, method: :get do
+    @event = Event.find(params[:id])
+  end
+
+  member_action :player_categories, method: :get do
+    @event = Event.find(params[:id])
+  end
+
+  member_action :courses, method: :get do
+    @event = Event.find(params[:id])
+  end
+
+  member_action :event_details, method: :get do
+    @event = Event.find(params[:id])
+  end
+
+  member_action :event_status, method: :get do
+    @event = Event.find(params[:id])
+  end
+
   filter :name_cont, as: :string, label: "Name"
 
   includes :entries, :playercats, :resultcats
@@ -62,25 +86,19 @@ ActiveAdmin.register Event do
     end
   end
 
-  show title: myTitle do
-    render "admin/events/menu", event: event
-    render "admin/events/courses", event: event
-      render "admin/events/entries", event: event
-    render "admin/events/rounds", event: event
-    render "admin/events/player_categories", event: event
-    render "admin/events/event_details", event: event
-    render "admin/events/event_status", event: event
-    page_call = params[:page] || "entries"
-    div id: "round_menu_page_call", data: { page_call: page_call }
-  end
-
   form do |f|
-    render partial: "admin/events/form", handlers: [ :arb ], locals: { f: }
+    render partial: "admin/events/form", handlers: [ :arb ], locals: { f: f }
     f.actions do
       f.action :submit
       f.cancel_link(url_for(:back))
     end
   end
 
-  controller { helper ActiveAdminViewsHelper }
+  controller do
+    helper ActiveAdminViewsHelper
+
+    def show
+      redirect_to entries_admin_tour_event_path(resource.tour, resource)
+    end
+  end
 end

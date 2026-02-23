@@ -192,7 +192,7 @@ tbody td {
         cursor: pointer !important;
         display: inline-block !important;
         text-align: center !important;
-        
+
         &:hover {
             background-color: #1565c0;
             text-decoration: none;
@@ -205,7 +205,7 @@ tbody td {
 
     .menu-button-status {
         background-color: darkred;
-    } 
+    }
     .menu-button-status.is-active {
         background-color: #b71c1c;
     }
@@ -214,19 +214,4 @@ tbody td {
 .flex-container {
     display: flex;
     gap: 10px;
-}
-
-// Hide all menu sections by default
-#config-times,
-#start-list,
-#scores-round,
-#status,
-#round-details,
-#event-entries,
-#rounds,
-#courses,
-#player-categories,
-#event-status,
-#event-details {
-    display: none;
 }

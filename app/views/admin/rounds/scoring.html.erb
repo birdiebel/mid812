@@ -1,3 +1,4 @@
+<%= render "admin/rounds/menu", round: @round, current_page: :scoring %>
 <div class="panel">
   <h3><%= @round.event.name %> : round <%= @round.num %> on <%= @round.date %></h3>
   <div class="panel_contents">
@@ -115,26 +116,6 @@
 </div>
 <script>
   $(document).ready(function() {
-
-    // Focus on search input when scores section is visible
-      var searchInput = $('#search-team-num');
-      var scoresRound = $('#scores-round');
-
-      if (!window.location.hash) {
-          if ("#scores-status" == "partial") {
-            $this.css("background-color", "yellow");
-          }
-      }
-
-      // Hide all sections
-      $('#config-times, #status, #round-details').hide();
-
-      // Show only scores section
-      $('#scores-round').show();
-
-      // Update menu buttons
-      $('.menu-event-button').removeClass('is-active');
-      $('a[href="#scores-round"]').addClass('is-active');
 
     // Refresh button handler
     $('#refresh-scores-btn').on('click', function() {

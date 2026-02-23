@@ -8,3 +8,5 @@ Rails.application.config.dartsass.builds = {
   "start_lists.scss" => "start_lists.css",
   "pdf.scss" => "pdf.css"
 }
+
+Rails.application.config.dartsass.build_options = [ "--quiet-deps", "--silence-deprecation=import" ]

@@ -1,38 +1,40 @@
-<div id="event-status" style="display:none;">
-  <div class="panel">
-    <h3>Event Status</h3>
-    <div class="panel_contents">
-      <%= form_for [:admin, event.tour, event], html: { class: 'formtastic event' } do |f| %>
-        <fieldset class="inputs">
-          <legend><span>Change Event Status</span></legend>
-
-          <ol>
-            <li class="radio input optional" id="event_status_input">
-              <fieldset class="choices">
-                <legend class="label"><label>Status</label></legend>
-                <ol>
-                  <% Event.statuses.keys.each do |status_key| %>
-                    <li class="choice">
-                      <label for="event_status_<%= status_key %>">
-                        <%= f.radio_button :status, status_key, id: "event_status_#{status_key}" %>
-                        <%= status_key.titleize %>
-                      </label>
-                    </li>
-                  <% end %>
-                </ol>
-              </fieldset>
-            </li>
-          </ol>
-        </fieldset>
-
-        <fieldset class="actions">
-          <ol>
-            <li class="action input_action">
-              <%= f.submit "Update Status", class: "submit" %>
-            </li>
-          </ol>
-        </fieldset>
-      <% end %>
+<% if local_assigns[:external] %>
+  <div id="event-status">
+  <% else %>
+    <div id="event-status" style="display:none;">
+    <% end %>
+    <div class="panel">
+      <h3>Event Status</h3>
+      <div class="panel_contents">
+        <%= form_for [:admin, event.tour, event], html: { class: 'formtastic event' } do |f| %>
+          <fieldset class="inputs">
+            <legend><span>Change Event Status</span></legend>
+            <ol>
+              <li class="radio input optional" id="event_status_input">
+                <fieldset class="choices">
+                  <legend class="label"><label>Status</label></legend>
+                  <ol>
+                    <% Event.statuses.keys.each do |status_key| %>
+                      <li class="choice">
+                        <label for="event_status_<%= status_key %>">
+                          <%= f.radio_button :status, status_key, id: "event_status_#{status_key}" %>
+                          <%= status_key.titleize %>
+                        </label>
+                      </li>
+                    <% end %>
+                  </ol>
+                </fieldset>
+              </li>
+            </ol>
+          </fieldset>
+          <fieldset class="actions">
+            <ol>
+              <li class="action input_action">
+                <%= f.submit "Update Status", class: "submit" %>
+              </li>
+            </ol>
+          </fieldset>
+        <% end %>
+      </div>
     </div>
   </div>
-</div>

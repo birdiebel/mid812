@@ -1,40 +1,41 @@
-<div id="status" class="section-box round-menu-section" hidden>
-  <div class="panel">
-    <h3>Status</h3>
-    <div class="panel_contents">
-      <%= form_for [:admin, round.event, round], html: { class: 'formtastic round' } do |f| %>
-        <fieldset class="inputs">
-          <legend><span>Change Round Status</span></legend>
-
-          <ol>
-            <li class="radio input optional" id="round_status_input">
-              <fieldset class="choices">
-                <legend class="label"><label>Status</label></legend>
-                <ol>
-                  <% Round.statuses.keys.each do |status_key| %>
-                    <li class="choice">
-                      <label for="round_status_<%= status_key %>">
-                        <%= f.radio_button :status, status_key, id: "round_status_#{status_key}" %>
-                        <%= status_key.titleize %>
-                      </label>
-                    </li>
-                  <% end %>
-                </ol>
-              </fieldset>
-            </li>
-          </ol>
-        </fieldset>
-
-        <fieldset class="actions">
-          <ol>
-            <li class="action input_action">
-              <%= f.submit "Update Status", class: "submit" %>
-            </li>
-          </ol>
-        </fieldset>
-      <% end %>
-
-      <p style="margin-top: 15px;"><strong>Total Entries:</strong> <%= round.event.entries.count %></p>
+<% if local_assigns[:external] %>
+  <div id="status" class="section-box round-menu-section">
+  <% else %>
+    <div id="status" class="section-box round-menu-section" hidden>
+    <% end %>
+    <div class="panel">
+      <h3>Status</h3>
+      <div class="panel_contents">
+        <%= form_for [:admin, round.event, round], html: { class: 'formtastic round' } do |f| %>
+          <fieldset class="inputs">
+            <legend><span>Change Round Status</span></legend>
+            <ol>
+              <li class="radio input optional" id="round_status_input">
+                <fieldset class="choices">
+                  <legend class="label"><label>Status</label></legend>
+                  <ol>
+                    <% Round.statuses.keys.each do |status_key| %>
+                      <li class="choice">
+                        <label for="round_status_<%= status_key %>">
+                          <%= f.radio_button :status, status_key, id: "round_status_#{status_key}" %>
+                          <%= status_key.titleize %>
+                        </label>
+                      </li>
+                    <% end %>
+                  </ol>
+                </fieldset>
+              </li>
+            </ol>
+          </fieldset>
+          <fieldset class="actions">
+            <ol>
+              <li class="action input_action">
+                <%= f.submit "Update Status", class: "submit" %>
+              </li>
+            </ol>
+          </fieldset>
+        <% end %>
+        <p style="margin-top: 15px;"><strong>Total Entries:</strong> <%= round.event.entries.count %></p>
+      </div>
     </div>
   </div>
-</div>

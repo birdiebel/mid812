@@ -1,18 +1,18 @@
+<% current_page = local_assigns.fetch(:current_page, :config_times).to_sym %>
 <div name="round-menu" class="button-group" style="margin-top: -30px; margin-bottom: -20px;">
-  <a href="#config-times" class="menu-button menu-event-button" data-target="#config-times">
-    Config Times
-  </a>
-  <%= link_to "Start List", start_list_admin_round_path(round), method: :get, class: "menu-button menu-event-button", style: "background-color: #43a047; color: white;" %>
-  <%= link_to "Scoring", "/admin/rounds/#{round.id}/scoring", method: :get, class: "menu-button menu-event-button", style: "background-color: #43a047; color: white;" %>
-  <a href="#round-details" class="menu-button menu-event-button" data-target="#round-details">
-    Round Details
-  </a>
-  <a href="#status" class="menu-button menu-event-button menu-button-status" data-target="#status">
-    <%= round.status.upcase %>
-  </a>
+  <%= link_to "Config Times", config_times_admin_round_path(round), class: "menu-button#{' is-active' if current_page == :config_times}" %>
+  <%= link_to "Start List",
+              start_list_admin_round_path(round),
+              method: :get,
+              class: "menu-button#{' is-active' if current_page == :start_list}",
+              style: "background-color: #43a047; color: white;" %>
+  <%= link_to "Scoring",
+              scoring_admin_round_path(round),
+              method: :get,
+              class: "menu-button#{' is-active' if current_page == :scoring}",
+              style: "background-color: #43a047; color: white;" %>
+  <%= link_to "Round Details", round_details_admin_round_path(round), class: "menu-button#{' is-active' if current_page == :round_details}" %>
+  <%= link_to round.status.upcase,
+              round_status_admin_round_path(round),
+              class: "menu-button menu-button-status#{' is-active' if current_page == :round_status}" %>
 </div>
-<style>
-  .round-menu-section {
-    display: none;
-  }
-</style>

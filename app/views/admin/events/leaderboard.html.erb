@@ -1,6 +1,4 @@
 <div id="ldb-external-page">
-  <div style="margin-bottom: 10px;">
-    <%= link_to "← Back to Event", admin_tour_event_path(@event.tour, @event), class: "btt btt-close" %>
-  </div>
+  <%= render "admin/events/menu", event: @event, current_page: :leaderboard %>
   <%= render "admin/events/ldb", event: @event %>
 </div>

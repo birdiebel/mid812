@@ -1,3 +1,4 @@
+<%= render "admin/rounds/menu", round: @round, current_page: :start_list %>
 <div class="panel">
   <h3><%= @round.event.name %> : round <%= @round.num %> on <%= @round.date %></h3>
   <div class="panel_contents">
@@ -7,11 +8,9 @@
       </button>
       <%= button_to "Close", "/admin/rounds/#{@round.id}", method: :get, style: "padding: 8px 16px; font-size: 1em; cursor: pointer; background-color: darkred; color: white; border: none; border-radius: 4px;" %>
     </div>
-
     <%= render "admin/rounds/start_list_content", round: @round %>
   </div>
 </div>
-
 <script>
   $(document).ready(function() {
     $('#refresh-start-list-btn').on('click', function() {
