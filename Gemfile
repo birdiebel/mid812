@@ -71,7 +71,7 @@ end
 
 gem "dartsass-rails", "0.5.1"
 gem "activeadmin"
-gem "devise", "~> 4.0"
+gem "devise", "~> 5.0"
 gem "jquery-rails"
 gem "faker"
 gem "amoeba"
