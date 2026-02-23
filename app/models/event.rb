@@ -204,6 +204,10 @@ class Event < ApplicationRecord
     entries.where.not(status: :refused).count
   end
 
+  def teams_valid
+    teams.where.not(status: :refused).count
+  end
+
   def at_least_one_resultcat
     if resultcats.empty? &&
          (!@resultcats_ids_to_sync || @resultcats_ids_to_sync.empty?)

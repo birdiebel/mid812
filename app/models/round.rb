@@ -23,12 +23,12 @@ class Round < ApplicationRecord
   end
 
   def start_list_caution
-    if slots_taked < event.entries_valid
-      "<span class='is_red'>Start list may be incomplete (#{slots_taked} slots occupied for #{event.entries_valid} valid entries)</span>
+    if slots_taked < event.teams_valid
+      "<span class='is_red'>Start list may be incomplete (#{slots_taked} slots occupied for #{event.teams_valid} valid teams)</span>
       <br>
       <span class='is_red'>Review start list</span>".html_safe
     else
-      "<span class='is_green'>Start list looks complete (#{slots_taked} slots occupied for #{event.entries_valid} valid entries)</span>".html_safe
+      "<span class='is_green'>Start list looks complete (#{slots_taked} slots occupied for #{event.teams_valid} valid teams)</span>".html_safe
     end
   end
 

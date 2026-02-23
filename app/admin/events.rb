@@ -24,7 +24,7 @@ ActiveAdmin.register Event do
   menu false
   config.batch_actions = false
 
-  base_title = ->(event) { "Event: #{event.name}" }
+  base_title = ->(event) { "#{event.name}" }
   page_title = ->(event, section_name) { "#{base_title.call(event)} | #{section_name}" }
 
   action_item "Close", only: [ :show ] do

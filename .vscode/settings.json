@@ -7,7 +7,10 @@
   },
   "rubyLsp.formatter": "syntax_tree",
   "rubyLsp.rubyVersionManager": {
-    "identifier": "rbenv"
+    "identifier": "mise"
+  },
+  "files.associations": {
+    "/home/jp/.rbenv/**/lib/ruby/**/*.rb": "plaintext"
   },
   "[erb]": {
     "editor.defaultFormatter": "aliariff.vscode-erb-beautify",

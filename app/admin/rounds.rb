@@ -6,7 +6,7 @@ ActiveAdmin.register Round do
   menu false
   config.batch_actions = false
 
-  base_title = ->(round) { "Round: #{round.event.name} ##{round.num}" }
+  base_title = ->(round) { "#{round.event.name} round : #{round.num}" }
   page_title = ->(round, section_name) { "#{base_title.call(round)} | #{section_name}" }
 
   action_item "Close", only: [ :show ] do
