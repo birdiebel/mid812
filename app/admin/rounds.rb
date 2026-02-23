@@ -6,6 +6,9 @@ ActiveAdmin.register Round do
   menu false
   config.batch_actions = false
 
+  base_title = ->(round) { "Round: #{round.event.name} ##{round.num}" }
+  page_title = ->(round, section_name) { "#{base_title.call(round)} | #{section_name}" }
+
   action_item "Close", only: [ :show ] do
     link_to "Close", rounds_admin_tour_event_path(resource.event.tour, resource.event)
   end
@@ -16,18 +19,22 @@ ActiveAdmin.register Round do
 
   member_action :config_times, method: :get do
     @round = Round.find(params[:id])
+    @page_title = page_title.call(@round, "Config Times")
   end
 
   member_action :round_details, method: :get do
     @round = Round.find(params[:id])
+    @page_title = page_title.call(@round, "Details")
   end
 
   member_action :round_status, method: :get do
     @round = Round.find(params[:id])
+    @page_title = page_title.call(@round, "Status")
   end
 
   member_action :scoring, method: :get do
     @round = Round.find(params[:id])
+    @page_title = page_title.call(@round, "Scoring")
     @round.ensure_scores_for_scoring!
     @slots = @round.scoring_slots
 
@@ -47,6 +54,7 @@ ActiveAdmin.register Round do
 
   member_action :start_list, method: :get do
     @round = Round.find(params[:id])
+    @page_title = page_title.call(@round, "Start List")
   end
 
   member_action :pdf_start_list, method: :get do

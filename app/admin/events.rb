@@ -24,6 +24,9 @@ ActiveAdmin.register Event do
   menu false
   config.batch_actions = false
 
+  base_title = ->(event) { "Event: #{event.name}" }
+  page_title = ->(event, section_name) { "#{base_title.call(event)} | #{section_name}" }
+
   action_item "Close", only: [ :show ] do
     link_to "Close", admin_tour_path(resource.tour_id)
   end
@@ -38,30 +41,37 @@ ActiveAdmin.register Event do
 
   member_action :leaderboard, method: :get do
     @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Leaderboard")
   end
 
   member_action :entries, method: :get do
     @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Entries")
   end
 
   member_action :rounds, method: :get do
     @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Rounds")
   end
 
   member_action :player_categories, method: :get do
     @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Player Categories")
   end
 
   member_action :courses, method: :get do
     @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Courses")
   end
 
   member_action :event_details, method: :get do
     @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Details")
   end
 
   member_action :event_status, method: :get do
     @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Status")
   end
 
   filter :name_cont, as: :string, label: "Name"
