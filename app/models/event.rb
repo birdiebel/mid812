@@ -115,8 +115,9 @@ class Event < ApplicationRecord
           net_total = net_by_round.values.sum
           stb_total = stb_by_round.values.sum
           par_total = par_by_round.values.sum
-          diff_par =
-            diff_by_round.values.any?(&:nil?) ? nil : diff_by_round.values.sum
+          # diff_par =
+          #   diff_by_round.values.any?(&:nil?) ? nil : diff_by_round.values.sum
+          diff_par = brut_total - par_total
 
           team_hole_played = team.round_hole_played(running_rounds.id)
 
