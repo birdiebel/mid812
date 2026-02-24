@@ -7,11 +7,10 @@ ActiveAdmin.register Tour do
 
   includes :events
 
-  action_item "Close", only: [ :show ] do
-    link_to "Close", admin_tours_path
-  end
-
   filter :name_cont, as: :string, label: "Name"
+
+  # Remove the buttons from the show page
+  config.action_items.delete_if { |item| item.display_on?(:show) }
 
   member_action :copyevent, method: :post do
     event = Event.find(params[:id])
@@ -49,48 +48,10 @@ ActiveAdmin.register Tour do
     end
   end
 
-  # show do
-  #   panel "Events" do
-  #     div do
-  #       button_to "Add event", new_admin_tour_event_path(tour_id: resource.id), method: :get
-  #     end
-
-  #     table_for tour.events do
-  #       column "ID", :id
-  #       column "Name" do |event|
-  #         link_to event.name, admin_tour_event_path(tour, event), method: :get
-  #       end
-  #       column "Format", :format
-  #       column "Status" do |event|
-  #         event.status
-  #       end
-  #       column "date_event" do |event|
-  #         l(event.date_event, format: :short) if event.date_event
-  #       end
-  #       column "date_open" do |event|
-  #         l(event.date_open, format: :short) if event.date_open
-  #       end
-  #       column "date_close" do |event|
-  #         l(event.date_close, format: :short) if event.date_close
-  #       end
-  #       column "nb_rounds" do |event|
-  #         event.nb_rounds
-  #       end
-  #       column "" do |event|
-  #         form_for [ :admin, event ], url: copyevent_admin_tour_path(event), method: :post do |f|
-  #           # f.submit "Copy Event", class: "btt btt-edit"
-  #           f.submit "Copy", button_html: { class: "submit-button", style: "background-color: blue;" }
-  #         end
-  #       end
-  #       column "" do |event|
-  #         button_to "Edit", edit_admin_tour_event_path(tour, event), method: :get, class: "btt btt-edit"
-  #       end
-  #     end
-  #   end
-  #   default_main_content
-  # end
-
   show do
+    div do
+      render partial: "menu", locals: { tour: tour }
+    end
     columns do
       column do
         panel "Events" do

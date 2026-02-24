@@ -15,4 +15,6 @@
   <%= link_to round.status.upcase,
               round_status_admin_round_path(round),
               class: "menu-button menu-button-status#{' is-active' if current_page == :round_status}" %>
+  <%= link_to "Close", rounds_admin_tour_event_path(round.event.tour, round.event),
+              class: "menu-button btt-close" %>
 </div>

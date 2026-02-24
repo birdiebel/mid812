@@ -9,4 +9,5 @@
   <%= link_to event.status.upcase,
               event_status_admin_tour_event_path(event.tour, event),
               class: "menu-button menu-button-status#{' is-active' if current_page == :event_status}" %>
+  <%= link_to "Close", admin_tour_path(event.tour), class: "menu-button btt-close" %>
 </div>
