@@ -20,11 +20,11 @@
     <% end %>
     <%# Row lbd %>
     <% event_teams&.each do |row| %>
-      <tr>
+      <tr class="team-row">
         <%# Position %>
         <td><%= row[:position] %></td>
         <%# Team Name %>
-        <td style="text-align: left; font-weight: bold;"><%= row[:team].team_name_short %></td>
+        <td style="text-align: left; font-weight: bold;" class="team-name"><%= row[:team].team_name_short %></td>
         <%# Holes Played %>
         <td><%= row[:team_hole_played] > 0 ? row[:team_hole_played] : "" %></td>
         <%# Each Round : score or start time %>

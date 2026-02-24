@@ -1,8 +1,11 @@
 <div id="ldb">
   <div class="panel">
-    <h3>Rounds</h3>
+    <h3>Leaderboard</h3>
     <div class="panel_contents">
       <% if event.entries.exists? %>
+        <div style="margin-bottom: 15px; display: flex; gap: 10px; align-items: center;">
+          <input type="text" id="search-team-name" placeholder="Search team ..." style="padding: 8px;  font-size: 1em;" autocomplete="off">
+        </div>
         <%# Boucle sur les catégories de résultats avec des équipes %>
         <% resultcat_ids_with_teams = event.teams.where(status: :enter).select(:resultcat_id) %>
         <% event.resultcats.where(id: resultcat_ids_with_teams).order(priority: :asc).each do |r| %>
@@ -19,6 +22,21 @@
     </div>
   </div>
 </div>
+<script>
+  $(document).ready(function() {
+    $('#search-team-name').on('input', function() {
+      var searchTerm = $(this).val().toLowerCase();
+      $('#ldb .team-row').each(function() {
+        var teamName = $(this).find('.team-name').text().toLowerCase();
+        if (teamName.includes(searchTerm)) {
+          $(this).show();
+        } else {
+          $(this).hide();
+        }
+      });
+    });
+  });
+</script>
 <script>
   (function($) {
     function isLdbPage() {

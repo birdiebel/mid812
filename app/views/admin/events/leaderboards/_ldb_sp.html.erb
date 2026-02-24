@@ -23,11 +23,11 @@
     <% end %>
     <%# Row lbd %>
     <% event_teams&.each do |row| %>
-      <tr>
+      <tr class="team-row">
         <%# Position %>
         <td><%= row[:position] %></td>
         <%# Team Name %>
-        <td style="text-align: left; font-weight: bold;"><%= row[:team].team_name_short %></td>
+        <td style="text-align: left; font-weight: bold;" class="team-name"><%= row[:team].team_name_short %></td>
         <%# Against Par %>
         <td>
           <%= row[:diff_par] && row[:par_total] > 0 ? against_par_badge(row[:diff_par], row[:par_total]) : "" %>
