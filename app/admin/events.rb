@@ -39,6 +39,11 @@ ActiveAdmin.register Event do
     link_to "Close", admin_tour_path(resource.tour_id)
   end
 
+  member_action :event_dashboard, method: :get do
+    @event = Event.find(params[:id])
+    @page_title = page_title.call(@event, "Dashboard")
+  end
+
   member_action :leaderboard, method: :get do
     @event = Event.find(params[:id])
     @page_title = page_title.call(@event, "Leaderboard")

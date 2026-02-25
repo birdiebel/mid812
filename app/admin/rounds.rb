@@ -10,11 +10,11 @@ ActiveAdmin.register Round do
   page_title = ->(round, section_name) { "#{base_title.call(round)} | #{section_name}" }
 
   action_item "Close", only: [ :show ] do
-    link_to "Close", rounds_admin_tour_event_path(resource.event.tour, resource.event)
+    link_to "Close", event_dashboard_admin_tour_event_path(resource.event.tour, resource.event)
   end
 
   action_item "Close", only: [ :config_times, :round_details, :round_status, :start_list, :scoring ] do
-    link_to "Close", rounds_admin_tour_event_path(resource.event.tour, resource.event)
+    link_to "Close", event_dashboard_admin_tour_event_path(resource.event.tour, resource.event)
   end
 
   member_action :config_times, method: :get do

@@ -1,0 +1,11 @@
+<div>
+  <div class="flex-start">
+    <div><strong>Status:</strong> <%= event.status.upcase %></div>
+  </div>
+  <div class="flex-start">
+    <div><strong>Team:</strong> <%= event.teams.count %></div>
+    <div><strong>[ Enter:</strong> <%= event.teams.where(status: 'enter').count %> / </div>
+    <div><strong>Disqualified:</strong> <%= event.teams.where.not(status: 'enter').count %> ]</div>
+  </div>
+  <div><strong>Can Result:</strong> <%= event.can_result ? "Yes" : "No" %></div>
+</div>

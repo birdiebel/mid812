@@ -7,13 +7,7 @@
     </h4>
     <div>
       <% if event.status.in?(["running"]) %>
-        <%= link_to "Open", admin_tour_event_path(event.tour, event, page: "ldb"), class: "btt btt-open" %>
-      <% end %>
-      <% if event.status.in?(["online", "registration", "waiting"]) %>
-        <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "event-entries" ), class: "btt btt-open" %>
-      <% end %>
-      <% if event.status.in?(["created"]) %>
-        <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "rounds" ), class: "btt btt-open" %>
+        <%= link_to "Open", leaderboard_admin_tour_event_path(event.tour, event), class: "btt btt-open" %>
       <% end %>
     </div>
   </div>
@@ -23,16 +17,9 @@
       <div class="flex-between" style="border-bottom: 1px solid lightgrey;">
         <h5 style="margin: 5px; padding: 5px;">Round <%= round.num %> - <%= round.status.upcase %></h5>
         <div>
-          <% if round.status=="created" %>
-            <%= link_to "Config teetimes" ,admin_round_path(round, page: "config_teetimes" ), class: "btt btt-config-teetimes" %>
-          <% end %>
-          <% if round.status=="pending" %>
-            <%= link_to "Start List" , start_list_admin_round_path(round), class: "btt btt-start-list" %>
-          <% end %>
           <% if round.status == "running" %>
             <%= link_to "Scoring" , scoring_admin_round_path(round), class: "btt btt-scoring" %>
           <% end %>
-          <%= link_to "Open", admin_round_path(round), class: "btt btt-edit" %>
         </div>
       </div>
     <% end %>

@@ -1,0 +1,36 @@
+<div style="margin-left: 20px;">
+  <% if event.rounds.any? %>
+    <% event.rounds.each do |round| %>
+      <div>
+        <div class="flex-start">
+          <div><strong>Round <%= round.num %>:</strong> <%= round.status.upcase %></div>
+          <div><strong>Date:</strong> <%= round.date %></div>
+          <div><strong>HCP %:</strong> <%= round.hcp_pc %></div>
+          <div><strong>Slots Occupied:</strong> <%= round.slots_taked %></div>
+          <% if round.status == "running" %>
+            <div><%= link_to "Open", scoring_admin_round_path(round), method: :get, class: "btt btt-edit" %></div>
+          <% elsif round.status == "pending" %>
+            <div><%= link_to "Open", start_list_admin_round_path(round), method: :get, class: "btt btt-edit" %></div>
+          <% else %>
+            <div><%= link_to "Open", config_times_admin_round_path(round), method: :get, class: "btt btt-edit" %></div>
+          <% end%>
+        </div>
+        <div class="flex-start" style="padding-left: 20px;">
+          <% if round.config_teetimes.any? %>
+            <% round.config_teetimes.each do |config_teetime| %>
+              <div><strong>Config Teetime:</strong> <%= config_teetime.start_time&.strftime("%H:%M") %></div>
+              <div><strong>Start Hole:</strong> <%= config_teetime.start_hole %></div>
+            <% end %>
+          <% else %>
+            <div class="is_red">No config teetimes for this round.</div>
+            <div><%= link_to "Manage Config Teetimes", config_times_admin_round_path(round), class: "btt btt-add" %></div>
+          <% end %>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="flex-start">
+        <p class="is_red">No rounds available.</p>
+        <p><%= link_to "Manage Rounds", rounds_admin_tour_event_path(event.tour, event), class: "btt btt-add" %></p>
+      </div>
+    <% end %>
+  </div>

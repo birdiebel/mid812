@@ -14,6 +14,13 @@
 // Overriding any non-variable Sass must be done after the fact.
 // For example, to change the default status-tag color:
 //
+.flex-start {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 5px 0 !important;
+    gap: 10px;
+}
 
 .flex-between {
     display: flex;

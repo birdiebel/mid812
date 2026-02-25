@@ -1,19 +1,16 @@
 <% Event.where(status: ["online", "registration"]).each do |event| %>
   <!-- Event -->
   <div class="flex-between" style="background-color: lightyellow; border-bottom: 1px solid lightgrey;">
-    <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @ 
+    <h4 style="margin: 5px; padding: 5px;"><span style="font-weight: bold;"><%= event.name %></span> @
       <%= event.date_event&.strftime("%A %d-%b-%Y") %> |
       <%= event.tour.name %>
     </h4>
     <div>
       <% if event.status == "online" %>
-        <%= link_to "Open", admin_tour_event_path(event.tour, event, page: "ldb"), class: "btt btt-open" %>
+        <%= link_to "Open", event_dashboard_admin_tour_event_path(event.tour, event), class: "btt btt-open" %>
       <% end %>
       <% if event.status=="registration" %>
-        <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "event-entries" ), class: "btt btt-open" %>
-      <% end %>
-      <% if event.status == "created" || event.status == "pending" %>
-        <%= link_to "Open" , admin_tour_event_path(event.tour, event, page: "rounds" ), class: "btt btt-open" %>
+        <%= link_to "Open" , entries_admin_tour_event_path(event.tour, event ), class: "btt btt-open" %>
       <% end %>
     </div>
   </div>

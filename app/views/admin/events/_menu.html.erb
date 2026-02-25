@@ -1,5 +1,6 @@
 <% current_page = local_assigns.fetch(:current_page, :entries).to_sym %>
 <div name="event-menu" class="button-group" style="margin-top: -30px; margin-bottom: -20px;">
+  <%= link_to "Dashboard", event_dashboard_admin_tour_event_path(event.tour, event), class: "menu-button#{' is-active' if current_page == :event_dashboard}" %>
   <%= link_to "Entries", entries_admin_tour_event_path(event.tour, event), class: "menu-button#{' is-active' if current_page == :entries}" %>
   <%= link_to "Rounds", rounds_admin_tour_event_path(event.tour, event), class: "menu-button#{' is-active' if current_page == :rounds}" %>
   <%= link_to "Leaderboard", leaderboard_admin_tour_event_path(event.tour, event), class: "menu-button#{' is-active' if current_page == :leaderboard}" %>

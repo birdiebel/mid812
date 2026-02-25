@@ -6,9 +6,11 @@
     <div class="panel">
       <h3>Rounds</h3>
       <div class="panel_contents">
-        <div style="margin-bottom: 15px;">
-          <%= link_to "Add Round", new_admin_round_path(round: { event_id: event.id }), class: "button" %>
-        </div>
+        <% if event.nb_rounds > event.rounds.count %>
+          <div style="margin-bottom: 15px;">
+            <%= link_to "Add Round", new_admin_round_path(round: { event_id: event.id }), class: "button" %>
+          </div>
+        <% end %>
         <% if event.rounds.any? %>
           <table class="index_table">
             <thead>

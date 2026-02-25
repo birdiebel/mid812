@@ -1,0 +1,14 @@
+<div id="event-details-external-page">
+  <%= render "admin/events/menu", event: @event, current_page: :event_dashboard %>
+  <div class="panel">
+    <% event = @event %>
+    <h3>Dashboard</h3>
+    <div class="panel_contents">
+      <%# Event %>
+      <h3 style="background-color: darkgrey; color: white; padding: 5px;"><b>Event</b></h3>
+      <%= render "admin/events/dashboard/event", event: @event %>
+      <%# Rounds %>
+      <h3 style="background-color: darkgrey; color: white; padding: 5px;"><b>Rounds</b></h3>
+      <%= render "admin/events/dashboard/rounds", event: @event %>
+    </div>
+  </div>
