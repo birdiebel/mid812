@@ -287,6 +287,21 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_18_000002) do
     t.index ["team_id"], name: "index_slots_on_team_id"
   end
 
+  create_table "team_results", force: :cascade do |t|
+    t.integer "brut"
+    t.datetime "created_at", null: false
+    t.bigint "event_id", null: false
+    t.integer "net"
+    t.integer "par"
+    t.integer "points"
+    t.integer "position"
+    t.integer "stb"
+    t.bigint "team_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id"], name: "index_team_results_on_event_id"
+    t.index ["team_id"], name: "index_team_results_on_team_id"
+  end
+
   create_table "team_scores", force: :cascade do |t|
     t.string "brut_str"
     t.integer "brut_total", default: 0
@@ -390,6 +405,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_02_18_000002) do
   add_foreign_key "scores", "teams"
   add_foreign_key "slots", "flights"
   add_foreign_key "slots", "teams"
+  add_foreign_key "team_results", "events"
+  add_foreign_key "team_results", "teams"
   add_foreign_key "team_scores", "rounds"
   add_foreign_key "team_scores", "teams"
   add_foreign_key "teams", "events"

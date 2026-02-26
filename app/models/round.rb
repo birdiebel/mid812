@@ -4,7 +4,7 @@ class Round < ApplicationRecord
   has_many :flights, through: :config_teetimes
   has_many :slots, through: :flights
   has_many :scores, dependent: :destroy
-
+  has_many :team_scores, dependent: :destroy
   # Jp
   has_one :course, through: :config_teetimes
 

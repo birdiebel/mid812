@@ -1,0 +1,72 @@
+<div class="panel">
+  <h3>Ajouter un joueur</h3>
+  <div class="panel_contents">
+    <div>
+      <form action="<%= entries_admin_tour_event_path(@event.tour, @event) rescue (local_assigns[:form_action] || request.path) %>" method="get">
+        <div style="display: flex; gap: 10px; align-items: center;">
+          <label>Recherche nom, prénom ou licence :</label>
+          <input type="text" name="player_search" value="<%= params[:player_search] %>" autocomplete="off">
+          <input type="hidden" name="event_id" value="<%= local_assigns[:event_id] || params[:event_id] %>">
+          <% if params[:team_id].present? %>
+            <input type="hidden" name="team_id" value="<%= params[:team_id] %>">
+            <span style="color: darkgreen; font-weight: bold;">Team sélectionnée : <%= Team.find(params[:team_id]).name rescue 'N/A' %></span>
+          <% end %>
+          <button type="submit">Rechercher</button>
+          <a href="<%= local_assigns[:form_action] || request.path %>" class="button">Effacer</a>
+        </div>
+      </form>
+    </div>
+    <div>
+      <% search = params[:player_search].to_s.strip %>
+      <% players = if search.present?
+        Player.left_joins(:licences)
+          .where("players.lastname ILIKE :query OR players.firstname ILIKE :query OR CONCAT(players.firstname, ' ', players.lastname) ILIKE :query OR licences.num ILIKE :query", query: "%#{search}%")
+          .where.not(id: Entry.where(event_id: local_assigns[:event_id] || params[:event_id]).select(:player_id))
+          .limit(15)
+      else
+        []
+      end %>
+      <h4 style="color: darkred;">Max 15 joueurs affichés — <%= players.size %> trouvés</h4>
+      <% if players.any? %>
+        <table>
+          <thead>
+            <tr>
+              <th>Cat</th>
+              <th>Nom complet</th>
+              <th>Genre</th>
+              <th>Licence</th>
+              <th>Club</th>
+              <th>Âge</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% players.each do |player| %>
+              <tr>
+                <td><%= player.icon_age_category %></td>
+                <td><%= player.full_name %></td>
+                <td><%= player.sexe %></td>
+                <td><%= player.my_licence %></td>
+                <td><%= player.my_club %></td>
+                <td><%= player.age %></td>
+                <td>
+                  <% if player.licences.exists? %>
+                    <% entry_params = { event_id: (local_assigns[:event_id] || params[:event_id]), player_id: player.id } %>
+                    <% if params[:team_id].present? %>
+                      <% entry_params[:team_id] = params[:team_id] %>
+                    <% end %>
+                    <%= link_to "Ajouter", admin_entries_path(entry: entry_params), method: :post, class: "button" %>
+                  <% else %>
+                    <span style="color: red;">Aucune licence</span>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      <% else %>
+        <div>Aucun joueur trouvé.</div>
+      <% end %>
+    </div>
+  </div>
+</div>

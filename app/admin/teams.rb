@@ -12,6 +12,12 @@ ActiveAdmin.register Team do
     column :num
     column :event
     column :name
+    column :status
+    column :team_results do |team|
+      team.team_results.map do |tr|
+        link_to "#{tr.resultcat.name} - Pos: #{tr.position} - Points: #{tr.points}", admin_team_result_path(tr)
+      end.join("<br>").html_safe
+    end
     column :resultcat.name
     column :status
     column "Total Age" do |team|

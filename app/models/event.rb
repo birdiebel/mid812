@@ -8,6 +8,23 @@ class Event < ApplicationRecord
   has_many :entries, dependent: :destroy
   has_many :rounds, dependent: :destroy
   has_many :teams, dependent: :destroy
+  has_many :team_results, dependent: :destroy
+
+    # Génère les TeamResults à la clôture de l'event
+    def close_and_generate_team_results
+      return unless status == "terminated"
+      leaderboard = teams_brut_totals_with_rounds
+      leaderboard.each do |row|
+        TeamResult.create!(event: self,
+                          team: row[:team],
+                          par: row[:par_total],
+                          brut: row[:brut_total],
+                          net: row[:net_total],
+                          stb: row[:stb_total],
+                          position: row[:position],
+                          points: 0) # points à calculer selon règles
+      end
+    end
 
   accepts_nested_attributes_for :event_playercats,
                                 allow_destroy: true,
