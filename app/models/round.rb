@@ -8,7 +8,7 @@ class Round < ApplicationRecord
   # Jp
   has_one :course, through: :config_teetimes
 
-  enum :status, [ :created, :pending, :running, :terminated, :suspended, :canceled ]
+  enum :status, { created: 0, pending: 1, running: 2, terminated: 3, suspended: 4, canceled: 5 }
 
   validates :hcp_pc, inclusion: { in: 0..100, message: "must be between 0 and 100" }
   validates :status, presence: true

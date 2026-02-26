@@ -1,0 +1,8 @@
+<%# Ce partial affiche le bouton Open selon le statut du round %>
+<% if round.status == "running" %>
+  <%= link_to "Open", scoring_admin_round_path(round), method: :get, class: "btt btt-edit" %>
+<% elsif round.status == "pending" %>
+  <%= link_to "Open", start_list_admin_round_path(round), method: :get, class: "btt btt-edit" %>
+<% else %>
+  <%= link_to "Open", config_times_admin_round_path(round), method: :get, class: "btt btt-edit" %>
+<% end %>

@@ -1,4 +1,10 @@
 Rails.application.routes.draw do
+  namespace :admin do
+    resources :events, only: []
+    patch "events/:id/update_status", to: "event_statuses#update", as: :event_update_status
+    patch "rounds/:id/update_status", to: "round_statuses#update", as: :round_update_status
+    get "rounds/:id/open_button", to: "rounds_open_button#show", as: :round_open_button
+  end
   mount ActionCable.server => "/cable"
 
   devise_for :users

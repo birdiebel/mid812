@@ -78,8 +78,7 @@ class Event < ApplicationRecord
     ]
   end
 
-  enum :status,
-       %i[created online registration waiting running terminated canceled]
+  enum :status, { created: 0, online: 1, registration: 2, waiting: 3, running: 4, terminated: 5, canceled: 6 }
   enum :format, %i[single team bigteam]
   enum :scoring, %i[stroke_play stableford]
 

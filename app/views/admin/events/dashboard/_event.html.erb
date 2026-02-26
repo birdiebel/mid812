@@ -1,11 +1,59 @@
 <div>
   <div class="flex-start">
-    <div><strong>Status:</strong> <%= event.status.upcase %></div>
+    <div>
+      <strong>Status:</strong>
+      <% Event.statuses.keys.each do |status_key| %>
+        <button
+          style="margin-right: 5px;"
+          data-status="<%= status_key %>"
+          data-event-id="<%= event.id %>"
+          class="event-status-btn btt <%= event.status == status_key ? 'btt-edit' : 'btt-add' %>"
+          <%= 'disabled' if event.status == status_key %>
+        >
+          <%= status_key.upcase %>
+        </button>
+      <% end %>
+      <span id="event-status-msg" style="margin-left: 10px; color: green;"></span>
+    </div>
   </div>
-  <div class="flex-start">
-    <div><strong>Team:</strong> <%= event.teams.count %></div>
-    <div><strong>[ Enter:</strong> <%= event.teams.where(status: 'enter').count %> / </div>
-    <div><strong>Disqualified:</strong> <%= event.teams.where.not(status: 'enter').count %> ]</div>
-  </div>
-  <div><strong>Can Result:</strong> <%= event.can_result ? "Yes" : "No" %></div>
 </div>
+<div class="flex-start">
+  <div><strong>Team:</strong> <%= event.teams.count %></div>
+  <div><strong>[ Enter:</strong> <%= event.teams.where(status: 'enter').count %> / </div>
+  <div><strong>Disqualified:</strong> <%= event.teams.where.not(status: 'enter').count %> ]</div>
+</div>
+<div><strong>Can Result:</strong> <%= event.can_result ? "Yes" : "No" %></div>
+</div>
+<%# Script Jquery %>
+<script>
+  $(function() {
+    $('.event-status-btn').on('click', function(e) {
+      e.preventDefault();
+      var $btn = $(this);
+      var status = $btn.data('status');
+      var eventId = $btn.data('event-id');
+      $.ajax({
+        url: '/admin/events/' + eventId + '/update_status',
+        type: 'PATCH',
+        contentType: 'application/json',
+        data: JSON.stringify({ status: status }),
+        headers: {
+          'X-CSRF-Token': $('meta[name="csrf-token"]').attr('content')
+        },
+        success: function(data) {
+          $('.event-status-btn').prop('disabled', false)
+            .removeClass('btt-edit').addClass('btt-add')
+            .css({ fontWeight: '', background: '' });
+          $btn.prop('disabled', true)
+            .removeClass('btt-add').addClass('btt-edit')
+            .css({ fontWeight: 'bold', background: '#b3e6b3' });
+          $('#event-status-msg').text('Status mis à jour : ' + status.toUpperCase());
+        },
+        error: function(xhr) {
+          var msg = 'Erreur : ' + (xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'inconnue');
+          $('#event-status-msg').text(msg);
+        }
+      });
+    });
+  });
+</script>
