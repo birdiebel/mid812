@@ -1,7 +1,7 @@
 <div>
   <div id="rounds-section">
     <% if event.rounds.any? %>
-      <% event.rounds.each do |round| %>
+      <% event.rounds.order(:num).each do |round| %>
         <div>
           <div class="flex-start" style="align-items: center; margin-bottom: 10px;">
             <div style="background-color: #fca4a4; padding: 5px;"><strong>Round <%= round.num %>:</strong></div>
