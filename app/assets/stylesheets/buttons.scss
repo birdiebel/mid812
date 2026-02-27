@@ -34,6 +34,12 @@
     background: darkred !important;
 }
 
+.btt-disabled {
+    background: #747474 !important;
+    color: #888 !important;
+    cursor: not-allowed !important;
+}
+
 .btt-close {
     color: #ffffff !important;
     background: black !important;

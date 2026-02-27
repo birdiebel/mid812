@@ -5,10 +5,14 @@
     <h3>Dashboard</h3>
     <div class="panel_contents">
       <%# Event %>
-      <h3 style="background-color: darkgrey; color: white; padding: 5px;"><b>Event</b></h3>
-      <%= render "admin/events/dashboard/event", event: @event %>
+      <div>
+        <h3 style="background-color: lightgrey; padding: 5px;"><b>Event</b></h3>
+        <%= render "admin/events/dashboard/event", event: @event %>
+      </div>
       <%# Rounds %>
-      <h3 style="background-color: darkgrey; color: white; padding: 5px;"><b>Rounds</b></h3>
-      <%= render "admin/events/dashboard/rounds", event: @event %>
+      <div>
+        <h3 style="background-color: lightgrey; padding: 5px;"><b>Rounds</b></h3>
+        <%= render "admin/events/dashboard/rounds", event: @event %>
+      </div>
     </div>
   </div>

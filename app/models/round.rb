@@ -18,18 +18,40 @@ class Round < ApplicationRecord
     date.strftime("%d/%m/%Y")
   end
 
+  def teams_scoring_completed
+    team_scores.where(status: :completed).count
+  end
+
+  def teams_scoring_caution
+    valid = false
+    txt = ""
+    if teams_scoring_completed < event.teams_valid
+      valid = false
+      txt = "<span class='is_red'>Scoring may be incomplete (#{teams_scoring_completed} teams scored for #{event.teams_valid} valid teams)</span>".html_safe
+    else
+      valid = true
+      txt = "<span class='is_green'>Scoring looks complete (#{teams_scoring_completed} teams scored for #{event.teams_valid} valid teams)</span>".html_safe
+    end
+    [ txt, valid ]
+  end
+
   def slots_taked
     config_teetimes.joins(flights: :slots).where.not(slots: { team_id: nil }).count
   end
 
   def start_list_caution
+    valid = false
+    txt = ""
     if slots_taked < event.teams_valid
-      "<span class='is_red'>Start list may be incomplete (#{slots_taked} slots occupied for #{event.teams_valid} valid teams)</span>
+      valid = false
+      txt = "<span class='is_red'>Start list may be incomplete (#{slots_taked} slots occupied for #{event.teams_valid} valid teams)</span>
       <br>
       <span class='is_red'>Review start list</span>".html_safe
     else
-      "<span class='is_green'>Start list looks complete (#{slots_taked} slots occupied for #{event.teams_valid} valid teams)</span>".html_safe
+      txt = "<span class='is_green'>Start list looks complete (#{slots_taked} slots occupied for #{event.teams_valid} valid teams)</span>".html_safe
+      valid = true
     end
+    [ txt, valid ]
   end
 
   def scoring_slots
