@@ -89,9 +89,17 @@ class Event < ApplicationRecord
   end
 
   def can_result
+    valid = false
+    txt = ""
     r_terminated = rounds.where(status: "terminated").count
     r_total = rounds.count
-    r_terminated == r_total && r_total > 0
+    valid = r_terminated == r_total
+      if valid
+        txt = "<span class='is_green'>Terminate possible : (#{r_terminated}/#{r_total} rounds terminated)</span>".html_safe
+      else
+        txt = "<span class='is_red'>Terminate event not yet possible : (#{r_terminated}/#{r_total} rounds terminated)</span>".html_safe
+      end
+    [ valid, txt ]
   end
 
   def my_playercats(licence)
