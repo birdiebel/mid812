@@ -231,6 +231,9 @@ class Event < ApplicationRecord
     if running_rounds.nil?
       running_rounds = self.rounds.where(status: "terminated").first
     end
+    if running_rounds.nil?
+      running_rounds = self.rounds.where(status: "suspended").first
+    end
 
     return [] if running_rounds.nil?
 
