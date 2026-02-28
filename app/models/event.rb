@@ -228,6 +228,9 @@ class Event < ApplicationRecord
       end
 
     running_rounds = self.rounds.where(status: "running").first
+    if running_rounds.nil?
+      running_rounds = self.rounds.where(status: "terminated").first
+    end
 
     return [] if running_rounds.nil?
 
