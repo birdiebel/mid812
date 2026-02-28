@@ -7,7 +7,9 @@
       <%# Event %>
       <div>
         <h3 style="background-color: lightgrey; padding: 5px;"><b>Event</b></h3>
-        <%= render "admin/events/dashboard/event", event: @event %>
+        <div id="event-section">
+          <%= render "admin/events/dashboard/event", event: @event %>
+        </div>
       </div>
       <%# Rounds %>
       <div>

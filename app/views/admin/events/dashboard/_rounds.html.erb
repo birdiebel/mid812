@@ -116,6 +116,13 @@
               $openBtnDiv.html(html);
             });
           }
+          // Refresh event-section
+          var eventId = $('#event-section .event-status-btn').first().data('event-id');
+          if (eventId) {
+            $.get('/admin/events/' + eventId + '/dashboard_event', function(html) {
+              $('#event-section').html(html);
+            });
+          }
         },
         error: function(xhr) {
           var msg = 'Erreur : ' + (xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : 'inconnue');

@@ -87,18 +87,52 @@ class Event < ApplicationRecord
     include_associations :playercats
     include_associations :resultcats
   end
+  def active_dashboard_buttons(button)
+    btn = button.is_a?(Array) ? button.first : button
+    # Si pas de round, on masque les boutons liés aux rounds
+    if rounds.empty?
+      hidden_buttons = [ "online", "registration", "waiting", "running", "terminated" ]
+      if hidden_buttons.include?(btn)
+        return "display: none;"
+      end
+    end
+
+    # Si pas de config_teetimes au round first, on masque les boutons liés à la gestion des rounds
+    first_round = rounds.first
+    if first_round && first_round.config_teetimes.empty?
+      hidden_buttons = [  "running", "terminated" ]
+      if hidden_buttons.include?(btn)
+        return "display: none;"
+      end
+    end
+    # Si aucun round not running, on masque les boutons
+    if rounds.where(status: [ Round.statuses["running"], Round.statuses["terminated"] ]).empty?
+      hidden_buttons = [ "running", "terminated" ]
+      if hidden_buttons.include?(btn)
+        return "display: none;"
+      end
+    end
+    # Check if can_result is valid, if not hide terminated button
+    can_result_valid = can_result[0]
+    if !can_result_valid && btn == "terminated"
+      return "display: none;"
+    else
+      return ""
+    end
+    ""
+  end
 
   def can_result
     valid = false
     txt = ""
-    r_terminated = rounds.where(status: "terminated").count
+    r_terminated = rounds.where(status: [ Round.statuses["terminated"], Round.statuses["canceled"] ]).count
     r_total = rounds.count
     valid = r_terminated == r_total
-      if valid
-        txt = "<span class='is_green'>Terminate possible : (#{r_terminated}/#{r_total} rounds terminated)</span>".html_safe
-      else
-        txt = "<span class='is_red'>Terminate event not yet possible : (#{r_terminated}/#{r_total} rounds terminated)</span>".html_safe
-      end
+    if valid
+      txt = "<span class='is_green'>Terminate possible : (#{r_terminated}/#{r_total} rounds terminated)</span>".html_safe
+    else
+      txt = "<span class='is_red'>Terminate event not yet possible : (#{r_terminated}/#{r_total} rounds terminated)</span>".html_safe
+    end
     [ valid, txt ]
   end
 

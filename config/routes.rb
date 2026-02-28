@@ -1,6 +1,6 @@
 Rails.application.routes.draw do
   namespace :admin do
-    resources :events, only: []
+    get "events/:id/dashboard_event", to: "dashboard_events#show", as: :event_dashboard_event
     patch "events/:id/update_status", to: "event_statuses#update", as: :event_update_status
     patch "rounds/:id/update_status", to: "round_statuses#update", as: :round_update_status
     get "rounds/:id/open_button", to: "rounds_open_button#show", as: :round_open_button
@@ -21,17 +21,6 @@ Rails.application.routes.draw do
   ActiveAdmin.routes(self)
   get "home/index"
   get "home/test_pdf", to: "home#test_pdf", defaults: { format: "pdf" }
-
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", :as => :rails_health_check
-
-  # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
-  # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-  # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-
-  # Defines the root path route ("/")
   root "home#index"
 end
